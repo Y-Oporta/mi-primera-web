@@ -3,12 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Datos</title>
+    <title>Panel de Administración</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: "Segoe UI", Arial, sans-serif;
             background: #f5f7fa;
             padding: 20px;
+        }
+
+        h1,
+        h2 {
+            margin-bottom: 10px;
         }
 
         .card {
@@ -22,12 +28,17 @@
         input,
         button {
             padding: 8px;
-            margin-right: 5px;
+            margin: 5px 5px 5px 0;
+        }
+
+        button {
+            cursor: pointer;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 10px;
         }
 
         th,
@@ -40,15 +51,80 @@
             background: #f0f2f5;
         }
 
-        button {
-            cursor: pointer;
+        td button {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 600px) {
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            tr {
+                margin-bottom: 10px;
+            }
+
+            th,
+            td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+
+            th::before,
+            td::before {
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+            }
+
+            th:nth-of-type(1)::before {
+                content: "Nombre";
+            }
+
+            th:nth-of-type(2)::before {
+                content: "Email";
+            }
+
+            th:nth-of-type(3)::before {
+                content: "Fecha";
+            }
+
+            th:nth-of-type(4)::before {
+                content: "Acciones";
+            }
+
+            td:nth-of-type(1)::before {
+                content: "Nombre";
+            }
+
+            td:nth-of-type(2)::before {
+                content: "Email";
+            }
+
+            td:nth-of-type(3)::before {
+                content: "Fecha";
+            }
+
+            td:nth-of-type(4)::before {
+                content: "Acciones";
+            }
         }
     </style>
 </head>
 
 <body>
 
-    <h1>Panel de administración</h1>
+    <h1>Panel de Administración</h1>
 
     <div class="card">
         <h2>Formulario</h2>
@@ -61,9 +137,7 @@
 
     <div class="card">
         <h2>Datos</h2>
-
         <input type="text" id="buscar" placeholder="Buscar por nombre o email">
-
         <table>
             <thead>
                 <tr>

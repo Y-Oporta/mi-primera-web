@@ -5,11 +5,11 @@ import {
     addDoc,
     getDocs,
     doc,
-    deleteDoc,
-    updateDoc
+    updateDoc,
+    deleteDoc
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// 🔥 Firebase config
+// 🔥 Configuración Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCOkJxMjRnlONU7tVx9XGmKhnzLMR80SSQ",
     authDomain: "mi-primera-web-7daca.firebaseapp.com",
@@ -29,13 +29,16 @@ const buscarInput = document.getElementById("buscar");
 
 let datos = [];
 
-// ➕ Guardar
+// ➕ Guardar registro
 formulario.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const nombre = document.getElementById("nombre").value;
+    const email = document.getElementById("email").value;
+
     await addDoc(collection(db, "formularios"), {
-        nombre: nombre.value,
-        email: email.value,
+        nombre,
+        email,
         fecha: new Date()
     });
 
@@ -51,21 +54,29 @@ async function cargarDatos() {
     const snapshot = await getDocs(collection(db, "formularios"));
 
     snapshot.forEach((docSnap) => {
-        datos.push({
-            id: docSnap.id,
-            ...docSnap.data()
-        });
+        datos.push({ id: docSnap.id, ...docSnap.data() });
     });
 
     mostrarDatos(datos);
 }
 
-// 🖥️ Mostrar tabla (SIN onclick en HTML)
+// 🖥️ Mostrar tabla y crear botones dinámicos
 function mostrarDatos(lista) {
     tabla.innerHTML = "";
 
     lista.forEach((item) => {
         const fila = document.createElement("tr");
+
+        const tdNombre = document.createElement("td");
+        tdNombre.textContent = item.nombre;
+
+        const tdEmail = document.createElement("td");
+        tdEmail.textContent = item.email;
+
+        const tdFecha = document.createElement("td");
+        tdFecha.textContent = item.fecha?.toDate().toLocaleString() || "";
+
+        const tdAcciones = document.createElement("td");
 
         const btnEditar = document.createElement("button");
         btnEditar.textContent = "Editar";
@@ -75,22 +86,19 @@ function mostrarDatos(lista) {
         btnEliminar.textContent = "Eliminar";
         btnEliminar.addEventListener("click", () => eliminar(item.id));
 
-        fila.innerHTML = `
-            <td>${item.nombre}</td>
-            <td>${item.email}</td>
-            <td>${item.fecha?.toDate().toLocaleString()}</td>
-        `;
+        tdAcciones.appendChild(btnEditar);
+        tdAcciones.appendChild(btnEliminar);
 
-        const acciones = document.createElement("td");
-        acciones.appendChild(btnEditar);
-        acciones.appendChild(btnEliminar);
+        fila.appendChild(tdNombre);
+        fila.appendChild(tdEmail);
+        fila.appendChild(tdFecha);
+        fila.appendChild(tdAcciones);
 
-        fila.appendChild(acciones);
         tabla.appendChild(fila);
     });
 }
 
-// 🔍 Buscar
+// 🔍 Buscar en la tabla
 buscarInput.addEventListener("keyup", () => {
     const texto = buscarInput.value.toLowerCase();
     const filtrados = datos.filter(d =>
@@ -100,10 +108,9 @@ buscarInput.addEventListener("keyup", () => {
     mostrarDatos(filtrados);
 });
 
-// ✏️ Editar (AHORA SÍ FUNCIONA)
+// ✏️ Editar registro
 async function editar(id) {
     const registro = datos.find(d => d.id === id);
-
     const nuevoNombre = prompt("Nuevo nombre:", registro.nombre);
     const nuevoEmail = prompt("Nuevo email:", registro.email);
 
@@ -117,9 +124,9 @@ async function editar(id) {
     cargarDatos();
 }
 
-// 🗑️ Eliminar
+// 🗑️ Eliminar registro
 async function eliminar(id) {
-    if (!confirm("¿Eliminar este registro?")) return;
+    if (!confirm("¿Seguro que quieres eliminar este registro?")) return;
 
     await deleteDoc(doc(db, "formularios", id));
     cargarDatos();
@@ -128,4 +135,4 @@ async function eliminar(id) {
 // Inicial
 cargarDatos();
 
-console.log("Panel profesional cargado correctamente");
+console.log("Panel cargado correctamente (PC y móvil)");
