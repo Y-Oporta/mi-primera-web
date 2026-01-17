@@ -47,24 +47,22 @@ formulario.addEventListener("submit", async (e) => {
 async function cargarDatos() {
     tabla.innerHTML = "";
 
-    const q = query(
-        collection(db, "formularios"),
-        orderBy("fecha", "desc")
+    const querySnapshot = await getDocs(
+        collection(db, "formularios")
     );
-
-    const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
         const data = doc.data();
 
-        const fila = `
-            <tr>
-                <td>${data.nombre}</td>
-                <td>${data.email}</td>
-                <td>${data.fecha?.toDate().toLocaleString()}</td>
-            </tr>
+        const fila = document.createElement("tr");
+
+        fila.innerHTML = `
+            <td>${data.nombre}</td>
+            <td>${data.email}</td>
+            <td>${data.fecha ? data.fecha.toDate().toLocaleString() : ""}</td>
         `;
-        tabla.innerHTML += fila;
+
+        tabla.appendChild(fila);
     });
 }
 
