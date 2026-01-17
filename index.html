@@ -5,150 +5,355 @@
     <meta charset="UTF-8">
     <title>Panel de Administración</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel de administración para gestionar usuarios">
+
+    <!-- Agregar ícono -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+
+    <!-- Mejorar CSS con variables y organización -->
     <style>
-        body {
-            font-family: "Segoe UI", Arial, sans-serif;
-            background: #f5f7fa;
-            padding: 20px;
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+            --light-bg: #f5f7fa;
+            --white: #ffffff;
+            --border-color: #ddd;
+            --shadow: 0 4px 12px rgba(0, 0, 0, .1);
+            --radius: 8px;
         }
 
-        h1,
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--light-bg);
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
         h2 {
-            margin-bottom: 10px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
         }
 
         .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
-            margin-bottom: 20px;
+            background: var(--white);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
         }
 
-        input,
-        button {
-            padding: 8px;
-            margin: 5px 5px 5px 0;
+        .form-group {
+            margin-bottom: 15px;
         }
 
-        button {
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+            padding: 8px 16px;
+            margin-right: 8px;
+        }
+
+        .btn-delete {
+            background: var(--danger-color);
+            color: white;
+            padding: 8px 16px;
+        }
+
+        .btn-edit:hover,
+        .btn-delete:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-container input {
+            flex: 1;
+            max-width: 400px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         th {
-            background: #f0f2f5;
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
         }
 
-        td button {
-            margin-right: 5px;
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
         }
 
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .search-container input {
+                max-width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .actions button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        /* Mejoras específicas para móvil con grid */
         @media (max-width: 600px) {
+            .form-group {
+                display: grid;
+                gap: 10px;
+            }
 
-            table,
-            thead,
-            tbody,
-            th,
-            td,
-            tr {
+            input {
+                max-width: 100%;
+            }
+
+            table.responsive-table {
+                display: grid;
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius);
+            }
+
+            table.responsive-table thead {
+                display: none;
+            }
+
+            table.responsive-table tbody,
+            table.responsive-table tr {
                 display: block;
             }
 
-            tr {
-                margin-bottom: 10px;
+            table.responsive-table tr {
+                margin-bottom: 15px;
+                border-bottom: 2px solid var(--border-color);
+                padding: 15px;
             }
 
-            th,
-            td {
-                text-align: right;
-                padding-left: 50%;
-                position: relative;
+            table.responsive-table tr:last-child {
+                margin-bottom: 0;
+                border-bottom: none;
             }
 
-            th::before,
-            td::before {
-                position: absolute;
-                left: 10px;
-                width: 45%;
-                white-space: nowrap;
+            table.responsive-table td {
+                display: grid;
+                grid-template-columns: 1fr 2fr;
+                gap: 10px;
+                padding: 10px 0;
+                border-bottom: 1px solid #f0f0f0;
                 text-align: left;
+            }
+
+            table.responsive-table td:last-child {
+                border-bottom: none;
+            }
+
+            table.responsive-table td::before {
+                content: attr(data-label);
                 font-weight: bold;
+                color: var(--primary-color);
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
 
-            th:nth-of-type(1)::before {
-                content: "Nombre";
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
 
-            th:nth-of-type(2)::before {
-                content: "Email";
-            }
-
-            th:nth-of-type(3)::before {
-                content: "Fecha";
-            }
-
-            th:nth-of-type(4)::before {
-                content: "Acciones";
-            }
-
-            td:nth-of-type(1)::before {
-                content: "Nombre";
-            }
-
-            td:nth-of-type(2)::before {
-                content: "Email";
-            }
-
-            td:nth-of-type(3)::before {
-                content: "Fecha";
-            }
-
-            td:nth-of-type(4)::before {
-                content: "Acciones";
-            }
+        .card {
+            animation: fadeIn 0.5s ease-out;
         }
     </style>
 </head>
 
 <body>
+    <div class="container">
+        <h1>📊 Panel de Administración</h1>
 
-    <h1>Panel de Administración</h1>
+        <div class="card">
+            <h2>Agregar Nuevo Usuario</h2>
+            <form id="formulario">
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" placeholder="Ingrese el nombre" required>
+                </div>
 
-    <div class="card">
-        <h2>Formulario</h2>
-        <form id="formulario">
-            <input type="text" id="nombre" placeholder="Nombre" required>
-            <input type="email" id="email" placeholder="Email" required>
-            <button type="submit">Guardar</button>
-        </form>
-    </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" placeholder="correo@ejemplo.com" required>
+                </div>
 
-    <div class="card">
-        <h2>Datos</h2>
-        <input type="text" id="buscar" placeholder="Buscar por nombre o email">
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Fecha</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tabla-datos"></tbody>
-        </table>
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-text">Guardar usuario</span>
+                </button>
+                <div class="form-message" id="form-message"></div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Lista de Usuarios</h2>
+
+            <div class="search-container">
+                <input type="text" id="buscar" placeholder="Buscar por nombre o email...">
+                <button class="btn btn-primary" id="btn-limpiar-busqueda">Limpiar</button>
+            </div>
+
+            <div id="tabla-contenedor">
+                <table class="responsive-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Fecha de registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-datos">
+                        <tr id="loading-row">
+                            <td colspan="4" class="loading">
+                                Cargando datos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="script.js"></script>
