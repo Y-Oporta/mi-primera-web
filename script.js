@@ -3,9 +3,7 @@ import {
     getFirestore,
     collection,
     addDoc,
-    getDocs,
-    query,
-    orderBy
+    getDocs
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 // 🔥 Configuración Firebase
@@ -34,8 +32,8 @@ formulario.addEventListener("submit", async (e) => {
     const email = document.getElementById("email").value;
 
     await addDoc(collection(db, "formularios"), {
-        nombre,
-        email,
+        nombre: nombre,
+        email: email,
         fecha: new Date()
     });
 
@@ -43,22 +41,20 @@ formulario.addEventListener("submit", async (e) => {
     cargarDatos();
 });
 
-// 👉 MOSTRAR DATOS EN LA TABLA
+// 👉 CARGAR DATOS EN LA TABLA
 async function cargarDatos() {
     tabla.innerHTML = "";
 
-    const querySnapshot = await getDocs(
-        collection(db, "formularios")
-    );
+    const snapshot = await getDocs(collection(db, "formularios"));
 
-    querySnapshot.forEach((doc) => {
+    snapshot.forEach((doc) => {
         const data = doc.data();
 
         const fila = document.createElement("tr");
 
         fila.innerHTML = `
-            <td>${data.nombre}</td>
-            <td>${data.email}</td>
+            <td>${data.nombre || ""}</td>
+            <td>${data.email || ""}</td>
             <td>${data.fecha ? data.fecha.toDate().toLocaleString() : ""}</td>
         `;
 
@@ -68,3 +64,5 @@ async function cargarDatos() {
 
 // Cargar datos al abrir la página
 cargarDatos();
+
+console.log("Firebase conectado y leyendo datos");

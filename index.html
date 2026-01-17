@@ -3,28 +3,36 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Mi primera web con Firebase</title>
+    <title>Formulario con Firebase</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
         }
 
+        form {
+            margin-bottom: 20px;
+        }
+
+        input,
+        button {
+            padding: 8px;
+            margin-right: 5px;
+        }
+
         table {
-            border-collapse: collapse;
             width: 100%;
-            margin-top: 20px;
+            border-collapse: collapse;
         }
 
         th,
         td {
             border: 1px solid #ccc;
             padding: 8px;
-            text-align: left;
         }
 
         th {
-            background-color: #f4f4f4;
+            background: #f0f0f0;
         }
     </style>
 </head>
@@ -49,12 +57,11 @@
                 <th>Fecha</th>
             </tr>
         </thead>
-        <tbody id="tabla-datos">
-            <!-- Aquí se cargan los datos -->
-        </tbody>
+        <tbody id="tabla-datos"></tbody>
     </table>
 
     <script type="module" src="script.js"></script>
+
 </body>
 
 </html>
