@@ -12,201 +12,220 @@ import {
     orderBy
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// 🔐 IMPORTANTE: Las credenciales de Firebase deben estar en variables de entorno
-// Esto es solo para demostración. En producción usa environment variables.
+// 🔐 Configuración de Firebase (REEMPLAZAR CON TUS DATOS)
 const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_AUTH_DOMAIN",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_STORAGE_BUCKET",
-    messagingSenderId: "TU_SENDER_ID",
-    appId: "TU_APP_ID"
+    apiKey: "AIzaSyCOkJxMjRnlONU7tVx9XGmKhnzLMR80SSQ",
+    authDomain: "mi-primera-web-7daca.firebaseapp.com",
+    projectId: "mi-primera-web-7daca",
+    storageBucket: "mi-primera-web-7daca.firebasestorage.app",
+    messagingSenderId: "885845436483",
+    appId: "1:885845436483:web:47cdedbb2df999b38cccf6"
 };
 
-// Validación básica de configuración
-if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "TU_API_KEY") {
-    console.error("❌ Configuración de Firebase no válida");
-    mostrarError("Error de configuración. Contacta al administrador.");
-}
-
+// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Referencias a elementos del DOM
-const formulario = document.getElementById("formulario");
-const tabla = document.getElementById("tabla-datos");
-const buscarInput = document.getElementById("buscar");
-const btnLimpiarBusqueda = document.getElementById("btn-limpiar-busqueda");
-const formMessage = document.getElementById("form-message");
-const loadingRow = document.getElementById("loading-row");
+// Constantes
+const COLECCION = "usuarios";
+
+// Elementos del DOM
+const elementos = {
+    formulario: document.getElementById('formulario'),
+    tablaDatos: document.getElementById('tabla-datos'),
+    buscarInput: document.getElementById('buscar'),
+    btnRefresh: document.getElementById('btn-refresh'),
+    btnCancelar: document.getElementById('btn-cancelar'),
+    totalUsuarios: document.getElementById('total-usuarios'),
+    loadingRow: document.getElementById('loading-row'),
+    emptyState: document.getElementById('empty-state'),
+    messageContainer: document.getElementById('message-container')
+};
 
 // Estado de la aplicación
-let datos = [];
+let usuarios = [];
 let editandoId = null;
-const COLECCION = "usuarios"; // Nombre centralizado de la colección
 
-// 🔧 Utilidades
+// 🔧 Funciones utilitarias
 function mostrarMensaje(texto, tipo = 'success') {
-    formMessage.textContent = texto;
-    formMessage.className = `form-message ${tipo}`;
-    formMessage.style.display = 'block';
+    const mensaje = document.createElement('div');
+    mensaje.className = `message message-${tipo}`;
+    mensaje.innerHTML = `
+        <strong>${tipo === 'success' ? '✓' : tipo === 'error' ? '✗' : 'ℹ'}</strong>
+        <span>${texto}</span>
+    `;
+
+    elementos.messageContainer.appendChild(mensaje);
 
     setTimeout(() => {
-        formMessage.style.display = 'none';
+        mensaje.style.opacity = '0';
+        mensaje.style.transform = 'translateY(-10px)';
+        setTimeout(() => mensaje.remove(), 300);
     }, 3000);
 }
 
-function mostrarError(mensaje) {
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = `❌ Error: ${mensaje}`;
-    errorDiv.style.cssText = `
-        background: #ffebee;
-        color: #c62828;
-        padding: 15px;
-        margin: 15px 0;
-        border-radius: 4px;
-        border-left: 4px solid #c62828;
-    `;
+function formatearFecha(timestamp) {
+    if (!timestamp) return 'N/A';
 
-    document.querySelector('.container').prepend(errorDiv);
+    const fecha = timestamp.toDate();
+    const ahora = new Date();
+    const diffMs = ahora - fecha;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHoras = Math.floor(diffMin / 60);
+    const diffDias = Math.floor(diffHoras / 24);
 
-    setTimeout(() => errorDiv.remove(), 5000);
-}
+    if (diffDias === 0) {
+        if (diffHoras === 0) {
+            return `Hace ${diffMin} min`;
+        }
+        return `Hace ${diffHoras} h`;
+    } else if (diffDias === 1) {
+        return 'Ayer';
+    } else if (diffDias < 7) {
+        return `Hace ${diffDias} días`;
+    }
 
-function formatearFecha(fechaFirebase) {
-    if (!fechaFirebase) return 'Fecha no disponible';
-
-    const fecha = fechaFirebase.toDate();
     return fecha.toLocaleDateString('es-ES', {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
     });
 }
 
-// 📋 Cargar y mostrar datos
-async function cargarDatos() {
+function validarEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
+// 📊 Funciones de datos
+async function cargarUsuarios() {
     try {
-        if (loadingRow) {
-            loadingRow.innerHTML = '<td colspan="4" class="loading">Cargando datos...</td>';
-        }
+        elementos.loadingRow.style.display = 'table-row';
+        elementos.emptyState.style.display = 'none';
 
-        tabla.innerHTML = '';
-        datos = [];
-
-        const q = query(collection(db, COLECCION), orderBy("fecha", "desc"));
+        usuarios = [];
+        const q = query(collection(db, COLECCION), orderBy("fechaCreacion", "desc"));
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
-            tabla.innerHTML = `
-                <tr id="empty-row">
-                    <td colspan="4" class="empty-state">
-                        📭 No hay usuarios registrados todavía
-                    </td>
-                </tr>
-            `;
+            elementos.loadingRow.style.display = 'none';
+            elementos.emptyState.style.display = 'block';
+            actualizarContador(0);
             return;
         }
 
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
-            datos.push({
+            usuarios.push({
                 id: docSnap.id,
                 nombre: data.nombre || '',
                 email: data.email || '',
-                fecha: data.fecha
+                fechaCreacion: data.fechaCreacion || null,
+                fechaActualizacion: data.fechaActualizacion || null
             });
         });
 
-        mostrarDatos(datos);
+        mostrarUsuarios(usuarios);
+        actualizarContador(usuarios.length);
 
     } catch (error) {
-        console.error("Error cargando datos:", error);
-        mostrarError("No se pudieron cargar los datos");
-        tabla.innerHTML = `
-            <tr id="error-row">
-                <td colspan="4" style="color: #c62828; text-align: center; padding: 30px;">
-                    ❌ Error al cargar los datos
-                </td>
-            </tr>
-        `;
+        console.error('Error cargando usuarios:', error);
+        mostrarMensaje('Error al cargar los usuarios', 'error');
     } finally {
-        if (loadingRow) loadingRow.remove();
+        elementos.loadingRow.style.display = 'none';
     }
 }
 
-function mostrarDatos(lista) {
-    tabla.innerHTML = '';
+function mostrarUsuarios(lista) {
+    elementos.tablaDatos.innerHTML = '';
 
-    lista.forEach((item) => {
-        const fila = document.createElement("tr");
+    if (lista.length === 0) {
+        elementos.emptyState.style.display = 'block';
+        return;
+    }
 
-        // Agregar atributos para responsive
-        const celdas = [
-            { label: "Nombre", value: item.nombre, className: "nombre" },
-            { label: "Email", value: item.email, className: "email" },
-            { label: "Fecha de registro", value: formatearFecha(item.fecha), className: "fecha" }
-        ];
+    lista.forEach(usuario => {
+        const fila = document.createElement('tr');
 
-        celdas.forEach(celda => {
-            const td = document.createElement("td");
-            td.textContent = celda.value;
-            td.className = celda.className;
-            td.setAttribute('data-label', celda.label);
-            fila.appendChild(td);
-        });
+        fila.innerHTML = `
+            <td>
+                <strong>${usuario.nombre}</strong>
+            </td>
+            <td>
+                <a href="mailto:${usuario.email}" style="color: var(--primary); text-decoration: none;">
+                    ${usuario.email}
+                </a>
+            </td>
+            <td>
+                <span style="color: var(--success);">${formatearFecha(usuario.fechaCreacion)}</span>
+            </td>
+            <td>
+                <span style="color: var(--warning);">${formatearFecha(usuario.fechaActualizacion)}</span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <button type="button" class="btn-icon btn-edit" title="Editar usuario" data-id="${usuario.id}">
+                        <i class="icon-edit"></i>
+                    </button>
+                    <button type="button" class="btn-icon btn-delete" title="Eliminar usuario" data-id="${usuario.id}">
+                        <i class="icon-delete"></i>
+                    </button>
+                </div>
+            </td>
+        `;
 
-        // Celda de acciones
-        const tdAcciones = document.createElement("td");
-        tdAcciones.className = "actions";
-        tdAcciones.setAttribute('data-label', 'Acciones');
+        elementos.tablaDatos.appendChild(fila);
+    });
 
-        const btnEditar = document.createElement("button");
-        btnEditar.textContent = "✏️ Editar";
-        btnEditar.className = "btn btn-edit";
-        btnEditar.title = "Editar usuario";
-        btnEditar.addEventListener("click", () => prepararEdicion(item));
+    // Agregar event listeners a los botones
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', () => prepararEdicion(btn.dataset.id));
+    });
 
-        const btnEliminar = document.createElement("button");
-        btnEliminar.textContent = "🗑️ Eliminar";
-        btnEliminar.className = "btn btn-delete";
-        btnEliminar.title = "Eliminar usuario";
-        btnEliminar.addEventListener("click", () => confirmarEliminacion(item));
-
-        tdAcciones.appendChild(btnEditar);
-        tdAcciones.appendChild(btnEliminar);
-        fila.appendChild(tdAcciones);
-
-        // Agregar ID como atributo para referencia
-        fila.setAttribute('data-id', item.id);
-
-        tabla.appendChild(fila);
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', () => confirmarEliminacion(btn.dataset.id));
     });
 }
 
-// 📝 Manejo del formulario
-function prepararEdicion(item) {
-    editandoId = item.id;
-
-    document.getElementById("nombre").value = item.nombre;
-    document.getElementById("email").value = item.email;
-
-    const submitBtn = formulario.querySelector('button[type="submit"]');
-    submitBtn.innerHTML = '<span class="btn-text">Actualizar usuario</span>';
-
-    mostrarMensaje(`Editando usuario: ${item.nombre}`, 'info');
-    document.getElementById("nombre").focus();
+function actualizarContador(total) {
+    elementos.totalUsuarios.textContent = `${total} ${total === 1 ? 'usuario' : 'usuarios'}`;
 }
 
-async function guardarRegistro(e) {
+// 📝 Funciones del formulario
+function prepararEdicion(id) {
+    const usuario = usuarios.find(u => u.id === id);
+    if (!usuario) return;
+
+    editandoId = id;
+    document.getElementById('nombre').value = usuario.nombre;
+    document.getElementById('email').value = usuario.email;
+
+    const submitBtn = elementos.formulario.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="icon-save"></i> Actualizar Usuario';
+
+    elementos.btnCancelar.style.display = 'inline-flex';
+
+    mostrarMensaje(`Editando usuario: ${usuario.nombre}`, 'info');
+    document.getElementById('nombre').focus();
+}
+
+function cancelarEdicion() {
+    editandoId = null;
+    elementos.formulario.reset();
+
+    const submitBtn = elementos.formulario.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="icon-save"></i> Guardar Usuario';
+
+    elementos.btnCancelar.style.display = 'none';
+}
+
+async function guardarUsuario(e) {
     e.preventDefault();
 
-    const nombre = document.getElementById("nombre").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const submitBtn = formulario.querySelector('button[type="submit"]');
+    const nombre = document.getElementById('nombre').value.trim();
+    const email = document.getElementById('email').value.trim().toLowerCase();
 
     // Validaciones
     if (!nombre || !email) {
@@ -214,166 +233,166 @@ async function guardarRegistro(e) {
         return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!validarEmail(email)) {
         mostrarMensaje('Por favor ingresa un email válido', 'error');
         return;
     }
 
+    const submitBtn = elementos.formulario.querySelector('button[type="submit"]');
+    const btnOriginalText = submitBtn.innerHTML;
+
     try {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="btn-text">Guardando...</span>';
+        submitBtn.innerHTML = '<span>Procesando...</span>';
+
+        const datosUsuario = {
+            nombre,
+            email,
+            fechaActualizacion: serverTimestamp()
+        };
 
         if (editandoId) {
-            // Modo edición
-            await updateDoc(doc(db, COLECCION, editandoId), {
-                nombre,
-                email,
-                actualizado: serverTimestamp()
-            });
-
+            // Actualizar usuario existente
+            await updateDoc(doc(db, COLECCION, editandoId), datosUsuario);
             mostrarMensaje(`Usuario "${nombre}" actualizado correctamente`, 'success');
-            editandoId = null;
         } else {
-            // Nuevo registro
-            await addDoc(collection(db, COLECCION), {
-                nombre,
-                email,
-                fecha: serverTimestamp()
-            });
-
-            mostrarMensaje(`Usuario "${nombre}" creado correctamente`, 'success');
+            // Crear nuevo usuario
+            datosUsuario.fechaCreacion = serverTimestamp();
+            await addDoc(collection(db, COLECCION), datosUsuario);
+            mostrarMensaje(`Usuario "${nombre}" creado exitosamente`, 'success');
         }
 
-        formulario.reset();
-        cargarDatos();
+        // Limpiar formulario y recargar
+        cancelarEdicion();
+        await cargarUsuarios();
 
     } catch (error) {
-        console.error("Error guardando registro:", error);
-        mostrarError("Error al guardar el registro");
+        console.error('Error guardando usuario:', error);
+        mostrarMensaje('Error al guardar el usuario', 'error');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span class="btn-text">Guardar usuario</span>';
+        submitBtn.innerHTML = btnOriginalText;
     }
 }
 
 // 🔍 Funcionalidad de búsqueda
-function filtrarDatos() {
-    const texto = buscarInput.value.toLowerCase().trim();
+function buscarUsuarios() {
+    const termino = elementos.buscarInput.value.trim().toLowerCase();
 
-    if (!texto) {
-        mostrarDatos(datos);
+    if (!termino) {
+        mostrarUsuarios(usuarios);
+        actualizarContador(usuarios.length);
         return;
     }
 
-    const filtrados = datos.filter(item =>
-        item.nombre.toLowerCase().includes(texto) ||
-        item.email.toLowerCase().includes(texto)
+    const resultados = usuarios.filter(usuario =>
+        usuario.nombre.toLowerCase().includes(termino) ||
+        usuario.email.toLowerCase().includes(termino)
     );
 
-    if (filtrados.length === 0) {
-        tabla.innerHTML = `
-            <tr>
-                <td colspan="4" class="empty-state">
-                    🔍 No se encontraron usuarios que coincidan con "${texto}"
-                </td>
-            </tr>
-        `;
-    } else {
-        mostrarDatos(filtrados);
+    mostrarUsuarios(resultados);
+    actualizarContador(resultados.length);
+}
+
+// 🗑️ Funciones de eliminación
+async function confirmarEliminacion(id) {
+    const usuario = usuarios.find(u => u.id === id);
+    if (!usuario) return;
+
+    // Usamos confirm nativo por simplicidad, pero puedes usar SweetAlert2
+    if (confirm(`¿Estás seguro de eliminar al usuario "${usuario.nombre}"?\nEsta acción no se puede deshacer.`)) {
+        await eliminarUsuario(id);
     }
 }
 
-// 🗑️ Eliminación con confirmación
-async function confirmarEliminacion(item) {
-    const confirmacion = await Swal.fire({
-        title: `¿Eliminar a ${item.nombre}?`,
-        text: "Esta acción no se puede deshacer",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-    });
-
-    if (confirmacion.isConfirmed) {
-        await eliminarRegistro(item.id);
-    }
-}
-
-async function eliminarRegistro(id) {
+async function eliminarUsuario(id) {
     try {
         await deleteDoc(doc(db, COLECCION, id));
 
-        // Animar la eliminación
-        const fila = document.querySelector(`tr[data-id="${id}"]`);
+        // Animación de eliminación
+        const fila = document.querySelector(`button[data-id="${id}"]`).closest('tr');
         if (fila) {
-            fila.style.opacity = '0.5';
+            fila.style.transition = 'all 0.3s ease';
+            fila.style.opacity = '0';
             fila.style.transform = 'translateX(-100%)';
-            setTimeout(() => cargarDatos(), 300);
+
+            setTimeout(async () => {
+                await cargarUsuarios();
+            }, 300);
         } else {
-            cargarDatos();
+            await cargarUsuarios();
         }
 
         mostrarMensaje('Usuario eliminado correctamente', 'success');
     } catch (error) {
-        console.error("Error eliminando registro:", error);
-        mostrarError("Error al eliminar el registro");
+        console.error('Error eliminando usuario:', error);
+        mostrarMensaje('Error al eliminar el usuario', 'error');
     }
 }
 
-// 🔧 Event Listeners
-formulario.addEventListener("submit", guardarRegistro);
+// 📱 Event Listeners
+function inicializarEventListeners() {
+    // Formulario
+    elementos.formulario.addEventListener('submit', guardarUsuario);
+    elementos.btnCancelar.addEventListener('click', cancelarEdicion);
 
-buscarInput.addEventListener("keyup", filtrarDatos);
+    // Búsqueda
+    elementos.buscarInput.addEventListener('input', buscarUsuarios);
 
-btnLimpiarBusqueda?.addEventListener("click", () => {
-    buscarInput.value = '';
-    mostrarDatos(datos);
-});
+    // Refresh
+    elementos.btnRefresh.addEventListener('click', cargarUsuarios);
 
-// ⌨️ Atajos de teclado
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.key === 'k') {
-        e.preventDefault();
-        buscarInput.focus();
-    }
+    // Atajos de teclado
+    document.addEventListener('keydown', (e) => {
+        // Ctrl + F para buscar
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            elementos.buscarInput.focus();
+            elementos.buscarInput.select();
+        }
 
-    if (e.key === 'Escape' && editandoId) {
-        formulario.reset();
-        editandoId = null;
-        const submitBtn = formulario.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = '<span class="btn-text">Guardar usuario</span>';
-        mostrarMensaje('Edición cancelada', 'info');
-    }
-});
+        // Escape para cancelar edición
+        if (e.key === 'Escape' && editandoId) {
+            cancelarEdicion();
+        }
 
-// 📱 Detectar tipo de dispositivo
-function detectarDispositivo() {
-    if ('maxTouchPoints' in navigator) {
-        document.body.classList.add('touch-device');
-    }
+        // F5 para refresh
+        if (e.key === 'F5') {
+            e.preventDefault();
+            cargarUsuarios();
+        }
+    });
+
+    // Focus en formulario al cargar
+    document.getElementById('nombre').focus();
 }
 
-// 📊 Inicialización
+// 🚀 Inicializar aplicación
 async function inicializarApp() {
-    detectarDispositivo();
+    console.log('🚀 Panel de Administración - Iniciando...');
 
-    // Mostrar versión/estado
-    console.log(`🚀 Panel de administración v1.0`);
-    console.log(`📊 Colección: ${COLECCION}`);
-    console.log(`📱 Dispositivo: ${window.innerWidth}px`);
+    try {
+        inicializarEventListeners();
+        await cargarUsuarios();
 
-    await cargarDatos();
+        console.log('✅ Aplicación cargada correctamente');
 
-    // Auto-focus en búsqueda
-    buscarInput.focus();
+        // Mostrar mensaje de bienvenida
+        setTimeout(() => {
+            mostrarMensaje('Panel de administración listo', 'info');
+        }, 1000);
+
+    } catch (error) {
+        console.error('❌ Error inicializando aplicación:', error);
+        mostrarMensaje('Error al inicializar la aplicación', 'error');
+    }
 }
 
-// Iniciar aplicación
-inicializarApp().catch(error => {
-    console.error("Error inicializando aplicación:", error);
-    mostrarError("Error al inicializar la aplicación");
-});
+// Iniciar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarApp);
+} else {
+    inicializarApp();
+}
 
-export { cargarDatos, mostrarDatos, guardarRegistro };
+export { cargarUsuarios, mostrarUsuarios, guardarUsuario };
