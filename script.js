@@ -3,10 +3,13 @@ import {
     getFirestore,
     collection,
     addDoc,
-    getDocs
+    getDocs,
+    doc,
+    deleteDoc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// 🔥 Configuración Firebase
+// 🔥 Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyCOkJxMjRnlONU7tVx9XGmKhnzLMR80SSQ",
     authDomain: "mi-primera-web-7daca.firebaseapp.com",
@@ -16,24 +19,23 @@ const firebaseConfig = {
     appId: "1:885845436483:web:47cdedbb2df999b38cccf6"
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Referencias HTML
+// HTML refs
 const formulario = document.getElementById("formulario");
 const tabla = document.getElementById("tabla-datos");
+const buscarInput = document.getElementById("buscar");
 
-// 👉 GUARDAR DATOS
+let datos = [];
+
+// ➕ Guardar
 formulario.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const nombre = document.getElementById("nombre").value;
-    const email = document.getElementById("email").value;
-
     await addDoc(collection(db, "formularios"), {
-        nombre: nombre,
-        email: email,
+        nombre: nombre.value,
+        email: email.value,
         fecha: new Date()
     });
 
@@ -41,28 +43,81 @@ formulario.addEventListener("submit", async (e) => {
     cargarDatos();
 });
 
-// 👉 CARGAR DATOS EN LA TABLA
+// 📥 Cargar datos
 async function cargarDatos() {
     tabla.innerHTML = "";
+    datos = [];
 
     const snapshot = await getDocs(collection(db, "formularios"));
 
-    snapshot.forEach((doc) => {
-        const data = doc.data();
+    snapshot.forEach((docSnap) => {
+        datos.push({
+            id: docSnap.id,
+            ...docSnap.data()
+        });
+    });
 
+    mostrarDatos(datos);
+}
+
+// 🖥️ Mostrar tabla
+function mostrarDatos(lista) {
+    tabla.innerHTML = "";
+
+    lista.forEach((item) => {
         const fila = document.createElement("tr");
 
         fila.innerHTML = `
-            <td>${data.nombre || ""}</td>
-            <td>${data.email || ""}</td>
-            <td>${data.fecha ? data.fecha.toDate().toLocaleString() : ""}</td>
+            <td>${item.nombre}</td>
+            <td>${item.email}</td>
+            <td>${item.fecha?.toDate().toLocaleString()}</td>
+            <td class="acciones">
+                <button onclick="editar('${item.id}')">Editar</button>
+                <button onclick="eliminar('${item.id}')">Eliminar</button>
+            </td>
         `;
 
         tabla.appendChild(fila);
     });
 }
 
-// Cargar datos al abrir la página
+// 🔍 Buscar
+buscarInput.addEventListener("keyup", () => {
+    const texto = buscarInput.value.toLowerCase();
+
+    const filtrados = datos.filter(d =>
+        d.nombre.toLowerCase().includes(texto) ||
+        d.email.toLowerCase().includes(texto)
+    );
+
+    mostrarDatos(filtrados);
+});
+
+// ✏️ Editar
+window.editar = async (id) => {
+    const registro = datos.find(d => d.id === id);
+
+    const nuevoNombre = prompt("Nuevo nombre:", registro.nombre);
+    const nuevoEmail = prompt("Nuevo email:", registro.email);
+
+    if (nuevoNombre && nuevoEmail) {
+        await updateDoc(doc(db, "formularios", id), {
+            nombre: nuevoNombre,
+            email: nuevoEmail
+        });
+        cargarDatos();
+    }
+};
+
+// 🗑️ Eliminar
+window.eliminar = async (id) => {
+    if (confirm("¿Seguro que quieres eliminar este registro?")) {
+        await deleteDoc(doc(db, "formularios", id));
+        cargarDatos();
+    }
+};
+
+// Inicial
 cargarDatos();
 
-console.log("Firebase conectado y leyendo datos");
+console.log("Panel cargado correctamente");
