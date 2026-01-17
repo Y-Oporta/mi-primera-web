@@ -1,8 +1,14 @@
-// Importar Firebase desde CDN (para web simple)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// Configuración de Firebase
+// 🔥 Configuración Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCOkJxMjRnlONU7tVx9XGmKhnzLMR80SSQ",
     authDomain: "mi-primera-web-7daca.firebaseapp.com",
@@ -14,29 +20,53 @@ const firebaseConfig = {
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-
-// Inicializar Firestore (BASE DE DATOS)
 const db = getFirestore(app);
 
-// Evento del formulario
-document.getElementById("formulario").addEventListener("submit", async (e) => {
+// Referencias HTML
+const formulario = document.getElementById("formulario");
+const tabla = document.getElementById("tabla-datos");
+
+// 👉 GUARDAR DATOS
+formulario.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const nombre = document.getElementById("nombre").value;
     const email = document.getElementById("email").value;
 
-    try {
-        await addDoc(collection(db, "formularios"), {
-            nombre: nombre,
-            email: email,
-            fecha: new Date()
-        });
+    await addDoc(collection(db, "formularios"), {
+        nombre,
+        email,
+        fecha: new Date()
+    });
 
-        alert("Datos guardados correctamente");
-        document.getElementById("formulario").reset();
-
-    } catch (error) {
-        alert("Error al guardar");
-        console.error(error);
-    }
+    formulario.reset();
+    cargarDatos();
 });
+
+// 👉 MOSTRAR DATOS EN LA TABLA
+async function cargarDatos() {
+    tabla.innerHTML = "";
+
+    const q = query(
+        collection(db, "formularios"),
+        orderBy("fecha", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+
+        const fila = `
+            <tr>
+                <td>${data.nombre}</td>
+                <td>${data.email}</td>
+                <td>${data.fecha?.toDate().toLocaleString()}</td>
+            </tr>
+        `;
+        tabla.innerHTML += fila;
+    });
+}
+
+// Cargar datos al abrir la página
+cargarDatos();

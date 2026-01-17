@@ -3,18 +3,56 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Mi primera web</title>
+    <title>Mi primera web con Firebase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
 </head>
 
 <body>
 
-    <h2>Formulario de contacto</h2>
+    <h2>Formulario</h2>
 
     <form id="formulario">
-        <input type="text" id="nombre" placeholder="Tu nombre" required><br><br>
-        <input type="email" id="email" placeholder="Tu email" required><br><br>
-        <button type="submit">Enviar</button>
+        <input type="text" id="nombre" placeholder="Nombre" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <button type="submit">Guardar</button>
     </form>
+
+    <h2>Datos guardados</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-datos">
+            <!-- Aquí se cargan los datos -->
+        </tbody>
+    </table>
 
     <script type="module" src="script.js"></script>
 </body>
