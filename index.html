@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Web</title>
+    <title>EduPro</title>
 
     <style>
         /* ===== VARIABLES ===== */
@@ -12,6 +12,7 @@
             --primary: #10b981;
             --primary-dark: #059669;
             --primary-light: #d1fae5;
+            --primary-light-2: #a7f3d0;
             --bg: #f9fafb;
             --nav-bg: rgba(255, 255, 255, 0.95);
             --text: #111827;
@@ -21,6 +22,8 @@
             --modal-bg: rgba(0, 0, 0, 0.4);
             --hover-bg: #f3f4f6;
             --card-bg: #ffffff;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         /* ===== RESET ===== */
@@ -39,6 +42,43 @@
             font-size: 14px;
         }
 
+        /* ===== ANIMACIONES ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
         /* ===== NAVBAR ===== */
         header {
             position: sticky;
@@ -47,6 +87,7 @@
             backdrop-filter: blur(8px);
             background: var(--nav-bg);
             border-bottom: 1px solid var(--border);
+            animation: slideIn 0.3s ease;
         }
 
         .nav {
@@ -59,8 +100,8 @@
         }
 
         .logo {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.2rem;
+            font-weight: 700;
             color: var(--primary);
             letter-spacing: -0.5px;
         }
@@ -127,6 +168,7 @@
             font-weight: 500;
             color: var(--text);
             padding: 0.5rem 0;
+            animation: fadeIn 0.3s ease;
         }
 
         .mobile-menu a:hover {
@@ -145,6 +187,7 @@
             min-height: calc(100vh - 64px);
             display: none;
             flex-direction: column;
+            animation: fadeIn 0.3s ease;
         }
 
         section.active {
@@ -160,6 +203,43 @@
             letter-spacing: -0.5px;
         }
 
+        /* ===== LOADING ANIMATION ===== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1003;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--primary-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* ===== CONTROLES DE TABLA ===== */
         .table-controls {
             display: flex;
@@ -168,6 +248,7 @@
             margin-bottom: 1.5rem;
             align-items: center;
             justify-content: space-between;
+            animation: fadeIn 0.4s ease;
         }
 
         .table-header {
@@ -182,6 +263,7 @@
         .search-container {
             flex: 1;
             min-width: 200px;
+            position: relative;
         }
 
         .search-input {
@@ -191,6 +273,7 @@
             border-radius: 6px;
             font-size: 0.875rem;
             background: white;
+            transition: all 0.3s;
         }
 
         .search-input:focus {
@@ -203,6 +286,7 @@
             display: flex;
             gap: 0.75rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .filter-select {
@@ -212,6 +296,62 @@
             font-size: 0.875rem;
             background: white;
             color: var(--text);
+            transition: all 0.3s;
+            min-width: 140px;
+        }
+
+        .filter-select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .clear-filters-btn {
+            padding: 0.625rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .clear-filters-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--text-light);
+            color: var(--text);
+        }
+
+        .clear-filters-btn i {
+            font-size: 1rem;
+        }
+
+        /* ===== BOTÓN PRINCIPAL ===== */
+        .primary-btn {
+            padding: 0.625rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.875rem;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .primary-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         /* ===== TABLA RESPONSIVA ===== */
@@ -221,6 +361,7 @@
             background: white;
             border-radius: 8px;
             margin-bottom: 1.5rem;
+            animation: fadeIn 0.5s ease;
         }
 
         table {
@@ -257,7 +398,12 @@
             color: var(--text);
             border-bottom: 1px solid var(--border);
             font-size: 0.875rem;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s;
+        }
+
+        tr {
+            animation: fadeIn 0.3s ease;
+            animation-fill-mode: both;
         }
 
         tr:hover td {
@@ -278,6 +424,8 @@
             background: white;
             border-bottom: 1px solid var(--border);
             padding: 1rem;
+            animation: fadeIn 0.3s ease;
+            animation-fill-mode: both;
         }
 
         .mobile-row-content {
@@ -346,7 +494,7 @@
             color: var(--text);
             cursor: pointer;
             font-size: 0.8rem;
-            transition: all 0.2s;
+            transition: all 0.3s;
             font-weight: 500;
         }
 
@@ -354,6 +502,7 @@
             background: var(--primary);
             border-color: var(--primary);
             color: white;
+            transform: translateY(-1px);
         }
 
         .mobile-actions-btn {
@@ -369,13 +518,110 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
 
         .mobile-actions-btn:hover {
             background: var(--primary);
             border-color: var(--primary);
             color: white;
+        }
+
+        /* ===== DETALLE MODAL ===== */
+        .detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1004;
+        }
+
+        .detail-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .detail-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .close-detail-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 0.25rem;
+            transition: color 0.3s;
+        }
+
+        .close-detail-btn:hover {
+            color: var(--primary);
+        }
+
+        .detail-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .detail-item {
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-label {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            color: var(--text);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .detail-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
         }
 
         /* ===== PAGINACIÓN ===== */
@@ -386,6 +632,7 @@
             gap: 0.5rem;
             margin-top: 1.5rem;
             flex-wrap: wrap;
+            animation: fadeIn 0.3s ease;
         }
 
         .page-btn {
@@ -396,7 +643,7 @@
             color: var(--text);
             cursor: pointer;
             font-size: 0.85rem;
-            transition: all 0.2s;
+            transition: all 0.3s;
             min-width: 36px;
             text-align: center;
         }
@@ -417,32 +664,15 @@
             cursor: not-allowed;
         }
 
+        .page-btn.disabled:hover {
+            background: white;
+            border-color: var(--border);
+        }
+
         .page-info {
             color: var(--text-light);
             font-size: 0.85rem;
             margin: 0 0.5rem;
-        }
-
-        /* ===== BOTÓN PRINCIPAL ===== */
-        .primary-btn {
-            padding: 0.625rem 1.25rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-            font-size: 0.875rem;
-            letter-spacing: 0.3px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .primary-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
         }
 
         /* ===== MODAL FORM ===== */
@@ -470,9 +700,11 @@
         .modal-content {
             background: white;
             padding: 2rem;
-            border-radius: 8px;
+            border-radius: 12px;
             width: 90%;
             max-width: 400px;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         .modal-content h2 {
@@ -483,13 +715,22 @@
         }
 
         .modal-content input,
-        .modal-content textarea {
+        .modal-content textarea,
+        .modal-content select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 0.875rem;
             margin-bottom: 0.75rem;
+            transition: border-color 0.3s;
+        }
+
+        .modal-content input:focus,
+        .modal-content textarea:focus,
+        .modal-content select:focus {
+            border-color: var(--primary);
+            outline: none;
         }
 
         .modal-content textarea {
@@ -522,9 +763,11 @@
         .mobile-actions-content {
             background: white;
             padding: 1.5rem;
-            border-radius: 8px;
+            border-radius: 12px;
             width: 90%;
             max-width: 280px;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         .mobile-action-item {
@@ -536,7 +779,7 @@
             justify-content: space-between;
             font-size: 0.875rem;
             color: var(--text);
-            transition: color 0.2s;
+            transition: color 0.3s;
         }
 
         .mobile-action-item:last-child {
@@ -619,8 +862,8 @@
 
             .mobile-row {
                 margin-bottom: 0.5rem;
-                border-radius: 6px;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+                box-shadow: var(--shadow);
             }
 
             .mobile-row:last-child {
@@ -637,6 +880,15 @@
 
             .mobile-detail-value {
                 font-size: 0.8rem;
+            }
+
+            .detail-modal-content {
+                padding: 1.5rem;
+                max-height: 85vh;
+            }
+
+            .detail-title {
+                font-size: 1.25rem;
             }
 
             .pagination {
@@ -688,6 +940,16 @@
                 min-width: 28px;
                 font-size: 0.75rem;
             }
+
+            .detail-modal-content {
+                padding: 1.25rem;
+                width: 95%;
+            }
+
+            .clear-filters-btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -696,7 +958,7 @@
 
     <header>
         <nav class="nav">
-            <div class="logo">Mi Web</div>
+            <div class="logo">EduPro</div>
             <div class="menu">
                 <a onclick="showSection('inicio')">Inicio</a>
                 <a onclick="showSection('servicios')">Servicios</a>
@@ -714,9 +976,10 @@
 
     <!-- SECCIONES -->
     <section id="inicio" class="active">
-        <h1>Bienvenido a Mi Web</h1>
-        <p style="text-align: center; color: var(--text-light); max-width: 600px; font-size: 0.95rem;">Explora nuestras
-            secciones para conocer nuestros servicios y contactarnos fácilmente.</p>
+        <h1>Bienvenido a EduPro</h1>
+        <p style="text-align: center; color: var(--text-light); max-width: 600px; font-size: 0.95rem;">
+            Plataforma educativa profesional para la gestión de servicios y recursos académicos.
+        </p>
     </section>
 
     <section id="servicios">
@@ -742,6 +1005,10 @@
                     <option value="media">Media</option>
                     <option value="baja">Baja</option>
                 </select>
+
+                <button class="clear-filters-btn" onclick="clearFilters()">
+                    <span>×</span> Limpiar
+                </button>
             </div>
 
             <button class="primary-btn" onclick="openModal()">
@@ -780,8 +1047,17 @@
 
     <section id="contacto">
         <h1>Contacto</h1>
-        <p style="text-align: center; color: var(--text-light);">Correo: contacto@miweb.com<br>Teléfono: +123456789</p>
+        <p style="text-align: center; color: var(--text-light);">
+            Correo: contacto@edupro.com<br>
+            Teléfono: +123456789<br>
+            Dirección: Av. Principal 123, Ciudad
+        </p>
     </section>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
 
     <!-- MODAL FORMULARIO -->
     <div class="modal" id="modal">
@@ -793,10 +1069,61 @@
                 <option value="">Seleccionar estado</option>
                 <option value="activo">Activo</option>
                 <option value="inactivo">Inactivo</option>
+                <option value="pendiente">Pendiente</option>
+            </select>
+            <select class="filter-select" style="width: 100%; margin-bottom: 1.5rem;">
+                <option value="">Seleccionar prioridad</option>
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
             </select>
             <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
                 <button class="action-btn" onclick="closeModal()">Cancelar</button>
-                <button class="primary-btn" onclick="closeModal()">Guardar</button>
+                <button class="primary-btn" onclick="saveService()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALLE -->
+    <div class="detail-modal" id="detailModal">
+        <div class="detail-modal-content">
+            <div class="detail-header">
+                <h3 class="detail-title" id="detailTitle">Título del Servicio</h3>
+                <button class="close-detail-btn" onclick="closeDetailModal()">×</button>
+            </div>
+
+            <div class="detail-info">
+                <div class="detail-item">
+                    <div class="detail-label">ID</div>
+                    <div class="detail-value" id="detailId">-</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Descripción</div>
+                    <div class="detail-value" id="detailDescription">-</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Estado</div>
+                    <div class="detail-value">
+                        <span id="detailStatus" class="detail-status">-</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Prioridad</div>
+                    <div class="detail-value" id="detailPriority">-</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">Fecha de Creación</div>
+                    <div class="detail-value" id="detailCreatedAt">-</div>
+                </div>
+
+                <div class="detail-item" style="border-bottom: none;">
+                    <div class="detail-label">Última Actualización</div>
+                    <div class="detail-value" id="detailUpdatedAt">-</div>
+                </div>
             </div>
         </div>
     </div>
@@ -830,21 +1157,141 @@
 
         // ===== Datos de ejemplo =====
         const sampleData = [
-            { id: 1, title: "Diseño Web Responsivo", description: "Creación de sitios web que se adaptan a todos los dispositivos móviles y escritorio.", status: "activo", priority: "alta" },
-            { id: 2, title: "Desarrollo de Aplicaciones", description: "Desarrollo de aplicaciones web y móviles personalizadas según tus necesidades.", status: "activo", priority: "alta" },
-            { id: 3, title: "Consultoría Tecnológica", description: "Asesoramiento especializado para optimizar tus procesos tecnológicos.", status: "pendiente", priority: "media" },
-            { id: 4, title: "Mantenimiento de Sistemas", description: "Soporte continuo y actualizaciones para mantener tus sistemas operativos.", status: "activo", priority: "baja" },
-            { id: 5, title: "Marketing Digital", description: "Estrategias de marketing online para aumentar tu presencia digital.", status: "activo", priority: "alta" },
-            { id: 6, title: "SEO y Posicionamiento", description: "Optimización para motores de búsqueda y mejora de posicionamiento.", status: "inactivo", priority: "media" },
-            { id: 7, title: "Redes Sociales", description: "Gestión y creación de contenido para redes sociales.", status: "activo", priority: "media" },
-            { id: 8, title: "Branding Corporativo", description: "Desarrollo de identidad visual y marca corporativa.", status: "pendiente", priority: "alta" },
-            { id: 9, title: "E-commerce", description: "Desarrollo de tiendas online y soluciones de comercio electrónico.", status: "activo", priority: "alta" },
-            { id: 10, title: "Hosting y Dominios", description: "Servicios de hosting web y registro de dominios.", status: "activo", priority: "baja" },
-            { id: 11, title: "Ciberseguridad", description: "Protección de sistemas y datos contra amenazas digitales.", status: "activo", priority: "alta" },
-            { id: 12, title: "Cloud Computing", description: "Soluciones de almacenamiento y computación en la nube.", status: "pendiente", priority: "media" },
-            { id: 13, title: "Inteligencia Artificial", description: "Implementación de soluciones basadas en IA y machine learning.", status: "inactivo", priority: "alta" },
-            { id: 14, title: "Automatización", description: "Automatización de procesos y tareas repetitivas.", status: "activo", priority: "media" },
-            { id: 15, title: "Análisis de Datos", description: "Análisis y visualización de datos para toma de decisiones.", status: "activo", priority: "alta" },
+            {
+                id: 1,
+                title: "Tutorías Personalizadas",
+                description: "Sesiones individuales de tutoría para estudiantes que necesitan apoyo adicional en sus cursos.",
+                status: "activo",
+                priority: "alta",
+                createdAt: "2024-01-15",
+                updatedAt: "2024-03-10"
+            },
+            {
+                id: 2,
+                title: "Clases Virtuales",
+                description: "Plataforma de clases en vivo con profesores certificados y materiales interactivos.",
+                status: "activo",
+                priority: "alta",
+                createdAt: "2024-01-20",
+                updatedAt: "2024-03-12"
+            },
+            {
+                id: 3,
+                title: "Recursos Educativos",
+                description: "Biblioteca digital con materiales de estudio, ejercicios y exámenes de práctica.",
+                status: "pendiente",
+                priority: "media",
+                createdAt: "2024-02-01",
+                updatedAt: "2024-02-28"
+            },
+            {
+                id: 4,
+                title: "Soporte Técnico",
+                description: "Asistencia técnica para problemas con la plataforma y herramientas educativas.",
+                status: "activo",
+                priority: "baja",
+                createdAt: "2024-01-10",
+                updatedAt: "2024-03-01"
+            },
+            {
+                id: 5,
+                title: "Orientación Vocacional",
+                description: "Sesiones de orientación para ayudar a estudiantes a elegir su carrera profesional.",
+                status: "activo",
+                priority: "alta",
+                createdAt: "2024-02-15",
+                updatedAt: "2024-03-08"
+            },
+            {
+                id: 6,
+                title: "Talleres Especializados",
+                description: "Talleres prácticos sobre temas específicos como programación, diseño y más.",
+                status: "inactivo",
+                priority: "media",
+                createdAt: "2024-01-25",
+                updatedAt: "2024-02-20"
+            },
+            {
+                id: 7,
+                title: "Evaluaciones Online",
+                description: "Sistema de evaluación y seguimiento del progreso académico de los estudiantes.",
+                status: "activo",
+                priority: "media",
+                createdAt: "2024-01-30",
+                updatedAt: "2024-03-05"
+            },
+            {
+                id: 8,
+                title: "Certificaciones",
+                description: "Programas de certificación reconocidos por instituciones educativas.",
+                status: "pendiente",
+                priority: "alta",
+                createdAt: "2024-02-10",
+                updatedAt: "2024-03-09"
+            },
+            {
+                id: 9,
+                title: "Comunidad de Aprendizaje",
+                description: "Foros y grupos de estudio para fomentar la colaboración entre estudiantes.",
+                status: "activo",
+                priority: "alta",
+                createdAt: "2024-01-18",
+                updatedAt: "2024-03-07"
+            },
+            {
+                id: 10,
+                title: "Materiales Descargables",
+                description: "PDFs, presentaciones y otros recursos descargables para estudio offline.",
+                status: "activo",
+                priority: "baja",
+                createdAt: "2024-01-22",
+                updatedAt: "2024-03-03"
+            },
+            {
+                id: 11,
+                title: "Consultoría Educativa",
+                description: "Asesoramiento para instituciones educativas sobre implementación de tecnologías.",
+                status: "activo",
+                priority: "alta",
+                createdAt: "2024-02-05",
+                updatedAt: "2024-03-11"
+            },
+            {
+                id: 12,
+                title: "Desarrollo de Contenidos",
+                description: "Creación de contenido educativo personalizado según necesidades específicas.",
+                status: "pendiente",
+                priority: "media",
+                createdAt: "2024-02-20",
+                updatedAt: "2024-03-04"
+            },
+            {
+                id: 13,
+                title: "Plataforma LMS",
+                description: "Sistema de gestión de aprendizaje con todas las herramientas necesarias.",
+                status: "inactivo",
+                priority: "alta",
+                createdAt: "2024-01-05",
+                updatedAt: "2024-02-15"
+            },
+            {
+                id: 14,
+                title: "Capacitación Docente",
+                description: "Programas de formación para profesores en metodologías innovadoras.",
+                status: "activo",
+                priority: "media",
+                createdAt: "2024-01-28",
+                updatedAt: "2024-03-02"
+            },
+            {
+                id: 15,
+                title: "Analítica Educativa",
+                description: "Herramientas de análisis de datos para mejorar los resultados de aprendizaje.",
+                status: "activo",
+                priority: "alta",
+                createdAt: "2024-02-08",
+                updatedAt: "2024-03-06"
+            },
         ];
 
         // ===== Inicialización =====
@@ -854,15 +1301,37 @@
             renderTable();
         });
 
+        // ===== Loading Animation =====
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        function showLoading() {
+            loadingOverlay.classList.add('show');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.remove('show');
+        }
+
+        // ===== Simular carga =====
+        function simulateLoad(callback) {
+            showLoading();
+            setTimeout(() => {
+                callback();
+                hideLoading();
+            }, 800); // Simular 800ms de carga
+        }
+
         // ===== Renderizar tabla =====
         function renderTable() {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const currentData = filteredData.slice(startIndex, endIndex);
+            simulateLoad(() => {
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const currentData = filteredData.slice(startIndex, endIndex);
 
-            renderDesktopTable(currentData);
-            renderMobileTable(currentData);
-            renderPagination();
+                renderDesktopTable(currentData);
+                renderMobileTable(currentData);
+                renderPagination();
+            });
         }
 
         // ===== Renderizar tabla de escritorio =====
@@ -870,27 +1339,29 @@
             const tableBody = document.getElementById('tableBody');
             tableBody.innerHTML = '';
 
-            data.forEach(item => {
+            data.forEach((item, index) => {
                 const row = document.createElement('tr');
+                row.style.animationDelay = `${index * 0.05}s`;
                 row.innerHTML = `
         <td>${item.id}</td>
         <td>${item.title}</td>
         <td>${item.description}</td>
         <td>
           <span style="
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem 0.75rem;
             border-radius: 12px;
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
             background: ${getStatusColor(item.status).bg};
             color: ${getStatusColor(item.status).text};
+            display: inline-block;
           ">
             ${getStatusText(item.status)}
           </span>
         </td>
         <td>
           <div class="actions-desktop">
-            <button class="action-btn" onclick="viewDetail(${item.id})">Ver</button>
+            <button class="action-btn" onclick="openDetailModal(${item.id})">Ver</button>
             <button class="action-btn" onclick="editItem(${item.id})">Editar</button>
             <button class="action-btn" onclick="deleteItem(${item.id})">Eliminar</button>
           </div>
@@ -905,9 +1376,10 @@
             const mobileTable = document.getElementById('mobileTable');
             mobileTable.innerHTML = '';
 
-            data.forEach(item => {
+            data.forEach((item, index) => {
                 const row = document.createElement('div');
                 row.className = 'mobile-row';
+                row.style.animationDelay = `${index * 0.05}s`;
                 row.innerHTML = `
         <div class="mobile-row-content">
           <div class="mobile-row-header">
@@ -923,10 +1395,10 @@
               <span class="mobile-detail-label">Estado:</span>
               <span class="mobile-detail-value">
                 <span style="
-                  padding: 0.15rem 0.4rem;
+                  padding: 0.15rem 0.5rem;
                   border-radius: 10px;
                   font-size: 0.7rem;
-                  font-weight: 500;
+                  font-weight: 600;
                   background: ${getStatusColor(item.status).bg};
                   color: ${getStatusColor(item.status).text};
                 ">
@@ -939,7 +1411,7 @@
               <span class="mobile-detail-value">
                 <span style="
                   color: ${getPriorityColor(item.priority)};
-                  font-weight: 500;
+                  font-weight: 600;
                 ">
                   ${item.priority.charAt(0).toUpperCase() + item.priority.slice(1)}
                 </span>
@@ -948,7 +1420,7 @@
           </div>
           <div class="mobile-row-actions">
             <div style="display: flex; gap: 0.5rem; font-size: 0.8rem;">
-              <button class="action-btn" style="flex: 1;" onclick="viewDetail(${item.id})">Ver</button>
+              <button class="action-btn" style="flex: 1;" onclick="openDetailModal(${item.id})">Ver</button>
               <button class="action-btn" style="flex: 1;" onclick="editItem(${item.id})">Editar</button>
             </div>
           </div>
@@ -1035,6 +1507,17 @@
             renderTable();
         }
 
+        // ===== Limpiar filtros =====
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterPriority').value = '';
+
+            filteredData = [...allData];
+            currentPage = 1;
+            renderTable();
+        }
+
         // ===== Cambiar página =====
         function changePage(page) {
             const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -1073,6 +1556,36 @@
             return colors[priority] || '#6b7280';
         }
 
+        // ===== Modal de Detalle =====
+        const detailModal = document.getElementById('detailModal');
+
+        function openDetailModal(id) {
+            const item = allData.find(i => i.id === id);
+            if (item) {
+                document.getElementById('detailTitle').textContent = item.title;
+                document.getElementById('detailId').textContent = item.id;
+                document.getElementById('detailDescription').textContent = item.description;
+
+                const statusElement = document.getElementById('detailStatus');
+                statusElement.textContent = getStatusText(item.status);
+                statusElement.style.background = getStatusColor(item.status).bg;
+                statusElement.style.color = getStatusColor(item.status).text;
+
+                document.getElementById('detailPriority').textContent =
+                    item.priority.charAt(0).toUpperCase() + item.priority.slice(1);
+                document.getElementById('detailPriority').style.color = getPriorityColor(item.priority);
+
+                document.getElementById('detailCreatedAt').textContent = item.createdAt;
+                document.getElementById('detailUpdatedAt').textContent = item.updatedAt;
+
+                detailModal.classList.add('show');
+            }
+        }
+
+        function closeDetailModal() {
+            detailModal.classList.remove('show');
+        }
+
         // ===== Menú móvil =====
         function toggleMenu() {
             document.getElementById('mobileMenu').classList.toggle('show');
@@ -1090,7 +1603,7 @@
             }
         }
 
-        // ===== Modal =====
+        // ===== Modal de formulario =====
         const modal = document.getElementById('modal');
         function openModal() {
             modal.classList.add('show');
@@ -1098,6 +1611,15 @@
 
         function closeModal() {
             modal.classList.remove('show');
+        }
+
+        function saveService() {
+            // Simular guardado
+            simulateLoad(() => {
+                alert('Servicio guardado exitosamente');
+                closeModal();
+                // Aquí normalmente harías una petición al servidor
+            });
         }
 
         // ===== Menú de acciones para móvil =====
@@ -1114,10 +1636,7 @@
 
         // ===== Funciones de acciones =====
         function viewDetail(id) {
-            const item = allData.find(i => i.id === id);
-            if (item) {
-                alert(`Viendo detalle:\n\nTítulo: ${item.title}\nDescripción: ${item.description}\nEstado: ${getStatusText(item.status)}\nPrioridad: ${item.priority}`);
-            }
+            openDetailModal(id);
         }
 
         function editItem(id) {
@@ -1130,27 +1649,38 @@
 
         function deleteItem(id) {
             if (confirm(`¿Estás seguro de eliminar el servicio #${id}?`)) {
-                const index = allData.findIndex(i => i.id === id);
-                if (index !== -1) {
-                    allData.splice(index, 1);
-                    filterTable(); // Re-filtrar y renderizar
-                    alert(`Servicio #${id} eliminado`);
-                }
+                simulateLoad(() => {
+                    const index = allData.findIndex(i => i.id === id);
+                    if (index !== -1) {
+                        allData.splice(index, 1);
+                        filterTable(); // Re-filtrar y renderizar
+                        closeMobileActions();
+                    }
+                });
             }
         }
 
         // ===== Event Listeners =====
         document.addEventListener('click', (e) => {
+            // Cerrar menú de acciones móvil
             if (mobileActionsMenu.classList.contains('show') &&
                 !e.target.closest('.mobile-actions-content') &&
                 !e.target.closest('.mobile-actions-btn')) {
                 closeMobileActions();
             }
 
+            // Cerrar modal de formulario
             if (modal.classList.contains('show') &&
                 !e.target.closest('.modal-content') &&
                 e.target.classList.contains('modal')) {
                 closeModal();
+            }
+
+            // Cerrar modal de detalle
+            if (detailModal.classList.contains('show') &&
+                !e.target.closest('.detail-modal-content') &&
+                e.target.classList.contains('detail-modal')) {
+                closeDetailModal();
             }
         });
 
@@ -1158,6 +1688,7 @@
             if (e.key === 'Escape') {
                 closeMobileActions();
                 closeModal();
+                closeDetailModal();
             }
         });
 
