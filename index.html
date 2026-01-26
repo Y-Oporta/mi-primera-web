@@ -1,324 +1,715 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Web</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Web</title>
 
-    <style>
-        /* ===== VARIABLES ===== */
-        :root {
-            --primary: #6366f1;
-            --bg: #f9fafb;
-            --nav-bg: rgba(255, 255, 255, 0.9);
-            --text: #111827;
-            --muted: #6b7280;
-            --shadow: rgba(0, 0, 0, 0.08);
-            --modal-bg: rgba(0, 0, 0, 0.4);
-        }
+<style>
+  /* ===== VARIABLES ===== */
+  :root {
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --bg: #f9fafb;
+    --nav-bg: rgba(255, 255, 255, 0.95);
+    --text: #111827;
+    --text-light: #6b7280;
+    --text-muted: #9ca3af;
+    --border: #e5e7eb;
+    --modal-bg: rgba(0,0,0,0.4);
+    --hover-bg: #f3f4f6;
+  }
 
-        /* ===== RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, sans-serif;
-        }
+  /* ===== RESET ===== */
+  * { 
+    margin:0; 
+    padding:0; 
+    box-sizing:border-box; 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  }
+  
+  body { 
+    background: var(--bg); 
+    color: var(--text); 
+    min-height:100vh; 
+    line-height:1.5; 
+    font-size: 14px;
+  }
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            line-height: 1.5;
-        }
+  /* ===== NAVBAR ===== */
+  header {
+    position: sticky;
+    top:0;
+    z-index:1000;
+    backdrop-filter: blur(8px);
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--border);
+  }
 
-        /* ===== NAVBAR ===== */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            background: var(--nav-bg);
-            box-shadow: 0 1px 6px var(--shadow);
-        }
+  .nav {
+    max-width: 1100px;
+    margin:auto;
+    padding:0.875rem 1.25rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
 
-        .nav {
-            max-width: 1100px;
-            margin: auto;
-            padding: 1rem 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+  .logo { 
+    font-size: 1.1rem; 
+    font-weight:600; 
+    color:var(--primary); 
+    letter-spacing: -0.5px;
+  }
 
-        .logo {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
+  .menu { 
+    display:flex; 
+    gap:1.75rem; 
+  }
+  
+  .menu a { 
+    text-decoration:none; 
+    color: var(--text-light); 
+    font-weight:500; 
+    font-size:0.9rem; 
+    transition:color 0.2s; 
+    cursor:pointer;
+    padding: 0.25rem 0;
+    position: relative;
+  }
+  
+  .menu a:hover { 
+    color: var(--primary); 
+  }
+  
+  .menu a:hover::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 1px;
+  }
 
-        .menu {
-            display: flex;
-            gap: 1.75rem;
-        }
+  .menu-toggle { 
+    display:none; 
+    font-size:1.25rem; 
+    cursor:pointer; 
+    color: var(--text); 
+    padding: 0.25rem;
+  }
 
-        .menu a {
-            text-decoration: none;
-            color: var(--muted);
-            font-weight: 500;
-            font-size: 0.95rem;
-            transition: color 0.25s;
-            cursor: pointer;
-        }
+  /* ===== MENU MÓVIL ===== */
+  .mobile-menu {
+    position: fixed;
+    top:0; 
+    left:0;
+    width:100%; 
+    height:100%;
+    background: var(--nav-bg);
+    display:flex; 
+    flex-direction:column; 
+    justify-content:center; 
+    align-items:center;
+    gap:1.5rem; 
+    transform:translateY(-100%);
+    transition: transform 0.3s ease;
+    z-index:999;
+  }
 
-        .menu a:hover {
-            color: var(--text);
-        }
+  .mobile-menu a { 
+    font-size:1.1rem; 
+    font-weight:500; 
+    color: var(--text); 
+    padding: 0.5rem 0;
+  }
+  
+  .mobile-menu a:hover { 
+    color: var(--primary); 
+  }
+  
+  .mobile-menu.show { 
+    transform:translateY(0); 
+  }
 
-        .menu-toggle {
-            display: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text);
-        }
+  /* ===== SECCIONES ===== */
+  section { 
+    max-width:1100px; 
+    margin:auto; 
+    padding:2.5rem 1.25rem; 
+    min-height:calc(100vh - 64px); 
+    display:none; 
+    justify-content:center; 
+    align-items:center; 
+    flex-direction:column; 
+  }
+  
+  section.active { 
+    display:flex; 
+  }
 
-        /* ===== MENU MÓVIL ===== */
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--nav-bg);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 2rem;
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-            z-index: 999;
-        }
+  h1 { 
+    font-size:clamp(1.5rem, 4vw, 2.5rem); 
+    font-weight:600; 
+    margin-bottom:1rem; 
+    text-align:center; 
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  
+  p { 
+    font-size:0.95rem; 
+    text-align:center; 
+    color:var(--text-light); 
+    margin-bottom:2rem; 
+    max-width: 600px;
+    line-height: 1.6;
+  }
 
-        .mobile-menu a {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text);
-        }
+  /* ===== TABLA SERVICIOS ===== */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 2.5rem;
+    background: white;
+  }
 
-        .mobile-menu a:hover {
-            color: var(--primary);
-        }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
 
-        .mobile-menu.show {
-            transform: translateY(0);
-        }
+  th {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text);
+    background: white;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-light);
+  }
 
-        /* ===== SECCIONES ===== */
-        section {
-            max-width: 1100px;
-            margin: auto;
-            padding: 3rem 1.25rem;
-            min-height: calc(100vh - 64px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
+  td {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+  }
 
-        section.active {
-            display: flex;
-        }
+  tr:hover td {
+    background: var(--hover-bg);
+  }
 
-        h1 {
-            font-size: clamp(1.6rem, 4vw, 2.8rem);
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
+  tr:last-child td {
+    border-bottom: none;
+  }
 
-        p {
-            font-size: 1rem;
-            text-align: center;
-            color: var(--muted);
-            margin-bottom: 2rem;
-        }
+  /* ===== COLUMNA ACCIONES ===== */
+  .actions-desktop {
+    display: flex;
+    gap: 0.5rem;
+  }
 
-        /* ===== TABLA SERVICIOS ===== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 2rem;
-        }
+  .action-btn {
+    padding: 0.35rem 0.75rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
 
-        td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            color: var(--text);
-        }
+  .action-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
 
-        tr:not(:last-child) td {
-            border-bottom: 1px solid #e5e7eb;
-        }
+  /* Botón de tres puntos para móvil */
+  .mobile-actions-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-light);
+    padding: 0.35rem 0.5rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
 
-        /* sutil */
+  .mobile-actions-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
 
-        /* ===== BOTÓN ===== */
-        button {
-            padding: 0.6rem 1.2rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.25s;
-        }
+  /* Menú de acciones para móvil */
+  .mobile-actions-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1002;
+  }
 
-        button:hover {
-            background: #4b49e1;
-        }
+  .mobile-actions-menu.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
-        /* ===== MODAL FORM ===== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--modal-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            z-index: 1001;
-        }
+  .mobile-actions-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 280px;
+  }
 
-        .modal.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
+  .mobile-action-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--text);
+    transition: color 0.2s;
+  }
 
-        .modal-content {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 5px 20px var(--shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+  .mobile-action-item:last-child {
+    border-bottom: none;
+  }
 
-        .modal-content input,
-        .modal-content textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-        }
+  .mobile-action-item:hover {
+    color: var(--primary);
+  }
 
-        .modal-content button {
-            align-self: flex-end;
-        }
+  .action-label {
+    font-weight: 500;
+  }
 
-        /* ===== RESPONSIVE ===== */
-        @media(max-width:768px) {
-            .menu {
-                display: none;
-            }
+  /* Ocultar/mostrar columnas según dispositivo */
+  .desktop-only {
+    display: none;
+  }
 
-            .menu-toggle {
-                display: block;
-            }
+  /* ===== BOTÓN PRINCIPAL ===== */
+  .primary-btn { 
+    padding: 0.625rem 1.25rem; 
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s; 
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.3px;
+  }
+  
+  .primary-btn:hover { 
+    background: var(--primary-dark); 
+    transform: translateY(-1px);
+  }
 
-            section {
-                padding: 2rem 1rem;
-            }
-        }
-    </style>
+  /* ===== MODAL FORM ===== */
+  .modal { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: var(--modal-bg); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: opacity 0.3s; 
+    z-index: 1001; 
+  }
+  
+  .modal.show { 
+    opacity: 1; 
+    pointer-events: auto; 
+  }
+  
+  .modal-content { 
+    background: white; 
+    padding: 2rem; 
+    border-radius: 8px; 
+    width: 90%; 
+    max-width: 400px; 
+  }
+  
+  .modal-content h2 { 
+    margin-bottom: 1rem; 
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .modal-content input, .modal-content textarea { 
+    width: 100%; 
+    padding: 0.75rem; 
+    border: 1px solid var(--border); 
+    border-radius: 6px; 
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .modal-content textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media(min-width: 769px) {
+    .desktop-only {
+      display: table-cell;
+    }
+    
+    .mobile-only {
+      display: none !important;
+    }
+    
+    .actions-mobile {
+      display: none;
+    }
+  }
+
+  @media(max-width: 768px){
+    /* Texto más pequeño en móvil */
+    body {
+      font-size: 13px;
+    }
+    
+    .menu { 
+      display: none; 
+    }
+    
+    .menu-toggle { 
+      display: block; 
+    }
+    
+    section { 
+      padding: 1.75rem 1rem; 
+    }
+    
+    .desktop-only {
+      display: none !important;
+    }
+    
+    .mobile-only {
+      display: table-cell;
+    }
+    
+    .actions-desktop {
+      display: none;
+    }
+    
+    th, td {
+      padding: 0.625rem 0.5rem;
+      font-size: 0.8rem;
+    }
+    
+    th {
+      font-size: 0.75rem;
+      padding: 0.75rem 0.5rem;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+    
+    p {
+      font-size: 0.875rem;
+    }
+    
+    .mobile-actions-content {
+      padding: 1.25rem;
+    }
+    
+    .mobile-action-item {
+      padding: 0.625rem 0;
+      font-size: 0.8rem;
+    }
+  }
+
+  @media(max-width: 480px){
+    body {
+      font-size: 12px;
+    }
+    
+    th, td {
+      padding: 0.5rem 0.375rem;
+      font-size: 0.75rem;
+    }
+    
+    th {
+      font-size: 0.7rem;
+      padding: 0.625rem 0.375rem;
+    }
+    
+    .mobile-actions-btn {
+      width: 28px;
+      height: 28px;
+      font-size: 0.875rem;
+      padding: 0.25rem;
+    }
+    
+    .action-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+  }
+</style>
 </head>
 
 <body>
 
-    <header>
-        <nav class="nav">
-            <div class="logo">Mi Web</div>
-            <div class="menu">
-                <a onclick="showSection('inicio')">Inicio</a>
-                <a onclick="showSection('servicios')">Servicios</a>
-                <a onclick="showSection('contacto')">Contacto</a>
+<header>
+  <nav class="nav">
+    <div class="logo">Mi Web</div>
+    <div class="menu">
+      <a onclick="showSection('inicio')">Inicio</a>
+      <a onclick="showSection('servicios')">Servicios</a>
+      <a onclick="showSection('contacto')">Contacto</a>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  </nav>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="showSection('inicio'); toggleMenu();">Inicio</a>
+  <a onclick="showSection('servicios'); toggleMenu();">Servicios</a>
+  <a onclick="showSection('contacto'); toggleMenu();">Contacto</a>
+</div>
+
+<!-- SECCIONES -->
+<section id="inicio" class="active">
+  <h1>Bienvenido a Mi Web</h1>
+  <p>Explora nuestras secciones para conocer nuestros servicios y contactarnos fácilmente.</p>
+</section>
+
+<section id="servicios">
+  <h1>Servicios</h1>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Título</th>
+          <th class="desktop-only">Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Diseño Web Responsivo</td>
+          <td class="desktop-only">Creación de sitios web que se adaptan a todos los dispositivos móviles y escritorio.</td>
+          <td>
+            <div class="actions-desktop">
+              <button class="action-btn" onclick="viewDetail(1)">Ver</button>
+              <button class="action-btn" onclick="editItem(1)">Editar</button>
+              <button class="action-btn" onclick="deleteItem(1)">Eliminar</button>
             </div>
-            <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-        </nav>
-    </header>
+            <div class="mobile-only actions-mobile">
+              <button class="mobile-actions-btn" onclick="openMobileActions(1)">⋯</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Desarrollo de Aplicaciones</td>
+          <td class="desktop-only">Desarrollo de aplicaciones web y móviles personalizadas según tus necesidades.</td>
+          <td>
+            <div class="actions-desktop">
+              <button class="action-btn" onclick="viewDetail(2)">Ver</button>
+              <button class="action-btn" onclick="editItem(2)">Editar</button>
+              <button class="action-btn" onclick="deleteItem(2)">Eliminar</button>
+            </div>
+            <div class="mobile-only actions-mobile">
+              <button class="mobile-actions-btn" onclick="openMobileActions(2)">⋯</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Consultoría Tecnológica</td>
+          <td class="desktop-only">Asesoramiento especializado para optimizar tus procesos tecnológicos.</td>
+          <td>
+            <div class="actions-desktop">
+              <button class="action-btn" onclick="viewDetail(3)">Ver</button>
+              <button class="action-btn" onclick="editItem(3)">Editar</button>
+              <button class="action-btn" onclick="deleteItem(3)">Eliminar</button>
+            </div>
+            <div class="mobile-only actions-mobile">
+              <button class="mobile-actions-btn" onclick="openMobileActions(3)">⋯</button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Mantenimiento de Sistemas</td>
+          <td class="desktop-only">Soporte continuo y actualizaciones para mantener tus sistemas operativos.</td>
+          <td>
+            <div class="actions-desktop">
+              <button class="action-btn" onclick="viewDetail(4)">Ver</button>
+              <button class="action-btn" onclick="editItem(4)">Editar</button>
+              <button class="action-btn" onclick="deleteItem(4)">Eliminar</button>
+            </div>
+            <div class="mobile-only actions-mobile">
+              <button class="mobile-actions-btn" onclick="openMobileActions(4)">⋯</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <button class="primary-btn" onclick="openModal()">Ingresar Información</button>
+</section>
 
-    <div class="mobile-menu" id="mobileMenu">
-        <a onclick="showSection('inicio'); toggleMenu();">Inicio</a>
-        <a onclick="showSection('servicios'); toggleMenu();">Servicios</a>
-        <a onclick="showSection('contacto'); toggleMenu();">Contacto</a>
+<section id="contacto">
+  <h1>Contacto</h1>
+  <p>Correo: contacto@miweb.com<br>Teléfono: +123456789</p>
+</section>
+
+<!-- MODAL FORMULARIO -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2>Formulario</h2>
+    <input type="text" placeholder="Nombre">
+    <input type="email" placeholder="Correo">
+    <textarea placeholder="Mensaje"></textarea>
+    <button class="primary-btn" onclick="closeModal()">Enviar</button>
+  </div>
+</div>
+
+<!-- MENÚ DE ACCIONES PARA MÓVIL -->
+<div class="mobile-actions-menu" id="mobileActionsMenu">
+  <div class="mobile-actions-content">
+    <h3 style="margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600; color: var(--text);">Acciones</h3>
+    <div class="mobile-action-item" onclick="viewDetail(currentItemId); closeMobileActions()">
+      <span class="action-label">Ver detalle</span>
     </div>
-
-    <!-- SECCIONES -->
-    <section id="inicio" class="active">
-        <h1>Bienvenido a Mi Web</h1>
-        <p>Explora nuestras secciones para conocer nuestros servicios y contactarnos fácilmente.</p>
-    </section>
-
-    <section id="servicios">
-        <h1>Servicios</h1>
-        <table>
-            <tr>
-                <td>Servicio 1</td>
-            </tr>
-            <tr>
-                <td>Servicio 2</td>
-            </tr>
-            <tr>
-                <td>Servicio 3</td>
-            </tr>
-        </table>
-        <button onclick="openModal()">Ingresar Información</button>
-    </section>
-
-    <section id="contacto">
-        <h1>Contacto</h1>
-        <p>Correo: contacto@miweb.com<br>Teléfono: +123456789</p>
-    </section>
-
-    <!-- MODAL FORMULARIO -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <h2>Formulario</h2>
-            <input type="text" placeholder="Nombre">
-            <input type="email" placeholder="Correo">
-            <textarea placeholder="Mensaje"></textarea>
-            <button onclick="closeModal()">Enviar</button>
-        </div>
+    <div class="mobile-action-item" onclick="editItem(currentItemId); closeMobileActions()">
+      <span class="action-label">Editar</span>
     </div>
+    <div class="mobile-action-item" onclick="deleteItem(currentItemId); closeMobileActions()">
+      <span class="action-label">Eliminar</span>
+    </div>
+    <div class="mobile-action-item" onclick="closeMobileActions()" style="color: var(--text-light);">
+      <span class="action-label">Cancelar</span>
+    </div>
+  </div>
+</div>
 
-    <script>
-        // ===== Menú móvil =====
-        function toggleMenu() {
-            document.getElementById('mobileMenu').classList.toggle('show');
-        }
+<script>
+  // ===== Variables globales =====
+  let currentItemId = null;
 
-        // ===== Secciones =====
-        function showSection(id) {
-            const sections = document.querySelectorAll('section');
-            sections.forEach(sec => sec.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
+  // ===== Menú móvil =====
+  function toggleMenu(){
+    document.getElementById('mobileMenu').classList.toggle('show');
+  }
 
-        // ===== Modal =====
-        const modal = document.getElementById('modal');
-        function openModal() { modal.classList.add('show'); }
-        function closeModal() { modal.classList.remove('show'); }
-    </script>
+  // ===== Secciones =====
+  function showSection(id){
+    const sections = document.querySelectorAll('section');
+    sections.forEach(sec => sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ===== Modal =====
+  const modal = document.getElementById('modal');
+  function openModal(){ 
+    modal.classList.add('show'); 
+  }
+  
+  function closeModal(){ 
+    modal.classList.remove('show'); 
+  }
+
+  // ===== Menú de acciones para móvil =====
+  const mobileActionsMenu = document.getElementById('mobileActionsMenu');
+  
+  function openMobileActions(itemId) {
+    currentItemId = itemId;
+    mobileActionsMenu.classList.add('show');
+  }
+
+  function closeMobileActions() {
+    mobileActionsMenu.classList.remove('show');
+  }
+
+  // ===== Funciones de acciones =====
+  function viewDetail(id) {
+    alert(`Viendo detalle del servicio #${id}`);
+    // Aquí normalmente redirigirías o mostrarías más información
+  }
+
+  function editItem(id) {
+    alert(`Editando servicio #${id}`);
+    // Aquí normalmente abrirías un formulario de edición
+  }
+
+  function deleteItem(id) {
+    if(confirm(`¿Estás seguro de eliminar el servicio #${id}?`)) {
+      alert(`Servicio #${id} eliminado`);
+      // Aquí normalmente harías una petición al servidor
+    }
+  }
+
+  // Cerrar menús al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if(mobileActionsMenu.classList.contains('show') && 
+       !e.target.closest('.mobile-actions-content') && 
+       !e.target.closest('.mobile-actions-btn')) {
+      closeMobileActions();
+    }
+    
+    if(modal.classList.contains('show') && 
+       !e.target.closest('.modal-content') && 
+       e.target.classList.contains('modal')) {
+      closeModal();
+    }
+  });
+
+  // Cerrar con Escape
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') {
+      closeMobileActions();
+      closeModal();
+    }
+  });
+</script>
 
 </body>
-
 </html>
