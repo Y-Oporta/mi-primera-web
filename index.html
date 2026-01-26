@@ -3,586 +3,322 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Administración</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Panel de administración para gestionar usuarios">
+    <title>Mi Web</title>
 
     <style>
-        /* Variables de diseño */
+        /* ===== VARIABLES ===== */
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #0d47a1;
-            --secondary: #5f6368;
-            --danger: #d32f2f;
-            --warning: #f57c00;
-            --success: #2e7d32;
-            --light-gray: #f8f9fa;
-            --medium-gray: #e0e0e0;
-            --dark-gray: #5f6368;
-            --white: #ffffff;
-            --border-radius: 6px;
-            --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s ease;
+            --primary: #6366f1;
+            --bg: #f9fafb;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --text: #111827;
+            --muted: #6b7280;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --modal-bg: rgba(0, 0, 0, 0.4);
         }
 
-        /* Reset y estilos base */
+        /* ===== RESET ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: system-ui, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #202124;
-            line-height: 1.5;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            padding: 20px;
+            line-height: 1.5;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Encabezado */
+        /* ===== NAVBAR ===== */
         header {
-            margin-bottom: 40px;
-            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: var(--nav-bg);
+            box-shadow: 0 1px 6px var(--shadow);
         }
 
-        h1 {
-            font-size: 2.5rem;
-            color: var(--primary-dark);
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .subtitle {
-            color: var(--secondary);
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-        }
-
-        /* Tarjetas */
-        .card {
-            background: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            padding: 30px;
-            margin-bottom: 30px;
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .card-title {
-            font-size: 1.5rem;
-            color: var(--primary-dark);
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--light-gray);
+        .nav {
+            max-width: 1100px;
+            margin: auto;
+            padding: 1rem 1.25rem;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
         }
 
-        .card-title i {
+        .logo {
+            font-size: 1.1rem;
+            font-weight: 700;
             color: var(--primary);
         }
 
-        /* Formulario */
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
+        .menu {
+            display: flex;
+            gap: 1.75rem;
         }
 
-        .form-group {
-            margin-bottom: 0;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
+        .menu a {
+            text-decoration: none;
+            color: var(--muted);
             font-weight: 500;
-            color: var(--dark-gray);
             font-size: 0.95rem;
-        }
-
-        input[type="text"],
-        input[type="email"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--medium-gray);
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: var(--transition);
-            background: var(--white);
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
-        }
-
-        .btn {
-            padding: 12px 28px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            font-weight: 500;
+            transition: color 0.25s;
             cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
+        }
+
+        .menu a:hover {
+            color: var(--text);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        /* ===== MENU MÓVIL ===== */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--nav-bg);
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            gap: 8px;
+            align-items: center;
+            gap: 2rem;
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
+        .mobile-menu a {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        .mobile-menu a:hover {
+            color: var(--primary);
         }
 
-        .btn-primary:active {
+        .mobile-menu.show {
             transform: translateY(0);
         }
 
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        /* Buscador */
-        .search-container {
-            background: var(--light-gray);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 25px;
-            display: flex;
+        /* ===== SECCIONES ===== */
+        section {
+            max-width: 1100px;
+            margin: auto;
+            padding: 3rem 1.25rem;
+            min-height: calc(100vh - 64px);
+            display: none;
+            justify-content: center;
             align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            flex-direction: column;
         }
 
-        .search-box {
-            flex: 1;
-            min-width: 300px;
-            position: relative;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--secondary);
-        }
-
-        .search-box input {
-            padding-left: 45px;
-            width: 100%;
-        }
-
-        .stats {
+        section.active {
             display: flex;
-            gap: 20px;
-            color: var(--secondary);
-            font-size: 0.9rem;
         }
 
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        h1 {
+            font-size: clamp(1.6rem, 4vw, 2.8rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
         }
 
-        /* Tabla - Estilo para computadoras */
-        .table-container {
-            overflow-x: auto;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--medium-gray);
-            background: var(--white);
+        p {
+            font-size: 1rem;
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 2rem;
         }
 
+        /* ===== TABLA SERVICIOS ===== */
         table {
             width: 100%;
-            min-width: 900px;
             border-collapse: collapse;
-            font-size: 0.95rem;
-        }
-
-        thead {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-        }
-
-        th {
-            padding: 18px 20px;
-            text-align: left;
-            font-weight: 500;
-            white-space: nowrap;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        th:last-child {
-            border-right: none;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--light-gray);
-            transition: var(--transition);
-        }
-
-        tbody tr:hover {
-            background: linear-gradient(135deg, rgba(26, 115, 232, 0.05) 0%, rgba(13, 71, 161, 0.05) 100%);
+            margin-bottom: 2rem;
         }
 
         td {
-            padding: 18px 20px;
-            vertical-align: middle;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            color: var(--text);
         }
 
-        /* Acciones en tabla */
-        .action-buttons {
-            display: flex;
-            gap: 10px;
+        tr:not(:last-child) td {
+            border-bottom: 1px solid #e5e7eb;
         }
 
-        .btn-icon {
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            color: var(--secondary);
-            border: 1px solid var(--medium-gray);
-            font-size: 1.1rem;
-        }
+        /* sutil */
 
-        .btn-icon:hover {
+        /* ===== BOTÓN ===== */
+        button {
+            padding: 0.6rem 1.2rem;
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
-            transform: scale(1.1);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.25s;
         }
 
-        .btn-delete {
-            background: transparent;
-            color: var(--danger);
-            border: 1px solid var(--danger);
+        button:hover {
+            background: #4b49e1;
         }
 
-        .btn-delete:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-edit {
-            background: transparent;
-            color: var(--warning);
-            border: 1px solid var(--warning);
-        }
-
-        .btn-edit:hover {
-            background: var(--warning);
-            color: white;
-        }
-
-        /* Estados */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--secondary);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: var(--medium-gray);
-        }
-
-        .loading {
+        /* ===== MODAL FORM ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-bg);
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 40px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1001;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--light-gray);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .modal.show {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Responsive para tablets */
-        @media (max-width: 1024px) {
-            .container {
-                padding: 15px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .search-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search-box {
-                min-width: 100%;
-            }
-
-            .table-container {
-                border: none;
-                background: transparent;
-            }
-
-            table {
-                min-width: 100%;
-            }
-        }
-
-        /* Responsive para móviles */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .card {
-                padding: 15px;
-            }
-
-            .btn {
-                padding: 10px 20px;
-                width: 100%;
-                justify-content: center;
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-
-            th,
-            td {
-                padding: 12px 15px;
-            }
-
-            .action-buttons {
-                justify-content: center;
-            }
-        }
-
-        /* Mensajes */
-        .message {
-            padding: 15px 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
+        .modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 20px var(--shadow);
             display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        .message-success {
-            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%);
-            border-left: 4px solid var(--success);
-            color: var(--success);
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
         }
 
-        .message-error {
-            background: linear-gradient(135deg, rgba(211, 47, 47, 0.1) 0%, rgba(198, 40, 40, 0.1) 100%);
-            border-left: 4px solid var(--danger);
-            color: var(--danger);
+        .modal-content button {
+            align-self: flex-end;
         }
 
-        .message-info {
-            background: linear-gradient(135deg, rgba(26, 115, 232, 0.1) 0%, rgba(13, 71, 161, 0.1) 100%);
-            border-left: 4px solid var(--primary);
-            color: var(--primary);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
+        /* ===== RESPONSIVE ===== */
+        @media(max-width:768px) {
+            .menu {
+                display: none;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .menu-toggle {
+                display: block;
             }
-        }
 
-        /* Iconos (usando emojis como fallback) */
-        i {
-            font-style: normal;
-        }
-
-        .icon-add::before {
-            content: "➕";
-        }
-
-        .icon-users::before {
-            content: "👥";
-        }
-
-        .icon-search::before {
-            content: "🔍";
-        }
-
-        .icon-count::before {
-            content: "📊";
-        }
-
-        .icon-empty::before {
-            content: "📭";
-        }
-
-        .icon-edit::before {
-            content: "✏️";
-        }
-
-        .icon-delete::before {
-            content: "🗑️";
-        }
-
-        .icon-save::before {
-            content: "💾";
-        }
-
-        .icon-cancel::before {
-            content: "❌";
+            section {
+                padding: 2rem 1rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <h1>Panel de Administración</h1>
-            <p class="subtitle">Gestión completa de usuarios y permisos del sistema</p>
-        </header>
 
-        <div id="message-container"></div>
-
-        <!-- Formulario para agregar/editar -->
-        <div class="card">
-            <h2 class="card-title"><i class="icon-add"></i> Gestión de Usuarios</h2>
-
-            <form id="formulario">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nombre">Nombre completo</label>
-                        <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Correo electrónico</label>
-                        <input type="email" id="email" placeholder="ejemplo@correo.com" required>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="icon-save"></i> Guardar Usuario
-                    </button>
-                    <button type="button" id="btn-cancelar" class="btn" style="display: none;">
-                        <i class="icon-cancel"></i> Cancelar
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Panel de búsqueda y estadísticas -->
-        <div class="card">
-            <h2 class="card-title"><i class="icon-users"></i> Lista de Usuarios</h2>
-
-            <div class="search-container">
-                <div class="search-box">
-                    <i class="icon-search"></i>
-                    <input type="text" id="buscar" placeholder="Buscar usuarios por nombre o email...">
-                </div>
-
-                <div class="stats">
-                    <div class="stat-item">
-                        <i class="icon-count"></i>
-                        <span id="total-usuarios">0 usuarios</span>
-                    </div>
-                    <button type="button" id="btn-refresh" class="btn-icon" title="Actualizar lista">
-                        🔄
-                    </button>
-                </div>
+    <header>
+        <nav class="nav">
+            <div class="logo">Mi Web</div>
+            <div class="menu">
+                <a onclick="showSection('inicio')">Inicio</a>
+                <a onclick="showSection('servicios')">Servicios</a>
+                <a onclick="showSection('contacto')">Contacto</a>
             </div>
+            <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        </nav>
+    </header>
 
-            <!-- Tabla de usuarios -->
-            <div class="table-container">
-                <table id="tabla-usuarios">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Fecha de Registro</th>
-                            <th>Última Actualización</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-datos">
-                        <tr id="loading-row">
-                            <td colspan="5" class="loading">
-                                <div class="spinner"></div>
-                                <span style="margin-left: 10px;">Cargando usuarios...</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <div class="mobile-menu" id="mobileMenu">
+        <a onclick="showSection('inicio'); toggleMenu();">Inicio</a>
+        <a onclick="showSection('servicios'); toggleMenu();">Servicios</a>
+        <a onclick="showSection('contacto'); toggleMenu();">Contacto</a>
+    </div>
 
-            <div id="empty-state" class="empty-state" style="display: none;">
-                <i class="icon-empty"></i>
-                <h3>No hay usuarios registrados</h3>
-                <p>Comienza agregando tu primer usuario usando el formulario superior.</p>
-            </div>
+    <!-- SECCIONES -->
+    <section id="inicio" class="active">
+        <h1>Bienvenido a Mi Web</h1>
+        <p>Explora nuestras secciones para conocer nuestros servicios y contactarnos fácilmente.</p>
+    </section>
+
+    <section id="servicios">
+        <h1>Servicios</h1>
+        <table>
+            <tr>
+                <td>Servicio 1</td>
+            </tr>
+            <tr>
+                <td>Servicio 2</td>
+            </tr>
+            <tr>
+                <td>Servicio 3</td>
+            </tr>
+        </table>
+        <button onclick="openModal()">Ingresar Información</button>
+    </section>
+
+    <section id="contacto">
+        <h1>Contacto</h1>
+        <p>Correo: contacto@miweb.com<br>Teléfono: +123456789</p>
+    </section>
+
+    <!-- MODAL FORMULARIO -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2>Formulario</h2>
+            <input type="text" placeholder="Nombre">
+            <input type="email" placeholder="Correo">
+            <textarea placeholder="Mensaje"></textarea>
+            <button onclick="closeModal()">Enviar</button>
         </div>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <script>
+        // ===== Menú móvil =====
+        function toggleMenu() {
+            document.getElementById('mobileMenu').classList.toggle('show');
+        }
+
+        // ===== Secciones =====
+        function showSection(id) {
+            const sections = document.querySelectorAll('section');
+            sections.forEach(sec => sec.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // ===== Modal =====
+        const modal = document.getElementById('modal');
+        function openModal() { modal.classList.add('show'); }
+        function closeModal() { modal.classList.remove('show'); }
+    </script>
+
 </body>
 
 </html>
