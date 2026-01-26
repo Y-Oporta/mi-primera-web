@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduPro - Notas</title>
+    <title>Notes Codex</title>
 
     <style>
         /* ===== VARIABLES ===== */
@@ -30,6 +30,8 @@
             --warning-light: #fef3c7;
             --info: #3b82f6;
             --info-light: #dbeafe;
+            --success: #10b981;
+            --success-light: #d1fae5;
         }
 
         /* ===== RESET ===== */
@@ -46,6 +48,7 @@
             min-height: 100vh;
             line-height: 1.5;
             font-size: 14px;
+            overflow-x: hidden;
         }
 
         /* ===== ANIMACIONES ===== */
@@ -73,18 +76,6 @@
             }
         }
 
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
-        }
-
         @keyframes slideInRight {
             from {
                 transform: translateX(100%);
@@ -95,6 +86,99 @@
                 transform: translateX(0);
                 opacity: 1;
             }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== NOTIFICACIONES CUSTOM ===== */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 350px;
+        }
+
+        .notification {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+            animation: fadeInUp 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            transform: translateX(0);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .notification.hiding {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .notification.success {
+            border-left-color: var(--success);
+        }
+
+        .notification.warning {
+            border-left-color: var(--warning);
+        }
+
+        .notification.error {
+            border-left-color: var(--danger);
+        }
+
+        .notification.info {
+            border-left-color: var(--info);
+        }
+
+        .notification-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text);
+        }
+
+        .notification-message {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .notification-close:hover {
+            color: var(--text);
         }
 
         /* ===== NAVBAR ===== */
@@ -118,7 +202,7 @@
         }
 
         .logo {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--primary);
             letter-spacing: -0.5px;
@@ -344,10 +428,6 @@
             color: var(--text);
         }
 
-        .clear-filters-btn i {
-            font-size: 1rem;
-        }
-
         /* ===== BOTÓN PRINCIPAL ===== */
         .primary-btn {
             padding: 0.625rem 1.25rem;
@@ -563,7 +643,7 @@
             color: white;
         }
 
-        /* ===== DETALLE MODAL - ESTILO TICKET ===== */
+        /* ===== DETALLE MODAL - ESTILO LIMPIO ===== */
         .detail-modal {
             position: fixed;
             top: 0;
@@ -578,6 +658,9 @@
             pointer-events: none;
             transition: opacity 0.3s;
             z-index: 1004;
+            padding: 1rem;
+            box-sizing: border-box;
+            overflow: auto;
         }
 
         .detail-modal.show {
@@ -589,39 +672,13 @@
             background: white;
             padding: 2rem;
             border-radius: 12px;
-            width: 90%;
+            width: 100%;
             max-width: 500px;
-            max-height: 80vh;
+            max-height: calc(100vh - 2rem);
             overflow-y: auto;
-            animation: slideInRight 0.3s ease;
+            animation: fadeInUp 0.3s ease;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             position: relative;
-        }
-
-        /* Estilo tipo ticket */
-        .detail-modal-content::before {
-            content: '';
-            position: absolute;
-            left: 20px;
-            top: 0;
-            width: calc(100% - 40px);
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 2px 2px 0 0;
-        }
-
-        .detail-modal-content::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 20%;
-            width: 10px;
-            height: 60%;
-            background: repeating-linear-gradient(transparent,
-                    transparent 10px,
-                    var(--border) 10px,
-                    var(--border) 20px);
-            border-radius: 0 4px 4px 0;
         }
 
         .detail-header {
@@ -629,20 +686,23 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 1.5rem;
-            padding-top: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
         }
 
         .detail-title {
             font-size: 1.5rem;
             font-weight: 600;
             color: var(--text);
-            margin: 0;
+            margin: 0 0 0.25rem 0;
         }
 
         .detail-id {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            font-weight: 500;
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: monospace;
+            letter-spacing: 0.5px;
         }
 
         .close-detail-btn {
@@ -653,6 +713,7 @@
             color: var(--text-light);
             padding: 0.25rem;
             transition: color 0.3s;
+            line-height: 1;
         }
 
         .close-detail-btn:hover {
@@ -662,45 +723,41 @@
         .detail-info {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
         }
 
         .detail-item {
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg);
+            padding: 0;
         }
 
         .detail-label {
             color: var(--text-light);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .detail-label i {
-            font-size: 1rem;
+            display: block;
         }
 
         .detail-value {
             color: var(--text);
             font-size: 1rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 6px;
+            margin-top: 0.25rem;
         }
 
         .detail-status {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
-            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         /* ===== MODAL DE FORMULARIO COMPLETO ===== */
@@ -718,6 +775,9 @@
             pointer-events: none;
             transition: opacity 0.3s;
             z-index: 1001;
+            padding: 1rem;
+            box-sizing: border-box;
+            overflow: auto;
         }
 
         .modal.show {
@@ -729,11 +789,11 @@
             background: white;
             padding: 2rem;
             border-radius: 12px;
-            width: 90%;
+            width: 100%;
             max-width: 450px;
-            max-height: 85vh;
+            max-height: calc(100vh - 2rem);
             overflow-y: auto;
-            animation: fadeIn 0.3s ease;
+            animation: fadeInUp 0.3s ease;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
@@ -742,17 +802,10 @@
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .modal-content h2 i {
-            font-size: 1.1rem;
         }
 
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
         }
 
         .form-label {
@@ -772,6 +825,7 @@
             border-radius: 6px;
             font-size: 0.875rem;
             transition: all 0.3s;
+            box-sizing: border-box;
         }
 
         .form-input:focus,
@@ -797,6 +851,7 @@
         .checkbox-group input {
             width: 18px;
             height: 18px;
+            cursor: pointer;
         }
 
         .checkbox-group label {
@@ -819,8 +874,8 @@
             justify-content: flex-end;
             gap: 0.75rem;
             margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--border);
         }
 
         /* ===== PAGINACIÓN ===== */
@@ -889,6 +944,8 @@
             pointer-events: none;
             transition: opacity 0.3s;
             z-index: 1002;
+            padding: 1rem;
+            box-sizing: border-box;
         }
 
         .mobile-actions-menu.show {
@@ -900,9 +957,9 @@
             background: white;
             padding: 1.5rem;
             border-radius: 12px;
-            width: 90%;
-            max-width: 280px;
-            animation: fadeIn 0.3s ease;
+            width: 100%;
+            max-width: 300px;
+            animation: fadeInUp 0.3s ease;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
@@ -915,7 +972,7 @@
             justify-content: space-between;
             font-size: 0.875rem;
             color: var(--text);
-            transition: color 0.3s;
+            transition: all 0.3s;
         }
 
         .mobile-action-item:last-child {
@@ -946,6 +1003,8 @@
         }
 
         @media (max-width: 768px) {
+
+            /* Texto más pequeño en móvil */
             body {
                 font-size: 13px;
             }
@@ -1008,6 +1067,7 @@
 
             .mobile-detail-label {
                 min-width: 60px;
+                font-size: 0.75rem;
             }
 
             .mobile-row-title {
@@ -1018,23 +1078,29 @@
                 font-size: 0.8rem;
             }
 
-            .detail-modal-content {
+            .detail-modal-content,
+            .modal-content,
+            .mobile-actions-content {
                 padding: 1.5rem;
-                max-height: 85vh;
-                width: 95%;
-            }
-
-            .detail-modal-content::after {
-                display: none;
+                max-height: calc(100vh - 2rem);
             }
 
             .detail-title {
                 font-size: 1.25rem;
             }
 
+            .detail-value {
+                font-size: 0.95rem;
+                padding: 0.5rem;
+            }
+
             .form-row {
                 flex-direction: column;
                 gap: 0;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
             }
 
             .pagination {
@@ -1050,11 +1116,25 @@
             .page-info {
                 font-size: 0.8rem;
             }
+
+            .notification-container {
+                left: 1rem;
+                right: 1rem;
+                max-width: 100%;
+            }
+
+            .notification {
+                padding: 0.875rem;
+            }
         }
 
         @media (max-width: 480px) {
             body {
                 font-size: 12px;
+            }
+
+            .logo {
+                font-size: 1.1rem;
             }
 
             .mobile-row {
@@ -1063,7 +1143,7 @@
 
             .mobile-detail-label {
                 min-width: 50px;
-                font-size: 0.75rem;
+                font-size: 0.7rem;
             }
 
             .mobile-detail-value {
@@ -1087,7 +1167,9 @@
                 font-size: 0.75rem;
             }
 
-            .detail-modal-content {
+            .detail-modal-content,
+            .modal-content,
+            .mobile-actions-content {
                 padding: 1.25rem;
             }
 
@@ -1096,8 +1178,15 @@
                 font-size: 0.8rem;
             }
 
-            .modal-content {
-                padding: 1.5rem;
+            .form-input,
+            .form-textarea,
+            .form-select {
+                padding: 0.625rem;
+                font-size: 0.8rem;
+            }
+
+            h1 {
+                font-size: 1.4rem;
             }
         }
     </style>
@@ -1105,9 +1194,12 @@
 
 <body>
 
+    <!-- Contenedor de notificaciones -->
+    <div class="notification-container" id="notificationContainer"></div>
+
     <header>
         <nav class="nav">
-            <div class="logo">EduPro</div>
+            <div class="logo">Notes Codex</div>
             <div class="menu">
                 <a onclick="showSection('inicio')">Inicio</a>
                 <a onclick="showSection('notas')">Notas</a>
@@ -1125,9 +1217,9 @@
 
     <!-- SECCIONES -->
     <section id="inicio" class="active">
-        <h1>Bienvenido a EduPro</h1>
+        <h1>Bienvenido a Notes Codex</h1>
         <p style="text-align: center; color: var(--text-light); max-width: 600px; font-size: 0.95rem;">
-            Sistema de gestión de notas y recordatorios académicos
+            Sistema de gestión de notas académicas y profesionales
         </p>
     </section>
 
@@ -1170,7 +1262,7 @@
             <table class="desktop-table">
                 <thead>
                     <tr>
-                        <th>N°</th>
+                        <th>ID</th>
                         <th>Título</th>
                         <th>Descripción</th>
                         <th>Categoría</th>
@@ -1199,7 +1291,7 @@
     <section id="contacto">
         <h1>Contacto</h1>
         <p style="text-align: center; color: var(--text-light);">
-            Correo: contacto@edupro.com<br>
+            Correo: contacto@notescodex.com<br>
             Teléfono: +123456789<br>
             Dirección: Av. Principal 123, Ciudad
         </p>
@@ -1213,7 +1305,7 @@
     <!-- MODAL FORMULARIO (Crear/Editar) -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <h2><span id="modalIcon">📝</span> <span id="modalTitle">Nueva Nota</span></h2>
+            <h2 id="modalTitle">Nueva Nota</h2>
 
             <div class="form-group">
                 <label class="form-label">Título *</label>
@@ -1291,57 +1383,57 @@
         </div>
     </div>
 
-    <!-- MODAL DE DETALLE (Estilo Ticket) -->
+    <!-- MODAL DE DETALLE (Estilo Limpio) -->
     <div class="detail-modal" id="detailModal">
         <div class="detail-modal-content">
             <div class="detail-header">
                 <div>
                     <h3 class="detail-title" id="detailTitle">Título de la Nota</h3>
-                    <div class="detail-id">ID: <span id="detailId">-</span></div>
+                    <div class="detail-id" id="detailIdCode">NT:000</div>
                 </div>
                 <button class="close-detail-btn" onclick="closeDetailModal()">×</button>
             </div>
 
             <div class="detail-info">
                 <div class="detail-item">
-                    <div class="detail-label">📋 Descripción</div>
+                    <span class="detail-label">Descripción</span>
                     <div class="detail-value" id="detailDescription">-</div>
                 </div>
 
                 <div class="detail-item">
-                    <div class="detail-label">🏷️ Categoría</div>
+                    <span class="detail-label">Categoría</span>
                     <div class="detail-value" id="detailCategory">-</div>
                 </div>
 
                 <div class="detail-item">
-                    <div class="detail-label">⚡ Estado</div>
-                    <div class="detail-value">
+                    <span class="detail-label">Estado</span>
+                    <div>
                         <span id="detailStatus" class="detail-status">-</span>
                     </div>
                 </div>
 
                 <div class="detail-item">
-                    <div class="detail-label">🎯 Prioridad</div>
+                    <span class="detail-label">Prioridad</span>
                     <div class="detail-value" id="detailPriority">-</div>
                 </div>
 
                 <div class="detail-item">
-                    <div class="detail-label">📅 Fecha de Registro</div>
+                    <span class="detail-label">Fecha de Registro</span>
                     <div class="detail-value" id="detailCreatedAt">-</div>
                 </div>
 
                 <div class="detail-item">
-                    <div class="detail-label">⏰ Fecha de Vencimiento</div>
+                    <span class="detail-label">Fecha de Vencimiento</span>
                     <div class="detail-value" id="detailDueDate">-</div>
                 </div>
 
                 <div class="detail-item">
-                    <div class="detail-label">🔔 Recordatorio</div>
+                    <span class="detail-label">Recordatorio</span>
                     <div class="detail-value" id="detailReminder">-</div>
                 </div>
 
-                <div class="detail-item" style="border-bottom: none;">
-                    <div class="detail-label">🔄 Última Actualización</div>
+                <div class="detail-item">
+                    <span class="detail-label">Última Actualización</span>
                     <div class="detail-value" id="detailUpdatedAt">-</div>
                 </div>
             </div>
@@ -1352,13 +1444,13 @@
     <div class="mobile-actions-menu" id="mobileActionsMenu">
         <div class="mobile-actions-content">
             <h3 style="margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600; color: var(--text);">Acciones</h3>
-            <div class="mobile-action-item" onclick="viewDetail(currentItemId); closeMobileActions()">
+            <div class="mobile-action-item" onclick="handleMobileAction('view')">
                 <span class="action-label">Ver detalle</span>
             </div>
-            <div class="mobile-action-item" onclick="editItem(currentItemId); closeMobileActions()">
+            <div class="mobile-action-item" onclick="handleMobileAction('edit')">
                 <span class="action-label">Editar</span>
             </div>
-            <div class="mobile-action-item" onclick="deleteItem(currentItemId); closeMobileActions()">
+            <div class="mobile-action-item" onclick="handleMobileAction('delete')">
                 <span class="action-label">Eliminar</span>
             </div>
             <div class="mobile-action-item" onclick="closeMobileActions()" style="color: var(--text-light);">
@@ -1375,8 +1467,59 @@
         let allData = [];
         let filteredData = [];
         let isEditing = false;
+        let mobileActionType = null;
 
-        // ===== Datos de ejemplo (solo 3 notas como solicitaste) =====
+        // ===== Sistema de Notificaciones =====
+        function showNotification(type, title, message, duration = 4000) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+
+            // Iconos por tipo
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            notification.innerHTML = `
+      <div class="notification-icon">${icons[type] || '•'}</div>
+      <div class="notification-content">
+        <div class="notification-title">${title}</div>
+        <div class="notification-message">${message}</div>
+      </div>
+      <button class="notification-close" onclick="closeNotification(this)">×</button>
+    `;
+
+            container.appendChild(notification);
+
+            // Auto cerrar después de la duración
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.classList.add('hiding');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, duration);
+
+            return notification;
+        }
+
+        function closeNotification(button) {
+            const notification = button.closest('.notification');
+            notification.classList.add('hiding');
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }
+
+        // ===== Datos de ejemplo (solo 3 notas) =====
         const sampleData = [
             {
                 id: 1,
@@ -1419,6 +1562,11 @@
             }
         ];
 
+        // ===== Función para generar ID con formato NT:000 =====
+        function generateNoteId(id) {
+            return `NT:${String(id).padStart(3, '0')}`;
+        }
+
         // ===== Inicialización =====
         document.addEventListener('DOMContentLoaded', function () {
             allData = [...sampleData];
@@ -1426,8 +1574,11 @@
             renderTable();
 
             // Configurar recordatorio toggle
-            document.getElementById('noteHasReminder').addEventListener('change', function () {
-                document.getElementById('reminderDetails').style.display = this.checked ? 'block' : 'none';
+            const reminderCheckbox = document.getElementById('noteHasReminder');
+            const reminderDetails = document.getElementById('reminderDetails');
+
+            reminderCheckbox.addEventListener('change', function () {
+                reminderDetails.style.display = this.checked ? 'block' : 'none';
             });
         });
 
@@ -1473,7 +1624,7 @@
                 const row = document.createElement('tr');
                 row.style.animationDelay = `${index * 0.05}s`;
                 row.innerHTML = `
-        <td>${item.id}</td>
+        <td><strong>${generateNoteId(item.id)}</strong></td>
         <td><strong>${item.title}</strong></td>
         <td>${item.description.substring(0, 60)}${item.description.length > 60 ? '...' : ''}</td>
         <td>
@@ -1527,14 +1678,15 @@
                 row.innerHTML = `
         <div class="mobile-row-content">
           <div class="mobile-row-header">
-            <div class="mobile-row-title">${item.title}</div>
+            <div>
+              <div class="mobile-row-title">${item.title}</div>
+              <div style="font-size: 0.7rem; color: var(--primary); font-weight: 600; margin-top: 0.125rem;">
+                ${generateNoteId(item.id)}
+              </div>
+            </div>
             <button class="mobile-actions-btn" onclick="openMobileActions(${item.id})">⋯</button>
           </div>
           <div class="mobile-row-details">
-            <div class="mobile-detail-item">
-              <span class="mobile-detail-label">ID:</span>
-              <span class="mobile-detail-value">${item.id}</span>
-            </div>
             <div class="mobile-detail-item">
               <span class="mobile-detail-label">Categoría:</span>
               <span class="mobile-detail-value">
@@ -1562,6 +1714,14 @@
                   color: ${getStatusColor(item.status).text};
                 ">
                   ${getStatusText(item.status)}
+                </span>
+              </span>
+            </div>
+            <div class="mobile-detail-item">
+              <span class="mobile-detail-label">Prioridad:</span>
+              <span class="mobile-detail-value">
+                <span style="color: ${getPriorityColor(item.priority)}; font-weight: 600;">
+                  ${item.priority.charAt(0).toUpperCase() + item.priority.slice(1)}
                 </span>
               </span>
             </div>
@@ -1649,7 +1809,7 @@
             filteredData = allData.filter(item => {
                 const matchesSearch = item.title.toLowerCase().includes(searchTerm) ||
                     item.description.toLowerCase().includes(searchTerm) ||
-                    item.category.toLowerCase().includes(searchTerm);
+                    getCategoryText(item.category).toLowerCase().includes(searchTerm);
                 const matchesStatus = !statusFilter || item.status === statusFilter;
                 const matchesPriority = !priorityFilter || item.priority === priorityFilter;
 
@@ -1669,6 +1829,8 @@
             filteredData = [...allData];
             currentPage = 1;
             renderTable();
+
+            showNotification('info', 'Filtros Limpiados', 'Todos los filtros han sido restablecidos');
         }
 
         // ===== Cambiar página =====
@@ -1731,14 +1893,14 @@
             return colors[priority] || '#6b7280';
         }
 
-        // ===== Modal de Detalle (Estilo Ticket) =====
+        // ===== Modal de Detalle (Estilo Limpio) =====
         const detailModal = document.getElementById('detailModal');
 
         function openDetailModal(id) {
             const item = allData.find(i => i.id === id);
             if (item) {
                 document.getElementById('detailTitle').textContent = item.title;
-                document.getElementById('detailId').textContent = item.id;
+                document.getElementById('detailIdCode').textContent = generateNoteId(item.id);
                 document.getElementById('detailDescription').textContent = item.description;
                 document.getElementById('detailCategory').textContent = getCategoryText(item.category);
 
@@ -1776,7 +1938,6 @@
             isEditing = itemId !== null;
 
             const modalTitle = document.getElementById('modalTitle');
-            const modalIcon = document.getElementById('modalIcon');
             const saveBtnText = document.getElementById('saveBtnText');
 
             if (isEditing && itemId) {
@@ -1785,7 +1946,6 @@
                 if (item) {
                     currentItemId = itemId;
                     modalTitle.textContent = 'Editar Nota';
-                    modalIcon.textContent = '✏️';
                     saveBtnText.textContent = 'Actualizar Nota';
 
                     // Llenar formulario con datos existentes
@@ -1794,12 +1954,13 @@
                     document.getElementById('noteCategory').value = item.category;
                     document.getElementById('notePriority').value = item.priority;
                     document.getElementById('noteCreatedAt').value = item.createdAt;
-                    document.getElementById('noteDueDate').value = item.dueDate;
+                    document.getElementById('noteDueDate').value = item.dueDate || '';
                     document.getElementById('noteStatus').value = item.status;
 
                     const hasReminder = document.getElementById('noteHasReminder');
                     hasReminder.checked = item.reminder;
-                    document.getElementById('reminderDetails').style.display = item.reminder ? 'block' : 'none';
+                    const reminderDetails = document.getElementById('reminderDetails');
+                    reminderDetails.style.display = item.reminder ? 'block' : 'none';
 
                     if (item.reminderDate) {
                         document.getElementById('noteReminderDate').value = item.reminderDate;
@@ -1809,7 +1970,6 @@
                 // Modo creación
                 currentItemId = null;
                 modalTitle.textContent = 'Nueva Nota';
-                modalIcon.textContent = '📝';
                 saveBtnText.textContent = 'Crear Nota';
 
                 // Limpiar formulario
@@ -1837,7 +1997,7 @@
             // Validar campos requeridos
             const title = document.getElementById('noteTitle').value.trim();
             if (!title) {
-                alert('El título es obligatorio');
+                showNotification('error', 'Error', 'El título es obligatorio');
                 return;
             }
 
@@ -1853,7 +2013,7 @@
                             category: document.getElementById('noteCategory').value,
                             priority: document.getElementById('notePriority').value,
                             createdAt: document.getElementById('noteCreatedAt').value,
-                            dueDate: document.getElementById('noteDueDate').value,
+                            dueDate: document.getElementById('noteDueDate').value || null,
                             status: document.getElementById('noteStatus').value,
                             reminder: document.getElementById('noteHasReminder').checked,
                             reminderDate: document.getElementById('noteHasReminder').checked
@@ -1861,10 +2021,12 @@
                                 : null,
                             updatedAt: new Date().toISOString().split('T')[0]
                         };
+
+                        showNotification('success', 'Nota Actualizada', `La nota "${title}" ha sido actualizada correctamente`);
                     }
                 } else {
                     // Crear nueva nota
-                    const newId = Math.max(...allData.map(item => item.id)) + 1;
+                    const newId = allData.length > 0 ? Math.max(...allData.map(item => item.id)) + 1 : 1;
                     const newNote = {
                         id: newId,
                         title: title,
@@ -1872,7 +2034,7 @@
                         category: document.getElementById('noteCategory').value,
                         priority: document.getElementById('notePriority').value,
                         createdAt: document.getElementById('noteCreatedAt').value,
-                        dueDate: document.getElementById('noteDueDate').value,
+                        dueDate: document.getElementById('noteDueDate').value || null,
                         status: document.getElementById('noteStatus').value,
                         reminder: document.getElementById('noteHasReminder').checked,
                         reminderDate: document.getElementById('noteHasReminder').checked
@@ -1882,6 +2044,7 @@
                     };
 
                     allData.unshift(newNote); // Agregar al inicio
+                    showNotification('success', 'Nota Creada', `La nota "${title}" ha sido creada correctamente`);
                 }
 
                 // Actualizar tabla y cerrar modal
@@ -1893,25 +2056,63 @@
         // ===== Funciones de edición y eliminación =====
         function editItem(id) {
             openModal(id);
-            closeMobileActions();
         }
 
         function deleteItem(id) {
-            if (confirm(`¿Estás seguro de eliminar la nota #${id}? Esta acción no se puede deshacer.`)) {
+            const item = allData.find(i => i.id === id);
+            if (!item) return;
+
+            // Crear modal de confirmación personalizado
+            const confirmDelete = confirm(`¿Estás seguro de eliminar la nota "${item.title}" (${generateNoteId(id)})?`);
+
+            if (confirmDelete) {
                 simulateLoad(() => {
                     const index = allData.findIndex(i => i.id === id);
                     if (index !== -1) {
+                        const deletedTitle = allData[index].title;
                         allData.splice(index, 1);
                         filterTable();
-                        closeMobileActions();
+                        showNotification('success', 'Nota Eliminada', `La nota "${deletedTitle}" ha sido eliminada`);
                     }
                 });
             }
         }
 
+        // ===== Menú de acciones móvil =====
+        function openMobileActions(itemId) {
+            currentItemId = itemId;
+            const menu = document.getElementById('mobileActionsMenu');
+            menu.classList.add('show');
+        }
+
+        function closeMobileActions() {
+            const menu = document.getElementById('mobileActionsMenu');
+            menu.classList.remove('show');
+            currentItemId = null;
+        }
+
+        function handleMobileAction(action) {
+            if (!currentItemId) return;
+
+            closeMobileActions();
+
+            switch (action) {
+                case 'view':
+                    openDetailModal(currentItemId);
+                    break;
+                case 'edit':
+                    editItem(currentItemId);
+                    break;
+                case 'delete':
+                    deleteItem(currentItemId);
+                    break;
+            }
+        }
+
         // ===== Menú móvil =====
         function toggleMenu() {
-            document.getElementById('mobileMenu').classList.toggle('show');
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('show');
         }
 
         // ===== Secciones =====
@@ -1925,22 +2126,11 @@
             }
         }
 
-        // ===== Menú de acciones para móvil =====
-        const mobileActionsMenu = document.getElementById('mobileActionsMenu');
-
-        function openMobileActions(itemId) {
-            currentItemId = itemId;
-            mobileActionsMenu.classList.add('show');
-        }
-
-        function closeMobileActions() {
-            mobileActionsMenu.classList.remove('show');
-        }
-
-        // ===== Event Listeners =====
+        // ===== Event Listeners mejorados =====
         document.addEventListener('click', (e) => {
             // Cerrar menú de acciones móvil
-            if (mobileActionsMenu.classList.contains('show') &&
+            const mobileMenu = document.getElementById('mobileActionsMenu');
+            if (mobileMenu.classList.contains('show') &&
                 !e.target.closest('.mobile-actions-content') &&
                 !e.target.closest('.mobile-actions-btn')) {
                 closeMobileActions();
@@ -1972,6 +2162,24 @@
         // Recalcular paginación al redimensionar
         window.addEventListener('resize', () => {
             renderPagination();
+        });
+
+        // Prevenir scroll en el body cuando un modal está abierto
+        function preventBodyScroll() {
+            const modals = document.querySelectorAll('.modal.show, .detail-modal.show, .mobile-actions-menu.show');
+            if (modals.length > 0) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Observar cambios en los modales
+        const observer = new MutationObserver(preventBodyScroll);
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class'],
+            subtree: true
         });
     </script>
 </body>
