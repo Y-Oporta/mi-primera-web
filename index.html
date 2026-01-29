@@ -1,1566 +1,1453 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notes Codex</title>
-
-    <style>
-        /* ===== VARIABLES ===== */
-        :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --primary-light: #d1fae5;
-            --primary-light-2: #a7f3d0;
-            --bg: #f9fafb;
-            --nav-bg: rgba(255, 255, 255, 0.95);
-            --text: #111827;
-            --text-light: #6b7280;
-            --text-muted: #9ca3af;
-            --border: #e5e7eb;
-            --modal-bg: rgba(0, 0, 0, 0.4);
-            --hover-bg: #f3f4f6;
-            --card-bg: #ffffff;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --danger: #ef4444;
-            --danger-light: #fee2e2;
-            --warning: #f59e0b;
-            --warning-light: #fef3c7;
-            --info: #3b82f6;
-            --info-light: #dbeafe;
-            --success: #10b981;
-            --success-light: #d1fae5;
-        }
-
-        /* ===== RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            line-height: 1.5;
-            font-size: 14px;
-            overflow-x: hidden;
-        }
-
-        /* ===== ANIMACIONES ===== */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(-20px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== NOTIFICACIONES CUSTOM ===== */
-        .notification-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 350px;
-        }
-
-        .notification {
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid var(--primary);
-            animation: fadeInUp 0.3s ease;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            transform: translateX(0);
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        .notification.hiding {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-
-        .notification.success {
-            border-left-color: var(--success);
-        }
-
-        .notification.warning {
-            border-left-color: var(--warning);
-        }
-
-        .notification.error {
-            border-left-color: var(--danger);
-        }
-
-        .notification.info {
-            border-left-color: var(--info);
-        }
-
-        .notification-icon {
-            font-size: 1.25rem;
-            flex-shrink: 0;
-        }
-
-        .notification-content {
-            flex: 1;
-        }
-
-        .notification-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            color: var(--text);
-        }
-
-        .notification-message {
-            font-size: 0.875rem;
-            color: var(--text-light);
-        }
-
-        .notification-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 0.25rem;
-            font-size: 1rem;
-            line-height: 1;
-        }
-
-        .notification-close:hover {
-            color: var(--text);
-        }
-
-        /* ===== NAVBAR ===== */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(8px);
-            background: var(--nav-bg);
-            border-bottom: 1px solid var(--border);
-            animation: slideIn 0.3s ease;
-        }
-
-        .nav {
-            max-width: 1100px;
-            margin: auto;
-            padding: 0.875rem 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: -0.5px;
-        }
-
-        .menu {
-            display: flex;
-            gap: 1.75rem;
-        }
-
-        .menu a {
-            text-decoration: none;
-            color: var(--text-light);
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-            cursor: pointer;
-            padding: 0.25rem 0;
-            position: relative;
-        }
-
-        .menu a:hover {
-            color: var(--primary);
-        }
-
-        .menu a:hover::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--primary);
-            border-radius: 1px;
-        }
-
-        .menu-toggle {
-            display: none;
-            font-size: 1.25rem;
-            cursor: pointer;
-            color: var(--text);
-            padding: 0.25rem;
-        }
-
-        /* ===== MENU MÓVIL ===== */
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--nav-bg);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 1.5rem;
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-            z-index: 999;
-        }
-
-        .mobile-menu a {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--text);
-            padding: 0.5rem 0;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .mobile-menu a:hover {
-            color: var(--primary);
-        }
-
-        .mobile-menu.show {
-            transform: translateY(0);
-        }
-
-        /* ===== SECCIONES ===== */
-        section {
-            max-width: 1100px;
-            margin: auto;
-            padding: 1.5rem 1.25rem;
-            min-height: calc(100vh - 64px);
-            display: none;
-            flex-direction: column;
-            animation: fadeIn 0.3s ease;
-        }
-
-        section.active {
-            display: flex;
-        }
-
-        h1 {
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            color: var(--text);
-            letter-spacing: -0.5px;
-        }
-
-        /* ===== LOADING ANIMATION ===== */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--modal-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1003;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .loading-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--primary-light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ===== CONTROLES DE TABLA ===== */
-        .table-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            align-items: center;
-            justify-content: space-between;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .table-header {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 1.5rem;
-        }
-
-        .search-container {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.625rem 1rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.875rem;
-            background: white;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        .filter-container {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .filter-select {
-            padding: 0.625rem 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.875rem;
-            background: white;
-            color: var(--text);
-            transition: all 0.3s;
-            min-width: 140px;
-        }
-
-        .filter-select:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-
-        .clear-filters-btn {
-            padding: 0.625rem 1rem;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-light);
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .clear-filters-btn:hover {
-            background: var(--hover-bg);
-            border-color: var(--text-light);
-            color: var(--text);
-        }
-
-        /* ===== BOTÓN PRINCIPAL ===== */
-        .primary-btn {
-            padding: 0.625rem 1.25rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-            font-size: 0.875rem;
-            letter-spacing: 0.3px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .primary-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .danger-btn {
-            background: var(--danger);
-        }
-
-        .danger-btn:hover {
-            background: #dc2626;
-        }
-
-        /* ===== TABLA RESPONSIVA ===== */
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            animation: fadeIn 0.5s ease;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 700px;
-        }
-
-        /* Estilo para escritorio */
-        .desktop-table {
-            display: table;
-        }
-
-        .mobile-table {
-            display: none;
-        }
-
-        th {
-            padding: 0.875rem 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-light);
-            background: white;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 0.875rem 1rem;
-            text-align: left;
-            color: var(--text);
-            border-bottom: 1px solid var(--border);
-            font-size: 0.875rem;
-            transition: background-color 0.3s;
-        }
-
-        tr {
-            animation: fadeIn 0.3s ease;
-            animation-fill-mode: both;
-        }
-
-        tr:hover td {
-            background: var(--hover-bg);
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* ===== ESTILOS PARA MÓVIL ===== */
-        .mobile-table {
-            display: none;
-            width: 100%;
-        }
-
-        .mobile-row {
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: 1rem;
-            animation: fadeIn 0.3s ease;
-            animation-fill-mode: both;
-        }
-
-        .mobile-row-content {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .mobile-row-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .mobile-row-title {
-            font-weight: 600;
-            color: var(--text);
-            font-size: 0.9rem;
-        }
-
-        .mobile-row-details {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .mobile-detail-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.25rem 0;
-            border-bottom: 1px dashed var(--border);
-        }
-
-        .mobile-detail-label {
-            color: var(--text-light);
-            font-weight: 500;
-            font-size: 0.8rem;
-            min-width: 70px;
-        }
-
-        .mobile-detail-value {
-            color: var(--text);
-            font-size: 0.85rem;
-            text-align: right;
-            flex: 1;
-        }
-
-        .mobile-row-actions {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--border);
-        }
-
-        /* ===== COLUMNA ACCIONES ===== */
-        .actions-desktop {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .action-btn {
-            padding: 0.35rem 0.75rem;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text);
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .action-btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .action-btn.danger {
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-
-        .action-btn.danger:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        .mobile-actions-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-            color: var(--text-light);
-            padding: 0.35rem 0.5rem;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .mobile-actions-btn:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        /* ===== DETALLE MODAL - DOS COLUMNAS ===== */
-        .detail-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--modal-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            z-index: 1004;
-            padding: 1rem;
-            box-sizing: border-box;
-        }
-
-        .detail-modal.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .detail-modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 700px;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: fadeInUp 0.3s ease;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid var(--primary-light);
-        }
-
-        .detail-title-wrapper {
-            flex: 1;
-        }
-
-        .detail-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text);
-            margin: 0 0 0.5rem 0;
-            line-height: 1.2;
-        }
-
-        .detail-id {
-            color: var(--primary);
-            font-size: 0.95rem;
-            font-weight: 600;
-            font-family: monospace;
-            letter-spacing: 0.5px;
-            background: var(--primary-light);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            display: inline-block;
-        }
-
-        .close-detail-btn {
-            background: transparent;
-            border: none;
-            font-size: 1.8rem;
-            cursor: pointer;
-            color: var(--text-light);
-            padding: 0.25rem;
-            transition: color 0.3s;
-            line-height: 1;
-        }
-
-        .close-detail-btn:hover {
-            color: var(--primary);
-        }
-
-        .detail-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        .detail-column {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .detail-group {
-            margin-bottom: 0.5rem;
-        }
-
-        .detail-label {
-            color: var(--text-light);
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .detail-value {
-            color: var(--text);
-            font-size: 1rem;
-            line-height: 1.6;
-            padding: 0.75rem 0;
-        }
-
-        .detail-description {
-            grid-column: 1 / -1;
-            background: var(--bg);
-            padding: 1.25rem;
-            border-radius: 8px;
-            margin-top: 0.5rem;
-        }
-
-        .detail-description .detail-value {
-            font-size: 1rem;
-            line-height: 1.7;
-            padding: 0;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        /* ===== MODAL DE FORMULARIO - FIJO Y CAMPOS UNIFORMES ===== */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--modal-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            z-index: 1001;
-            padding: 1rem;
-            box-sizing: border-box;
-        }
-
-        .modal.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            animation: fadeInUp 0.3s ease;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .modal-content h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .form-body {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-            margin-right: -0.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .form-input,
-        .form-textarea,
-        .form-select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-            box-sizing: border-box;
-        }
-
-        .form-input:focus,
-        .form-textarea:focus,
-        .form-select:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px var(--primary-light);
-        }
-
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .checkbox-group input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .checkbox-group label {
-            font-size: 0.9rem;
-            color: var(--text);
-            cursor: pointer;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 2px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        /* ===== PAGINACIÓN ===== */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .page-btn {
-            padding: 0.5rem 0.75rem;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            color: var(--text);
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-            min-width: 36px;
-            text-align: center;
-        }
-
-        .page-btn:hover {
-            background: var(--primary-light);
-            border-color: var(--primary);
-        }
-
-        .page-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        .page-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .page-btn.disabled:hover {
-            background: white;
-            border-color: var(--border);
-        }
-
-        .page-info {
-            color: var(--text-light);
-            font-size: 0.85rem;
-            margin: 0 0.5rem;
-        }
-
-        /* ===== MENÚ DE ACCIONES PARA MÓVIL ===== */
-        .mobile-actions-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--modal-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            z-index: 1002;
-            padding: 1rem;
-            box-sizing: border-box;
-        }
-
-        .mobile-actions-menu.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .mobile-actions-content {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 300px;
-            animation: fadeInUp 0.3s ease;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .mobile-action-item {
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            color: var(--text);
-            transition: all 0.3s;
-        }
-
-        .mobile-action-item:last-child {
-            border-bottom: none;
-        }
-
-        .mobile-action-item:hover {
-            color: var(--primary);
-        }
-
-        .action-label {
-            font-weight: 600;
-        }
-
-        /* ===== SCROLLBAR PERSONALIZADO ===== */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-light);
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (min-width: 769px) {
-            .desktop-table {
-                display: table;
-            }
-
-            .mobile-table {
-                display: none !important;
-            }
-
-            .actions-mobile {
-                display: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-
-            /* Texto más pequeño en móvil */
-            body {
-                font-size: 13px;
-            }
-
-            .menu {
-                display: none;
-            }
-
-            .menu-toggle {
-                display: block;
-            }
-
-            section {
-                padding: 1.25rem 1rem;
-            }
-
-            .table-controls {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.75rem;
-            }
-
-            .table-header {
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-
-            .search-container {
-                width: 100%;
-            }
-
-            .filter-container {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .filter-select {
-                flex: 1;
-                min-width: 0;
-            }
-
-            /* Mostrar tabla móvil */
-            .desktop-table {
-                display: none !important;
-            }
-
-            .mobile-table {
-                display: block;
-            }
-
-            .mobile-row {
-                margin-bottom: 0.5rem;
-                border-radius: 8px;
-                box-shadow: var(--shadow);
-            }
-
-            .mobile-row:last-child {
-                margin-bottom: 0;
-            }
-
-            .mobile-detail-label {
-                min-width: 60px;
-                font-size: 0.75rem;
-            }
-
-            .mobile-row-title {
-                font-size: 0.85rem;
-            }
-
-            .mobile-detail-value {
-                font-size: 0.8rem;
-            }
-
-            /* Detalle modal responsivo */
-            .detail-modal-content {
-                padding: 1.5rem;
-                max-height: 90vh;
-            }
-
-            .detail-content {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .detail-title {
-                font-size: 1.4rem;
-            }
-
-            .detail-description {
-                grid-column: 1;
-            }
-
-            /* Modal formulario responsivo */
-            .modal-content {
-                padding: 1.5rem;
-                max-height: 95vh;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .form-group {
-                margin-bottom: 1.25rem;
-            }
-
-            .pagination {
-                gap: 0.25rem;
-            }
-
-            .page-btn {
-                padding: 0.4rem 0.6rem;
-                min-width: 32px;
-                font-size: 0.8rem;
-            }
-
-            .page-info {
-                font-size: 0.8rem;
-            }
-
-            .notification-container {
-                left: 1rem;
-                right: 1rem;
-                max-width: 100%;
-            }
-
-            .notification {
-                padding: 0.875rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                font-size: 12px;
-            }
-
-            .logo {
-                font-size: 1.1rem;
-            }
-
-            .mobile-row {
-                padding: 0.75rem;
-            }
-
-            .mobile-detail-label {
-                min-width: 50px;
-                font-size: 0.7rem;
-            }
-
-            .mobile-detail-value {
-                font-size: 0.75rem;
-            }
-
-            .mobile-row-title {
-                font-size: 0.8rem;
-            }
-
-            .mobile-actions-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 0.875rem;
-                padding: 0.25rem;
-            }
-
-            .page-btn {
-                padding: 0.35rem 0.5rem;
-                min-width: 28px;
-                font-size: 0.75rem;
-            }
-
-            .detail-modal-content,
-            .modal-content,
-            .mobile-actions-content {
-                padding: 1.25rem;
-            }
-
-            .clear-filters-btn {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.8rem;
-            }
-
-            .form-input,
-            .form-textarea,
-            .form-select {
-                padding: 0.625rem;
-                font-size: 0.85rem;
-            }
-
-            h1 {
-                font-size: 1.4rem;
-            }
-
-            .detail-title {
-                font-size: 1.2rem;
-            }
-
-            .detail-value {
-                font-size: 0.95rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes Codex</title>
+
+<style>
+  /* ===== VARIABLES ===== */
+  :root {
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --primary-light: #d1fae5;
+    --primary-light-2: #a7f3d0;
+    --bg: #f9fafb;
+    --nav-bg: rgba(255, 255, 255, 0.95);
+    --text: #111827;
+    --text-light: #6b7280;
+    --text-muted: #9ca3af;
+    --border: #e5e7eb;
+    --modal-bg: rgba(0,0,0,0.4);
+    --hover-bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --warning: #f59e0b;
+    --warning-light: #fef3c7;
+    --info: #3b82f6;
+    --info-light: #dbeafe;
+    --success: #10b981;
+    --success-light: #d1fae5;
+  }
+
+  /* ===== RESET ===== */
+  * { 
+    margin:0; 
+    padding:0; 
+    box-sizing:border-box; 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  }
+  
+  body { 
+    background: var(--bg); 
+    color: var(--text); 
+    min-height:100vh; 
+    line-height:1.5; 
+    font-size: 14px;
+    overflow-x: hidden;
+  }
+
+  /* ===== ANIMACIONES ===== */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== NOTIFICACIONES CUSTOM ===== */
+  .notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    border-left: 4px solid var(--primary);
+    animation: fadeInUp 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transform: translateX(0);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .notification.hiding {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  .notification.success {
+    border-left-color: var(--success);
+  }
+
+  .notification.warning {
+    border-left-color: var(--warning);
+  }
+
+  .notification.error {
+    border-left-color: var(--danger);
+  }
+
+  .notification.info {
+    border-left-color: var(--info);
+  }
+
+  .notification-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .notification-content {
+    flex: 1;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text);
+  }
+
+  .notification-message {
+    font-size: 0.875rem;
+    color: var(--text-light);
+  }
+
+  .notification-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .notification-close:hover {
+    color: var(--text);
+  }
+
+  /* ===== NAVBAR ===== */
+  header {
+    position: sticky;
+    top:0;
+    z-index:1000;
+    backdrop-filter: blur(8px);
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--border);
+    animation: slideIn 0.3s ease;
+  }
+
+  .nav {
+    max-width: 1100px;
+    margin:auto;
+    padding:0.875rem 1.25rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  .logo { 
+    font-size: 1.3rem; 
+    font-weight:700; 
+    color:var(--primary); 
+    letter-spacing: -0.5px;
+  }
+
+  .menu { 
+    display:flex; 
+    gap:1.75rem; 
+  }
+  
+  .menu a { 
+    text-decoration:none; 
+    color: var(--text-light); 
+    font-weight:500; 
+    font-size:0.9rem; 
+    transition:color 0.2s; 
+    cursor:pointer;
+    padding: 0.25rem 0;
+    position: relative;
+  }
+  
+  .menu a:hover { 
+    color: var(--primary); 
+  }
+  
+  .menu a:hover::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 1px;
+  }
+
+  .menu-toggle { 
+    display:none; 
+    font-size:1.25rem; 
+    cursor:pointer; 
+    color: var(--text); 
+    padding: 0.25rem;
+  }
+
+  /* ===== MENU MÓVIL ===== */
+  .mobile-menu {
+    position: fixed;
+    top:0; 
+    left:0;
+    width:100%; 
+    height:100%;
+    background: var(--nav-bg);
+    display:flex; 
+    flex-direction:column; 
+    justify-content:center; 
+    align-items:center;
+    gap:1.5rem; 
+    transform:translateY(-100%);
+    transition: transform 0.3s ease;
+    z-index:999;
+  }
+
+  .mobile-menu a { 
+    font-size:1.1rem; 
+    font-weight:500; 
+    color: var(--text); 
+    padding: 0.5rem 0;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .mobile-menu a:hover { 
+    color: var(--primary); 
+  }
+  
+  .mobile-menu.show { 
+    transform:translateY(0); 
+  }
+
+  /* ===== SECCIONES ===== */
+  section { 
+    max-width:1100px; 
+    margin:auto; 
+    padding:1.5rem 1.25rem; 
+    min-height:calc(100vh - 64px); 
+    display:none; 
+    flex-direction:column; 
+    animation: fadeIn 0.3s ease;
+  }
+  
+  section.active { 
+    display:flex; 
+  }
+
+  h1 { 
+    font-size:clamp(1.5rem, 4vw, 2.5rem); 
+    font-weight:600; 
+    margin-bottom:1.5rem; 
+    text-align:center; 
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  /* ===== LOADING ANIMATION ===== */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1003;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .loading-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--primary-light);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ===== CONTROLES DE TABLA ===== */
+  .table-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .table-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-container {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: white;
+    transition: all 0.3s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+
+  .filter-container {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-select {
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: white;
+    color: var(--text);
+    transition: all 0.3s;
+    min-width: 140px;
+  }
+
+  .filter-select:focus {
+    border-color: var(--primary);
+    outline: none;
+  }
+
+  .clear-filters-btn {
+    padding: 0.625rem 1rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .clear-filters-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--text-light);
+    color: var(--text);
+  }
+
+  /* ===== BOTÓN PRINCIPAL ===== */
+  .primary-btn { 
+    padding: 0.625rem 1.25rem; 
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.3s; 
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .primary-btn:hover { 
+    background: var(--primary-dark); 
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .danger-btn {
+    background: var(--danger);
+  }
+
+  .danger-btn:hover {
+    background: #dc2626;
+  }
+
+  /* ===== TABLA RESPONSIVA ===== */
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    animation: fadeIn 0.5s ease;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+  }
+
+  /* Estilo para escritorio */
+  .desktop-table {
+    display: table;
+  }
+
+  .mobile-table {
+    display: none;
+  }
+
+  th {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-light);
+    background: white;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+    transition: background-color 0.3s;
+  }
+
+  tr {
+    animation: fadeIn 0.3s ease;
+    animation-fill-mode: both;
+  }
+
+  tr:hover td {
+    background: var(--hover-bg);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* ===== ESTILOS PARA MÓVIL ===== */
+  .mobile-table {
+    display: none;
+    width: 100%;
+  }
+
+  .mobile-row {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+    animation-fill-mode: both;
+  }
+
+  .mobile-row-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mobile-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .mobile-row-title {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+
+  .mobile-row-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .mobile-detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.25rem 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .mobile-detail-label {
+    color: var(--text-light);
+    font-weight: 500;
+    font-size: 0.8rem;
+    min-width: 70px;
+  }
+
+  .mobile-detail-value {
+    color: var(--text);
+    font-size: 0.85rem;
+    text-align: right;
+    flex: 1;
+  }
+
+  .mobile-row-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ===== COLUMNA ACCIONES ===== */
+  .actions-desktop {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    padding: 0.35rem 0.75rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+    font-weight: 500;
+  }
+
+  .action-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  .action-btn.danger {
+    border-color: var(--danger);
+    color: var(--danger);
+  }
+
+  .action-btn.danger:hover {
+    background: var(--danger);
+    color: white;
+  }
+
+  .mobile-actions-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: var(--text-light);
+    padding: 0.35rem 0.5rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+
+  .mobile-actions-btn:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+
+  /* ===== DETALLE MODAL - ESTILO LIMPIO ===== */
+  .detail-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1004;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow: auto;
+  }
+
+  .detail-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .detail-modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    animation: fadeInUp 0.3s ease;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    position: relative;
+  }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .detail-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0 0 0.25rem 0;
+  }
+
+  .detail-id {
+    color: var(--primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+  }
+
+  .close-detail-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-light);
+    padding: 0.25rem;
+    transition: color 0.3s;
+    line-height: 1;
+  }
+
+  .close-detail-btn:hover {
+    color: var(--primary);
+  }
+
+  .detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .detail-item {
+    padding: 0;
+  }
+
+  .detail-label {
+    color: var(--text-light);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .detail-value {
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.6;
+    padding: 0.75rem;
+    background: var(--bg);
+    border-radius: 6px;
+    margin-top: 0.25rem;
+  }
+
+  .detail-status {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  /* ===== MODAL DE FORMULARIO COMPLETO ===== */
+  .modal { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: var(--modal-bg); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: opacity 0.3s; 
+    z-index: 1001; 
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow: auto;
+  }
+  
+  .modal.show { 
+    opacity: 1; 
+    pointer-events: auto; 
+  }
+  
+  .modal-content { 
+    background: white; 
+    padding: 2rem; 
+    border-radius: 12px; 
+    width: 100%; 
+    max-width: 450px; 
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    animation: fadeInUp 0.3s ease;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  }
+  
+  .modal-content h2 { 
+    margin-bottom: 1.5rem; 
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .form-input, .form-textarea, .form-select { 
+    width: 100%; 
+    padding: 0.75rem; 
+    border: 1px solid var(--border); 
+    border-radius: 6px; 
+    font-size: 0.875rem;
+    transition: all 0.3s;
+    box-sizing: border-box;
+  }
+  
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+  
+  .form-textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .checkbox-group input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  .checkbox-group label {
+    font-size: 0.875rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .form-row .form-group {
+    flex: 1;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border);
+  }
+
+  /* ===== PAGINACIÓN ===== */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .page-btn {
+    padding: 0.5rem 0.75rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .page-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+  }
+
+  .page-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+
+  .page-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .page-btn.disabled:hover {
+    background: white;
+    border-color: var(--border);
+  }
+
+  .page-info {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin: 0 0.5rem;
+  }
+
+  /* ===== MENÚ DE ACCIONES PARA MÓVIL ===== */
+  .mobile-actions-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--modal-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 1002;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .mobile-actions-menu.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-actions-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 300px;
+    animation: fadeInUp 0.3s ease;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  }
+
+  .mobile-action-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--text);
+    transition: all 0.3s;
+  }
+
+  .mobile-action-item:last-child {
+    border-bottom: none;
+  }
+
+  .mobile-action-item:hover {
+    color: var(--primary);
+  }
+
+  .action-label {
+    font-weight: 500;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (min-width: 769px) {
+    .desktop-table {
+      display: table;
+    }
+    
+    .mobile-table {
+      display: none !important;
+    }
+    
+    .actions-mobile {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    /* Texto más pequeño en móvil */
+    body {
+      font-size: 13px;
+    }
+    
+    .menu { 
+      display: none; 
+    }
+    
+    .menu-toggle { 
+      display: block; 
+    }
+    
+    section { 
+      padding: 1.25rem 1rem; 
+    }
+    
+    .table-controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+    
+    .table-header {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .search-container {
+      width: 100%;
+    }
+    
+    .filter-container {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .filter-select {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    /* Mostrar tabla móvil */
+    .desktop-table {
+      display: none !important;
+    }
+    
+    .mobile-table {
+      display: block;
+    }
+    
+    .mobile-row {
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    
+    .mobile-row:last-child {
+      margin-bottom: 0;
+    }
+    
+    .mobile-detail-label {
+      min-width: 60px;
+      font-size: 0.75rem;
+    }
+    
+    .mobile-row-title {
+      font-size: 0.85rem;
+    }
+    
+    .mobile-detail-value {
+      font-size: 0.8rem;
+    }
+    
+    .detail-modal-content,
+    .modal-content,
+    .mobile-actions-content {
+      padding: 1.5rem;
+      max-height: calc(100vh - 2rem);
+    }
+    
+    .detail-title {
+      font-size: 1.25rem;
+    }
+    
+    .detail-value {
+      font-size: 0.95rem;
+      padding: 0.5rem;
+    }
+    
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .pagination {
+      gap: 0.25rem;
+    }
+    
+    .page-btn {
+      padding: 0.4rem 0.6rem;
+      min-width: 32px;
+      font-size: 0.8rem;
+    }
+    
+    .page-info {
+      font-size: 0.8rem;
+    }
+    
+    .notification-container {
+      left: 1rem;
+      right: 1rem;
+      max-width: 100%;
+    }
+    
+    .notification {
+      padding: 0.875rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      font-size: 12px;
+    }
+    
+    .logo {
+      font-size: 1.1rem;
+    }
+    
+    .mobile-row {
+      padding: 0.75rem;
+    }
+    
+    .mobile-detail-label {
+      min-width: 50px;
+      font-size: 0.7rem;
+    }
+    
+    .mobile-detail-value {
+      font-size: 0.75rem;
+    }
+    
+    .mobile-row-title {
+      font-size: 0.8rem;
+    }
+    
+    .mobile-actions-btn {
+      width: 28px;
+      height: 28px;
+      font-size: 0.875rem;
+      padding: 0.25rem;
+    }
+    
+    .page-btn {
+      padding: 0.35rem 0.5rem;
+      min-width: 28px;
+      font-size: 0.75rem;
+    }
+    
+    .detail-modal-content,
+    .modal-content,
+    .mobile-actions-content {
+      padding: 1.25rem;
+    }
+    
+    .clear-filters-btn {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+    
+    .form-input, .form-textarea, .form-select {
+      padding: 0.625rem;
+      font-size: 0.8rem;
+    }
+    
+    h1 {
+      font-size: 1.4rem;
+    }
+  }
+</style>
 </head>
 
 <body>
 
-    <!-- Contenedor de notificaciones -->
-    <div class="notification-container" id="notificationContainer"></div>
+<!-- Contenedor de notificaciones -->
+<div class="notification-container" id="notificationContainer"></div>
 
-    <header>
-        <nav class="nav">
-            <div class="logo">Notes Codex</div>
-            <div class="menu">
-                <a onclick="showSection('inicio')">Inicio</a>
-                <a onclick="showSection('notas')">Notas</a>
-                <a onclick="showSection('contacto')">Contacto</a>
-            </div>
-            <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-        </nav>
-    </header>
-
-    <div class="mobile-menu" id="mobileMenu">
-        <a onclick="showSection('inicio'); toggleMenu();">Inicio</a>
-        <a onclick="showSection('notas'); toggleMenu();">Notas</a>
-        <a onclick="showSection('contacto'); toggleMenu();">Contacto</a>
+<header>
+  <nav class="nav">
+    <div class="logo">Notes Codex</div>
+    <div class="menu">
+      <a onclick="showSection('inicio')">Inicio</a>
+      <a onclick="showSection('notas')">Notas</a>
+      <a onclick="showSection('contacto')">Contacto</a>
     </div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  </nav>
+</header>
 
-    <!-- SECCIONES -->
-    <section id="inicio" class="active">
-        <h1>Bienvenido a Notes Codex</h1>
-        <p style="text-align: center; color: var(--text-light); max-width: 600px; font-size: 0.95rem;">
-            Sistema de gestión de notas académicas y profesionales
-        </p>
-    </section>
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="showSection('inicio'); toggleMenu();">Inicio</a>
+  <a onclick="showSection('notas'); toggleMenu();">Notas</a>
+  <a onclick="showSection('contacto'); toggleMenu();">Contacto</a>
+</div>
 
-    <section id="notas">
-        <h1>Notas Académicas</h1>
+<!-- SECCIONES -->
+<section id="inicio" class="active">
+  <h1>Bienvenido a Notes Codex</h1>
+  <p style="text-align: center; color: var(--text-light); max-width: 600px; font-size: 0.95rem;">
+    Sistema de gestión de notas académicas y profesionales
+  </p>
+</section>
 
-        <div class="table-header">
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Buscar notas..." id="searchInput"
-                    oninput="filterTable()">
-            </div>
-
-            <div class="filter-container">
-                <select class="filter-select" id="filterStatus" onchange="filterTable()">
-                    <option value="">Todos los estados</option>
-                    <option value="activo">Activo</option>
-                    <option value="completado">Completado</option>
-                    <option value="pendiente">Pendiente</option>
-                </select>
-
-                <select class="filter-select" id="filterPriority" onchange="filterTable()">
-                    <option value="">Todas las prioridades</option>
-                    <option value="alta">Alta</option>
-                    <option value="media">Media</option>
-                    <option value="baja">Baja</option>
-                </select>
-
-                <button class="clear-filters-btn" onclick="clearFilters()">
-                    <span>×</span> Limpiar
-                </button>
-            </div>
-
-            <button class="primary-btn" onclick="openModal()">
-                <span>+</span> Nueva Nota
-            </button>
-        </div>
-
-        <!-- Tabla para escritorio -->
-        <div class="table-wrapper">
-            <table class="desktop-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Título</th>
-                        <th>Descripción</th>
-                        <th>Categoría</th>
-                        <th>Estado</th>
-                        <th>Vencimiento</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Los datos se cargan dinámicamente -->
-                </tbody>
-            </table>
-
-            <!-- Tabla para móvil -->
-            <div class="mobile-table" id="mobileTable">
-                <!-- Los datos móviles se cargan dinámicamente -->
-            </div>
-        </div>
-
-        <!-- Paginación -->
-        <div class="pagination" id="pagination">
-            <!-- La paginación se genera dinámicamente -->
-        </div>
-    </section>
-
-    <section id="contacto">
-        <h1>Contacto</h1>
-        <p style="text-align: center; color: var(--text-light);">
-            Correo: contacto@notescodex.com<br>
-            Teléfono: +123456789<br>
-            Dirección: Av. Principal 123, Ciudad
-        </p>
-    </section>
-
-    <!-- LOADING OVERLAY -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner"></div>
+<section id="notas">
+  <h1>Notas Académicas</h1>
+  
+  <div class="table-header">
+    <div class="search-container">
+      <input type="text" 
+             class="search-input" 
+             placeholder="Buscar notas..." 
+             id="searchInput"
+             oninput="filterTable()">
     </div>
-
-    <!-- MODAL FORMULARIO (Crear/Editar) -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Nueva Nota</h2>
-            </div>
-
-            <div class="form-body">
-                <div class="form-group">
-                    <label class="form-label">Título *</label>
-                    <input type="text" class="form-input" id="noteTitle" placeholder="Ingrese el título de la nota">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Descripción</label>
-                    <textarea class="form-textarea" id="noteDescription"
-                        placeholder="Descripción detallada de la nota..."></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Categoría</label>
-                        <select class="form-select" id="noteCategory">
-                            <option value="academica">Académica</option>
-                            <option value="personal">Personal</option>
-                            <option value="trabajo">Trabajo</option>
-                            <option value="proyecto">Proyecto</option>
-                            <option value="recordatorio">Recordatorio</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Prioridad</label>
-                        <select class="form-select" id="notePriority">
-                            <option value="alta">Alta</option>
-                            <option value="media" selected>Media</option>
-                            <option value="baja">Baja</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Fecha de Registro</label>
-                        <input type="date" class="form-input" id="noteCreatedAt">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Fecha de Vencimiento</label>
-                        <input type="date" class="form-input" id="noteDueDate">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Recordatorio</label>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="noteHasReminder">
-                        <label for="noteHasReminder">Activar recordatorio</label>
-                    </div>
-                </div>
-
-                <div class="form-group" id="reminderDetails" style="display: none;">
-                    <label class="form-label">Fecha del Recordatorio</label>
-                    <input type="datetime-local" class="form-input" id="noteReminderDate">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Estado</label>
-                    <select class="form-select" id="noteStatus">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="activo">Activo</option>
-                        <option value="completado">Completado</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button class="action-btn" onclick="closeModal()">Cancelar</button>
-                <button class="primary-btn" onclick="saveNote()" id="saveNoteBtn">
-                    <span id="saveBtnText">Guardar Nota</span>
-                </button>
-            </div>
-        </div>
+    
+    <div class="filter-container">
+      <select class="filter-select" id="filterStatus" onchange="filterTable()">
+        <option value="">Todos los estados</option>
+        <option value="activo">Activo</option>
+        <option value="completado">Completado</option>
+        <option value="pendiente">Pendiente</option>
+      </select>
+      
+      <select class="filter-select" id="filterPriority" onchange="filterTable()">
+        <option value="">Todas las prioridades</option>
+        <option value="alta">Alta</option>
+        <option value="media">Media</option>
+        <option value="baja">Baja</option>
+      </select>
+      
+      <button class="clear-filters-btn" onclick="clearFilters()">
+        <span>×</span> Limpiar
+      </button>
     </div>
-
-    <!-- MODAL DE DETALLE (Dos columnas) -->
-    <div class="detail-modal" id="detailModal">
-        <div class="detail-modal-content">
-            <div class="detail-header">
-                <div class="detail-title-wrapper">
-                    <h3 class="detail-title" id="detailTitle">Título de la Nota</h3>
-                    <div class="detail-id" id="detailIdCode">NT:000</div>
-                </div>
-                <button class="close-detail-btn" onclick="closeDetailModal()">×</button>
-            </div>
-
-            <div class="detail-content">
-                <div class="detail-column">
-                    <div class="detail-group">
-                        <span class="detail-label">Categoría</span>
-                        <div class="detail-value" id="detailCategory">-</div>
-                    </div>
-
-                    <div class="detail-group">
-                        <span class="detail-label">Estado</span>
-                        <div>
-                            <span id="detailStatus" class="status-badge">-</span>
-                        </div>
-                    </div>
-
-                    <div class="detail-group">
-                        <span class="detail-label">Prioridad</span>
-                        <div class="detail-value" id="detailPriority">-</div>
-                    </div>
-                </div>
-
-                <div class="detail-column">
-                    <div class="detail-group">
-                        <span class="detail-label">Fecha de Registro</span>
-                        <div class="detail-value" id="detailCreatedAt">-</div>
-                    </div>
-
-                    <div class="detail-group">
-                        <span class="detail-label">Fecha de Vencimiento</span>
-                        <div class="detail-value" id="detailDueDate">-</div>
-                    </div>
-
-                    <div class="detail-group">
-                        <span class="detail-label">Recordatorio</span>
-                        <div class="detail-value" id="detailReminder">-</div>
-                    </div>
-                </div>
-
-                <div class="detail-description">
-                    <span class="detail-label">Descripción</span>
-                    <div class="detail-value" id="detailDescription">-</div>
-                </div>
-            </div>
-        </div>
+    
+    <button class="primary-btn" onclick="openModal()">
+      <span>+</span> Nueva Nota
+    </button>
+  </div>
+  
+  <!-- Tabla para escritorio -->
+  <div class="table-wrapper">
+    <table class="desktop-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Descripción</th>
+          <th>Categoría</th>
+          <th>Estado</th>
+          <th>Vencimiento</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Los datos se cargan dinámicamente -->
+      </tbody>
+    </table>
+    
+    <!-- Tabla para móvil -->
+    <div class="mobile-table" id="mobileTable">
+      <!-- Los datos móviles se cargan dinámicamente -->
     </div>
+  </div>
+  
+  <!-- Paginación -->
+  <div class="pagination" id="pagination">
+    <!-- La paginación se genera dinámicamente -->
+  </div>
+</section>
 
-    <!-- MENÚ DE ACCIONES PARA MÓVIL -->
-    <div class="mobile-actions-menu" id="mobileActionsMenu">
-        <div class="mobile-actions-content">
-            <h3 style="margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600; color: var(--text);">Acciones</h3>
-            <div class="mobile-action-item" onclick="handleMobileAction('view')">
-                <span class="action-label">Ver detalle</span>
-                <span style="color: var(--text-light);">›</span>
-            </div>
-            <div class="mobile-action-item" onclick="handleMobileAction('edit')">
-                <span class="action-label">Editar</span>
-                <span style="color: var(--text-light);">›</span>
-            </div>
-            <div class="mobile-action-item" onclick="handleMobileAction('delete')">
-                <span class="action-label">Eliminar</span>
-                <span style="color: var(--text-light);">›</span>
-            </div>
-            <div class="mobile-action-item" onclick="closeMobileActions()" style="color: var(--text-light);">
-                <span class="action-label">Cancelar</span>
-            </div>
-        </div>
+<section id="contacto">
+  <h1>Contacto</h1>
+  <p style="text-align: center; color: var(--text-light);">
+    Correo: contacto@notescodex.com<br>
+    Teléfono: +123456789<br>
+    Dirección: Av. Principal 123, Ciudad
+  </p>
+</section>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- MODAL FORMULARIO (Crear/Editar) -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2 id="modalTitle">Nueva Nota</h2>
+    
+    <div class="form-group">
+      <label class="form-label">Título *</label>
+      <input type="text" class="form-input" id="noteTitle" placeholder="Ingrese el título de la nota">
     </div>
+    
+    <div class="form-group">
+      <label class="form-label">Descripción</label>
+      <textarea class="form-textarea" id="noteDescription" placeholder="Descripción detallada de la nota..."></textarea>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Categoría</label>
+        <select class="form-select" id="noteCategory">
+          <option value="academica">Académica</option>
+          <option value="personal">Personal</option>
+          <option value="trabajo">Trabajo</option>
+          <option value="proyecto">Proyecto</option>
+          <option value="recordatorio">Recordatorio</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Prioridad</label>
+        <select class="form-select" id="notePriority">
+          <option value="alta">Alta</option>
+          <option value="media" selected>Media</option>
+          <option value="baja">Baja</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Fecha de Registro</label>
+        <input type="date" class="form-input" id="noteCreatedAt">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Fecha de Vencimiento</label>
+        <input type="date" class="form-input" id="noteDueDate">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Recordatorio</label>
+      <div class="checkbox-group">
+        <input type="checkbox" id="noteHasReminder">
+        <label for="noteHasReminder">Activar recordatorio</label>
+      </div>
+    </div>
+    
+    <div class="form-group" id="reminderDetails" style="display: none;">
+      <label class="form-label">Fecha del Recordatorio</label>
+      <input type="datetime-local" class="form-input" id="noteReminderDate">
+    </div>
+    
+    <div class="form-group">
+      <label class="form-label">Estado</label>
+      <select class="form-select" id="noteStatus">
+        <option value="pendiente">Pendiente</option>
+        <option value="activo">Activo</option>
+        <option value="completado">Completado</option>
+      </select>
+    </div>
+    
+    <div class="form-actions">
+      <button class="action-btn" onclick="closeModal()">Cancelar</button>
+      <button class="primary-btn" onclick="saveNote()" id="saveNoteBtn">
+        <span id="saveBtnText">Guardar Nota</span>
+      </button>
+    </div>
+  </div>
+</div>
 
-    <script>
-        // ===== Variables globales =====
-        let currentItemId = null;
-        let currentPage = 1;
-        const itemsPerPage = 10;
-        let allData = [];
-        let filteredData = [];
-        let isEditing = false;
+<!-- MODAL DE DETALLE (Estilo Limpio) -->
+<div class="detail-modal" id="detailModal">
+  <div class="detail-modal-content">
+    <div class="detail-header">
+      <div>
+        <h3 class="detail-title" id="detailTitle">Título de la Nota</h3>
+        <div class="detail-id" id="detailIdCode">NT:000</div>
+      </div>
+      <button class="close-detail-btn" onclick="closeDetailModal()">×</button>
+    </div>
+    
+    <div class="detail-info">
+      <div class="detail-item">
+        <span class="detail-label">Descripción</span>
+        <div class="detail-value" id="detailDescription">-</div>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Categoría</span>
+        <div class="detail-value" id="detailCategory">-</div>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Estado</span>
+        <div>
+          <span id="detailStatus" class="detail-status">-</span>
+        </div>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Prioridad</span>
+        <div class="detail-value" id="detailPriority">-</div>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Fecha de Registro</span>
+        <div class="detail-value" id="detailCreatedAt">-</div>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Fecha de Vencimiento</span>
+        <div class="detail-value" id="detailDueDate">-</div>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Recordatorio</span>
+        <div class="detail-value" id="detailReminder">-</div>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">Última Actualización</span>
+        <div class="detail-value" id="detailUpdatedAt">-</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        // ===== Sistema de Notificaciones =====
-        function showNotification(type, title, message, duration = 4000) {
-            const container = document.getElementById('notificationContainer');
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
+<!-- MENÚ DE ACCIONES PARA MÓVIL -->
+<div class="mobile-actions-menu" id="mobileActionsMenu">
+  <div class="mobile-actions-content">
+    <h3 style="margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600; color: var(--text);">Acciones</h3>
+    <div class="mobile-action-item" onclick="handleMobileAction('view')">
+      <span class="action-label">Ver detalle</span>
+    </div>
+    <div class="mobile-action-item" onclick="handleMobileAction('edit')">
+      <span class="action-label">Editar</span>
+    </div>
+    <div class="mobile-action-item" onclick="handleMobileAction('delete')">
+      <span class="action-label">Eliminar</span>
+    </div>
+    <div class="mobile-action-item" onclick="closeMobileActions()" style="color: var(--text-light);">
+      <span class="action-label">Cancelar</span>
+    </div>
+  </div>
+</div>
 
-            // Iconos por tipo
-            const icons = {
-                success: '✓',
-                error: '✗',
-                warning: '⚠',
-                info: 'ℹ'
-            };
+<script>
+  // ===== Variables globales =====
+  let currentItemId = null;
+  let currentPage = 1;
+  const itemsPerPage = 10;
+  let allData = [];
+  let filteredData = [];
+  let isEditing = false;
+  let mobileActionType = null;
 
-            notification.innerHTML = `
+  // ===== Sistema de Notificaciones =====
+  function showNotification(type, title, message, duration = 4000) {
+    const container = document.getElementById('notificationContainer');
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    // Iconos por tipo
+    const icons = {
+      success: '✓',
+      error: '✗',
+      warning: '⚠',
+      info: 'ℹ'
+    };
+    
+    notification.innerHTML = `
       <div class="notification-icon">${icons[type] || '•'}</div>
       <div class="notification-content">
         <div class="notification-title">${title}</div>
@@ -1568,163 +1455,139 @@
       </div>
       <button class="notification-close" onclick="closeNotification(this)">×</button>
     `;
+    
+    container.appendChild(notification);
+    
+    // Auto cerrar después de la duración
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.classList.add('hiding');
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }
+    }, duration);
+    
+    return notification;
+  }
 
-            container.appendChild(notification);
+  function closeNotification(button) {
+    const notification = button.closest('.notification');
+    notification.classList.add('hiding');
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 300);
+  }
 
-            // Auto cerrar después de la duración
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.classList.add('hiding');
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            notification.remove();
-                        }
-                    }, 300);
-                }
-            }, duration);
+  // ===== Datos de ejemplo (solo 3 notas) =====
+  const sampleData = [
+    { 
+      id: 1, 
+      title: "Tutorías Personalizadas", 
+      description: "Sesiones individuales de tutoría para estudiantes que necesitan apoyo adicional en sus cursos.", 
+      category: "academica",
+      status: "activo", 
+      priority: "alta",
+      createdAt: "2024-01-15",
+      dueDate: "2024-04-15",
+      reminder: true,
+      reminderDate: "2024-04-10T09:00",
+      updatedAt: "2024-03-10"
+    },
+    { 
+      id: 2, 
+      title: "Clases Virtuales", 
+      description: "Plataforma de clases en vivo con profesores certificados y materiales interactivos.", 
+      category: "academica",
+      status: "activo", 
+      priority: "alta",
+      createdAt: "2024-01-20",
+      dueDate: "2024-03-30",
+      reminder: true,
+      reminderDate: "2024-03-25T14:30",
+      updatedAt: "2024-03-12"
+    },
+    { 
+      id: 3, 
+      title: "Recursos Educativos", 
+      description: "Biblioteca digital con materiales de estudio, ejercicios y exámenes de práctica.", 
+      category: "academica",
+      status: "pendiente", 
+      priority: "media",
+      createdAt: "2024-02-01",
+      dueDate: "2024-03-15",
+      reminder: false,
+      reminderDate: null,
+      updatedAt: "2024-02-28"
+    }
+  ];
 
-            return notification;
-        }
+  // ===== Función para generar ID con formato NT:000 =====
+  function generateNoteId(id) {
+    return `NT:${String(id).padStart(3, '0')}`;
+  }
 
-        function closeNotification(button) {
-            const notification = button.closest('.notification');
-            notification.classList.add('hiding');
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 300);
-        }
+  // ===== Inicialización =====
+  document.addEventListener('DOMContentLoaded', function() {
+    allData = [...sampleData];
+    filteredData = [...sampleData];
+    renderTable();
+    
+    // Configurar recordatorio toggle
+    const reminderCheckbox = document.getElementById('noteHasReminder');
+    const reminderDetails = document.getElementById('reminderDetails');
+    
+    reminderCheckbox.addEventListener('change', function() {
+      reminderDetails.style.display = this.checked ? 'block' : 'none';
+    });
+  });
 
-        // ===== Datos de ejemplo (solo 3 notas) =====
-        const sampleData = [
-            {
-                id: 1,
-                title: "Tutorías Personalizadas",
-                description: "Sesiones individuales de tutoría para estudiantes que necesitan apoyo adicional en sus cursos. Incluye seguimiento personalizado y materiales complementarios.",
-                category: "academica",
-                status: "activo",
-                priority: "alta",
-                createdAt: "2024-01-15",
-                dueDate: "2024-04-15",
-                reminder: true,
-                reminderDate: "2024-04-10T09:00",
-                updatedAt: "2024-03-10"
-            },
-            {
-                id: 2,
-                title: "Clases Virtuales",
-                description: "Plataforma de clases en vivo con profesores certificados y materiales interactivos. Incluye grabaciones de sesiones y foros de discusión.",
-                category: "academica",
-                status: "activo",
-                priority: "alta",
-                createdAt: "2024-01-20",
-                dueDate: "2024-03-30",
-                reminder: true,
-                reminderDate: "2024-03-25T14:30",
-                updatedAt: "2024-03-12"
-            },
-            {
-                id: 3,
-                title: "Recursos Educativos",
-                description: "Biblioteca digital con materiales de estudio, ejercicios y exámenes de práctica. Contiene recursos para todas las áreas del conocimiento.",
-                category: "academica",
-                status: "pendiente",
-                priority: "media",
-                createdAt: "2024-02-01",
-                dueDate: "2024-03-15",
-                reminder: false,
-                reminderDate: null,
-                updatedAt: "2024-02-28"
-            }
-        ];
+  // ===== Loading Animation =====
+  const loadingOverlay = document.getElementById('loadingOverlay');
 
-        // ===== Función para generar ID con formato NT:000 =====
-        function generateNoteId(id) {
-            return `NT:${String(id).padStart(3, '0')}`;
-        }
+  function showLoading() {
+    loadingOverlay.classList.add('show');
+  }
 
-        // ===== Inicialización =====
-        document.addEventListener('DOMContentLoaded', function () {
-            allData = [...sampleData];
-            filteredData = [...sampleData];
-            renderTable();
+  function hideLoading() {
+    loadingOverlay.classList.remove('show');
+  }
 
-            // Configurar recordatorio toggle
-            const reminderCheckbox = document.getElementById('noteHasReminder');
-            const reminderDetails = document.getElementById('reminderDetails');
+  // ===== Simular carga =====
+  function simulateLoad(callback) {
+    showLoading();
+    setTimeout(() => {
+      callback();
+      hideLoading();
+    }, 500);
+  }
 
-            reminderCheckbox.addEventListener('change', function () {
-                reminderDetails.style.display = this.checked ? 'block' : 'none';
-            });
+  // ===== Renderizar tabla =====
+  function renderTable() {
+    simulateLoad(() => {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const currentData = filteredData.slice(startIndex, endIndex);
+      
+      renderDesktopTable(currentData);
+      renderMobileTable(currentData);
+      renderPagination();
+    });
+  }
 
-            // Configurar fecha actual por defecto
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('noteCreatedAt').value = today;
-
-            // Configurar fecha mínima para fechas futuras
-            document.getElementById('noteDueDate').min = today;
-            document.getElementById('noteReminderDate').min = today + 'T00:00';
-
-            // Prevenir scroll en el body cuando modales están abiertos
-            setupModalScrollPrevention();
-        });
-
-        // ===== Prevenir scroll en body cuando modales están abiertos =====
-        function setupModalScrollPrevention() {
-            const modals = document.querySelectorAll('.modal, .detail-modal, .mobile-actions-menu');
-
-            modals.forEach(modal => {
-                modal.addEventListener('touchmove', function (e) {
-                    if (modal.classList.contains('show')) {
-                        e.stopPropagation();
-                    }
-                }, { passive: false });
-            });
-        }
-
-        // ===== Loading Animation =====
-        const loadingOverlay = document.getElementById('loadingOverlay');
-
-        function showLoading() {
-            loadingOverlay.classList.add('show');
-        }
-
-        function hideLoading() {
-            loadingOverlay.classList.remove('show');
-        }
-
-        // ===== Simular carga =====
-        function simulateLoad(callback) {
-            showLoading();
-            setTimeout(() => {
-                callback();
-                hideLoading();
-            }, 500);
-        }
-
-        // ===== Renderizar tabla =====
-        function renderTable() {
-            simulateLoad(() => {
-                const startIndex = (currentPage - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-                const currentData = filteredData.slice(startIndex, endIndex);
-
-                renderDesktopTable(currentData);
-                renderMobileTable(currentData);
-                renderPagination();
-            });
-        }
-
-        // ===== Renderizar tabla de escritorio =====
-        function renderDesktopTable(data) {
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = '';
-
-            data.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.style.animationDelay = `${index * 0.05}s`;
-                row.innerHTML = `
+  // ===== Renderizar tabla de escritorio =====
+  function renderDesktopTable(data) {
+    const tableBody = document.getElementById('tableBody');
+    tableBody.innerHTML = '';
+    
+    data.forEach((item, index) => {
+      const row = document.createElement('tr');
+      row.style.animationDelay = `${index * 0.05}s`;
+      row.innerHTML = `
         <td><strong>${generateNoteId(item.id)}</strong></td>
         <td><strong>${item.title}</strong></td>
         <td>${item.description.substring(0, 60)}${item.description.length > 60 ? '...' : ''}</td>
@@ -1757,26 +1620,26 @@
         <td>${item.dueDate || 'No especificada'}</td>
         <td>
           <div class="actions-desktop">
-            <button class="action-btn" onclick="viewItem(${item.id})">Ver</button>
+            <button class="action-btn" onclick="openDetailModal(${item.id})">Ver</button>
             <button class="action-btn" onclick="editItem(${item.id})">Editar</button>
-            <button class="action-btn danger" onclick="confirmDeleteItem(${item.id})">Eliminar</button>
+            <button class="action-btn danger" onclick="deleteItem(${item.id})">Eliminar</button>
           </div>
         </td>
       `;
-                tableBody.appendChild(row);
-            });
-        }
+      tableBody.appendChild(row);
+    });
+  }
 
-        // ===== Renderizar tabla móvil =====
-        function renderMobileTable(data) {
-            const mobileTable = document.getElementById('mobileTable');
-            mobileTable.innerHTML = '';
-
-            data.forEach((item, index) => {
-                const row = document.createElement('div');
-                row.className = 'mobile-row';
-                row.style.animationDelay = `${index * 0.05}s`;
-                row.innerHTML = `
+  // ===== Renderizar tabla móvil =====
+  function renderMobileTable(data) {
+    const mobileTable = document.getElementById('mobileTable');
+    mobileTable.innerHTML = '';
+    
+    data.forEach((item, index) => {
+      const row = document.createElement('div');
+      row.className = 'mobile-row';
+      row.style.animationDelay = `${index * 0.05}s`;
+      row.innerHTML = `
         <div class="mobile-row-content">
           <div class="mobile-row-header">
             <div>
@@ -1831,508 +1694,457 @@
               <span class="mobile-detail-value">${item.dueDate || 'Sin fecha'}</span>
             </div>
           </div>
+          <div class="mobile-row-actions">
+            <div style="display: flex; gap: 0.5rem; font-size: 0.8rem;">
+              <button class="action-btn" style="flex: 1;" onclick="openDetailModal(${item.id})">Ver</button>
+              <button class="action-btn" style="flex: 1;" onclick="editItem(${item.id})">Editar</button>
+            </div>
+          </div>
         </div>
       `;
-                mobileTable.appendChild(row);
-            });
-        }
+      mobileTable.appendChild(row);
+    });
+  }
 
-        // ===== Renderizar paginación =====
-        function renderPagination() {
-            const pagination = document.getElementById('pagination');
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-            if (totalPages <= 1) {
-                pagination.innerHTML = '';
-                return;
-            }
-
-            let paginationHTML = '';
-
-            // Botón anterior
-            paginationHTML += `
+  // ===== Renderizar paginación =====
+  function renderPagination() {
+    const pagination = document.getElementById('pagination');
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    
+    if (totalPages <= 1) {
+      pagination.innerHTML = '';
+      return;
+    }
+    
+    let paginationHTML = '';
+    
+    // Botón anterior
+    paginationHTML += `
       <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" 
               onclick="changePage(${currentPage - 1})" 
               ${currentPage === 1 ? 'disabled' : ''}>
         ←
       </button>
     `;
-
-            // Páginas
-            const maxVisiblePages = window.innerWidth < 768 ? 3 : 5;
-            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-            if (endPage - startPage + 1 < maxVisiblePages) {
-                startPage = Math.max(1, endPage - maxVisiblePages + 1);
-            }
-
-            for (let i = startPage; i <= endPage; i++) {
-                paginationHTML += `
+    
+    // Páginas
+    const maxVisiblePages = window.innerWidth < 768 ? 3 : 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      paginationHTML += `
         <button class="page-btn ${i === currentPage ? 'active' : ''}" 
                 onclick="changePage(${i})">
           ${i}
         </button>
       `;
-            }
-
-            // Botón siguiente
-            paginationHTML += `
+    }
+    
+    // Botón siguiente
+    paginationHTML += `
       <button class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" 
               onclick="changePage(${currentPage + 1})" 
               ${currentPage === totalPages ? 'disabled' : ''}>
         →
       </button>
     `;
-
-            // Información de página
-            paginationHTML += `
+    
+    // Información de página
+    paginationHTML += `
       <div class="page-info">
         ${((currentPage - 1) * itemsPerPage) + 1}-${Math.min(currentPage * itemsPerPage, filteredData.length)} de ${filteredData.length}
       </div>
     `;
+    
+    pagination.innerHTML = paginationHTML;
+  }
 
-            pagination.innerHTML = paginationHTML;
+  // ===== Filtrar tabla =====
+  function filterTable() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const statusFilter = document.getElementById('filterStatus').value;
+    const priorityFilter = document.getElementById('filterPriority').value;
+    
+    filteredData = allData.filter(item => {
+      const matchesSearch = item.title.toLowerCase().includes(searchTerm) || 
+                           item.description.toLowerCase().includes(searchTerm) ||
+                           getCategoryText(item.category).toLowerCase().includes(searchTerm);
+      const matchesStatus = !statusFilter || item.status === statusFilter;
+      const matchesPriority = !priorityFilter || item.priority === priorityFilter;
+      
+      return matchesSearch && matchesStatus && matchesPriority;
+    });
+    
+    currentPage = 1;
+    renderTable();
+  }
+
+  // ===== Limpiar filtros =====
+  function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterPriority').value = '';
+    
+    filteredData = [...allData];
+    currentPage = 1;
+    renderTable();
+    
+    showNotification('info', 'Filtros Limpiados', 'Todos los filtros han sido restablecidos');
+  }
+
+  // ===== Cambiar página =====
+  function changePage(page) {
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+      currentPage = page;
+      renderTable();
+    }
+  }
+
+  // ===== Funciones auxiliares =====
+  function getStatusText(status) {
+    const statusMap = {
+      'activo': 'Activo',
+      'completado': 'Completado',
+      'pendiente': 'Pendiente'
+    };
+    return statusMap[status] || status;
+  }
+
+  function getStatusColor(status) {
+    const colors = {
+      'activo': { bg: '#d1fae5', text: '#065f46' },
+      'completado': { bg: '#dbeafe', text: '#1e40af' },
+      'pendiente': { bg: '#fef3c7', text: '#92400e' }
+    };
+    return colors[status] || { bg: '#f3f4f6', text: '#6b7280' };
+  }
+
+  function getCategoryText(category) {
+    const categoryMap = {
+      'academica': 'Académica',
+      'personal': 'Personal',
+      'trabajo': 'Trabajo',
+      'proyecto': 'Proyecto',
+      'recordatorio': 'Recordatorio'
+    };
+    return categoryMap[category] || category;
+  }
+
+  function getCategoryColor(category) {
+    const colors = {
+      'academica': { bg: '#dbeafe', text: '#1e40af' },
+      'personal': { bg: '#f3e8ff', text: '#6b21a8' },
+      'trabajo': { bg: '#fef3c7', text: '#92400e' },
+      'proyecto': { bg: '#dcfce7', text: '#166534' },
+      'recordatorio': { bg: '#fee2e2', text: '#991b1b' }
+    };
+    return colors[category] || { bg: '#f3f4f6', text: '#6b7280' };
+  }
+
+  function getPriorityColor(priority) {
+    const colors = {
+      'alta': '#dc2626',
+      'media': '#d97706',
+      'baja': '#059669'
+    };
+    return colors[priority] || '#6b7280';
+  }
+
+  // ===== Modal de Detalle (Estilo Limpio) =====
+  const detailModal = document.getElementById('detailModal');
+  
+  function openDetailModal(id) {
+    const item = allData.find(i => i.id === id);
+    if (item) {
+      document.getElementById('detailTitle').textContent = item.title;
+      document.getElementById('detailIdCode').textContent = generateNoteId(item.id);
+      document.getElementById('detailDescription').textContent = item.description;
+      document.getElementById('detailCategory').textContent = getCategoryText(item.category);
+      
+      const statusElement = document.getElementById('detailStatus');
+      statusElement.textContent = getStatusText(item.status);
+      statusElement.style.background = getStatusColor(item.status).bg;
+      statusElement.style.color = getStatusColor(item.status).text;
+      
+      document.getElementById('detailPriority').textContent = 
+        item.priority.charAt(0).toUpperCase() + item.priority.slice(1);
+      document.getElementById('detailPriority').style.color = getPriorityColor(item.priority);
+      document.getElementById('detailPriority').style.fontWeight = '600';
+      
+      document.getElementById('detailCreatedAt').textContent = item.createdAt;
+      document.getElementById('detailDueDate').textContent = item.dueDate || 'No especificada';
+      
+      document.getElementById('detailReminder').textContent = item.reminder 
+        ? `Activado (${new Date(item.reminderDate).toLocaleString()})`
+        : 'No activado';
+      
+      document.getElementById('detailUpdatedAt').textContent = item.updatedAt;
+      
+      detailModal.classList.add('show');
+    }
+  }
+
+  function closeDetailModal() {
+    detailModal.classList.remove('show');
+  }
+
+  // ===== Modal de formulario =====
+  const modal = document.getElementById('modal');
+  
+  function openModal(itemId = null) {
+    isEditing = itemId !== null;
+    
+    const modalTitle = document.getElementById('modalTitle');
+    const saveBtnText = document.getElementById('saveBtnText');
+    
+    if (isEditing && itemId) {
+      // Modo edición
+      const item = allData.find(i => i.id === itemId);
+      if (item) {
+        currentItemId = itemId;
+        modalTitle.textContent = 'Editar Nota';
+        saveBtnText.textContent = 'Actualizar Nota';
+        
+        // Llenar formulario con datos existentes
+        document.getElementById('noteTitle').value = item.title;
+        document.getElementById('noteDescription').value = item.description;
+        document.getElementById('noteCategory').value = item.category;
+        document.getElementById('notePriority').value = item.priority;
+        document.getElementById('noteCreatedAt').value = item.createdAt;
+        document.getElementById('noteDueDate').value = item.dueDate || '';
+        document.getElementById('noteStatus').value = item.status;
+        
+        const hasReminder = document.getElementById('noteHasReminder');
+        hasReminder.checked = item.reminder;
+        const reminderDetails = document.getElementById('reminderDetails');
+        reminderDetails.style.display = item.reminder ? 'block' : 'none';
+        
+        if (item.reminderDate) {
+          document.getElementById('noteReminderDate').value = item.reminderDate;
         }
+      }
+    } else {
+      // Modo creación
+      currentItemId = null;
+      modalTitle.textContent = 'Nueva Nota';
+      saveBtnText.textContent = 'Crear Nota';
+      
+      // Limpiar formulario
+      document.getElementById('noteTitle').value = '';
+      document.getElementById('noteDescription').value = '';
+      document.getElementById('noteCategory').value = 'academica';
+      document.getElementById('notePriority').value = 'media';
+      document.getElementById('noteCreatedAt').value = new Date().toISOString().split('T')[0];
+      document.getElementById('noteDueDate').value = '';
+      document.getElementById('noteStatus').value = 'pendiente';
+      document.getElementById('noteHasReminder').checked = false;
+      document.getElementById('reminderDetails').style.display = 'none';
+      document.getElementById('noteReminderDate').value = '';
+    }
+    
+    modal.classList.add('show');
+  }
 
-        // ===== Filtrar tabla =====
-        function filterTable() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const statusFilter = document.getElementById('filterStatus').value;
-            const priorityFilter = document.getElementById('filterPriority').value;
+  function closeModal() {
+    modal.classList.remove('show');
+    isEditing = false;
+  }
 
-            filteredData = allData.filter(item => {
-                const matchesSearch = item.title.toLowerCase().includes(searchTerm) ||
-                    item.description.toLowerCase().includes(searchTerm) ||
-                    getCategoryText(item.category).toLowerCase().includes(searchTerm);
-                const matchesStatus = !statusFilter || item.status === statusFilter;
-                const matchesPriority = !priorityFilter || item.priority === priorityFilter;
-
-                return matchesSearch && matchesStatus && matchesPriority;
-            });
-
-            currentPage = 1;
-            renderTable();
+  function saveNote() {
+    // Validar campos requeridos
+    const title = document.getElementById('noteTitle').value.trim();
+    if (!title) {
+      showNotification('error', 'Error', 'El título es obligatorio');
+      return;
+    }
+    
+    simulateLoad(() => {
+      if (isEditing && currentItemId) {
+        // Actualizar nota existente
+        const index = allData.findIndex(i => i.id === currentItemId);
+        if (index !== -1) {
+          allData[index] = {
+            ...allData[index],
+            title: title,
+            description: document.getElementById('noteDescription').value,
+            category: document.getElementById('noteCategory').value,
+            priority: document.getElementById('notePriority').value,
+            createdAt: document.getElementById('noteCreatedAt').value,
+            dueDate: document.getElementById('noteDueDate').value || null,
+            status: document.getElementById('noteStatus').value,
+            reminder: document.getElementById('noteHasReminder').checked,
+            reminderDate: document.getElementById('noteHasReminder').checked 
+              ? document.getElementById('noteReminderDate').value 
+              : null,
+            updatedAt: new Date().toISOString().split('T')[0]
+          };
+          
+          showNotification('success', 'Nota Actualizada', `La nota "${title}" ha sido actualizada correctamente`);
         }
+      } else {
+        // Crear nueva nota
+        const newId = allData.length > 0 ? Math.max(...allData.map(item => item.id)) + 1 : 1;
+        const newNote = {
+          id: newId,
+          title: title,
+          description: document.getElementById('noteDescription').value,
+          category: document.getElementById('noteCategory').value,
+          priority: document.getElementById('notePriority').value,
+          createdAt: document.getElementById('noteCreatedAt').value,
+          dueDate: document.getElementById('noteDueDate').value || null,
+          status: document.getElementById('noteStatus').value,
+          reminder: document.getElementById('noteHasReminder').checked,
+          reminderDate: document.getElementById('noteHasReminder').checked 
+            ? document.getElementById('noteReminderDate').value 
+            : null,
+          updatedAt: new Date().toISOString().split('T')[0]
+        };
+        
+        allData.unshift(newNote); // Agregar al inicio
+        showNotification('success', 'Nota Creada', `La nota "${title}" ha sido creada correctamente`);
+      }
+      
+      // Actualizar tabla y cerrar modal
+      filterTable();
+      closeModal();
+    });
+  }
 
-        // ===== Limpiar filtros =====
-        function clearFilters() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterPriority').value = '';
+  // ===== Funciones de edición y eliminación =====
+  function editItem(id) {
+    openModal(id);
+  }
 
-            filteredData = [...allData];
-            currentPage = 1;
-            renderTable();
-
-            showNotification('info', 'Filtros Limpiados', 'Todos los filtros han sido restablecidos');
+  function deleteItem(id) {
+    const item = allData.find(i => i.id === id);
+    if (!item) return;
+    
+    // Crear modal de confirmación personalizado
+    const confirmDelete = confirm(`¿Estás seguro de eliminar la nota "${item.title}" (${generateNoteId(id)})?`);
+    
+    if (confirmDelete) {
+      simulateLoad(() => {
+        const index = allData.findIndex(i => i.id === id);
+        if (index !== -1) {
+          const deletedTitle = allData[index].title;
+          allData.splice(index, 1);
+          filterTable();
+          showNotification('success', 'Nota Eliminada', `La nota "${deletedTitle}" ha sido eliminada`);
         }
+      });
+    }
+  }
 
-        // ===== Cambiar página =====
-        function changePage(page) {
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  // ===== Menú de acciones móvil =====
+  function openMobileActions(itemId) {
+    currentItemId = itemId;
+    const menu = document.getElementById('mobileActionsMenu');
+    menu.classList.add('show');
+  }
 
-            if (page >= 1 && page <= totalPages && page !== currentPage) {
-                currentPage = page;
-                renderTable();
-            }
-        }
+  function closeMobileActions() {
+    const menu = document.getElementById('mobileActionsMenu');
+    menu.classList.remove('show');
+    currentItemId = null;
+  }
 
-        // ===== Funciones auxiliares =====
-        function getStatusText(status) {
-            const statusMap = {
-                'activo': 'Activo',
-                'completado': 'Completado',
-                'pendiente': 'Pendiente'
-            };
-            return statusMap[status] || status;
-        }
+  function handleMobileAction(action) {
+    if (!currentItemId) return;
+    
+    closeMobileActions();
+    
+    switch(action) {
+      case 'view':
+        openDetailModal(currentItemId);
+        break;
+      case 'edit':
+        editItem(currentItemId);
+        break;
+      case 'delete':
+        deleteItem(currentItemId);
+        break;
+    }
+  }
 
-        function getStatusColor(status) {
-            const colors = {
-                'activo': { bg: '#d1fae5', text: '#065f46' },
-                'completado': { bg: '#dbeafe', text: '#1e40af' },
-                'pendiente': { bg: '#fef3c7', text: '#92400e' }
-            };
-            return colors[status] || { bg: '#f3f4f6', text: '#6b7280' };
-        }
+  // ===== Menú móvil =====
+  function toggleMenu(){
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('show');
+  }
 
-        function getCategoryText(category) {
-            const categoryMap = {
-                'academica': 'Académica',
-                'personal': 'Personal',
-                'trabajo': 'Trabajo',
-                'proyecto': 'Proyecto',
-                'recordatorio': 'Recordatorio'
-            };
-            return categoryMap[category] || category;
-        }
+  // ===== Secciones =====
+  function showSection(id){
+    const sections = document.querySelectorAll('section');
+    sections.forEach(sec => sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    
+    if (id === 'notas') {
+      setTimeout(() => renderPagination(), 100);
+    }
+  }
 
-        function getCategoryColor(category) {
-            const colors = {
-                'academica': { bg: '#dbeafe', text: '#1e40af' },
-                'personal': { bg: '#f3e8ff', text: '#6b21a8' },
-                'trabajo': { bg: '#fef3c7', text: '#92400e' },
-                'proyecto': { bg: '#dcfce7', text: '#166534' },
-                'recordatorio': { bg: '#fee2e2', text: '#991b1b' }
-            };
-            return colors[category] || { bg: '#f3f4f6', text: '#6b7280' };
-        }
+  // ===== Event Listeners mejorados =====
+  document.addEventListener('click', (e) => {
+    // Cerrar menú de acciones móvil
+    const mobileMenu = document.getElementById('mobileActionsMenu');
+    if(mobileMenu.classList.contains('show') && 
+       !e.target.closest('.mobile-actions-content') && 
+       !e.target.closest('.mobile-actions-btn')) {
+      closeMobileActions();
+    }
+    
+    // Cerrar modal de formulario
+    if(modal.classList.contains('show') && 
+       !e.target.closest('.modal-content') && 
+       e.target.classList.contains('modal')) {
+      closeModal();
+    }
+    
+    // Cerrar modal de detalle
+    if(detailModal.classList.contains('show') && 
+       !e.target.closest('.detail-modal-content') && 
+       e.target.classList.contains('detail-modal')) {
+      closeDetailModal();
+    }
+  });
 
-        function getPriorityColor(priority) {
-            const colors = {
-                'alta': '#dc2626',
-                'media': '#d97706',
-                'baja': '#059669'
-            };
-            return colors[priority] || '#6b7280';
-        }
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') {
+      closeMobileActions();
+      closeModal();
+      closeDetailModal();
+    }
+  });
 
-        // ===== Modal de Detalle (Dos columnas) =====
-        const detailModal = document.getElementById('detailModal');
+  // Recalcular paginación al redimensionar
+  window.addEventListener('resize', () => {
+    renderPagination();
+  });
 
-        function openDetailModal(id) {
-            const item = allData.find(i => i.id === id);
-            if (item) {
-                document.getElementById('detailTitle').textContent = item.title;
-                document.getElementById('detailIdCode').textContent = generateNoteId(item.id);
-                document.getElementById('detailDescription').textContent = item.description;
-                document.getElementById('detailCategory').textContent = getCategoryText(item.category);
+  // Prevenir scroll en el body cuando un modal está abierto
+  function preventBodyScroll() {
+    const modals = document.querySelectorAll('.modal.show, .detail-modal.show, .mobile-actions-menu.show');
+    if (modals.length > 0) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
 
-                const statusElement = document.getElementById('detailStatus');
-                statusElement.textContent = getStatusText(item.status);
-                statusElement.style.background = getStatusColor(item.status).bg;
-                statusElement.style.color = getStatusColor(item.status).text;
-
-                document.getElementById('detailPriority').textContent =
-                    item.priority.charAt(0).toUpperCase() + item.priority.slice(1);
-                document.getElementById('detailPriority').style.color = getPriorityColor(item.priority);
-                document.getElementById('detailPriority').style.fontWeight = '600';
-
-                document.getElementById('detailCreatedAt').textContent = formatDate(item.createdAt);
-                document.getElementById('detailDueDate').textContent = item.dueDate ? formatDate(item.dueDate) : 'No especificada';
-
-                document.getElementById('detailReminder').textContent = item.reminder
-                    ? `Sí (${formatDateTime(item.reminderDate)})`
-                    : 'No activado';
-
-                detailModal.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-
-        function closeDetailModal() {
-            detailModal.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-
-        // ===== Funciones de formato =====
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-
-        function formatDateTime(dateTimeString) {
-            if (!dateTimeString) return '';
-            const date = new Date(dateTimeString);
-            return date.toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        // ===== Modal de formulario =====
-        const modal = document.getElementById('modal');
-
-        function openModal(itemId = null) {
-            isEditing = itemId !== null;
-
-            const modalTitle = document.getElementById('modalTitle');
-            const saveBtnText = document.getElementById('saveBtnText');
-
-            if (isEditing && itemId) {
-                // Modo edición
-                const item = allData.find(i => i.id === itemId);
-                if (item) {
-                    currentItemId = itemId;
-                    modalTitle.textContent = 'Editar Nota';
-                    saveBtnText.textContent = 'Actualizar Nota';
-
-                    // Llenar formulario con datos existentes
-                    document.getElementById('noteTitle').value = item.title;
-                    document.getElementById('noteDescription').value = item.description;
-                    document.getElementById('noteCategory').value = item.category;
-                    document.getElementById('notePriority').value = item.priority;
-                    document.getElementById('noteCreatedAt').value = item.createdAt;
-                    document.getElementById('noteDueDate').value = item.dueDate || '';
-                    document.getElementById('noteStatus').value = item.status;
-
-                    const hasReminder = document.getElementById('noteHasReminder');
-                    hasReminder.checked = item.reminder;
-                    const reminderDetails = document.getElementById('reminderDetails');
-                    reminderDetails.style.display = item.reminder ? 'block' : 'none';
-
-                    if (item.reminderDate) {
-                        document.getElementById('noteReminderDate').value = item.reminderDate;
-                    }
-                }
-            } else {
-                // Modo creación
-                currentItemId = null;
-                modalTitle.textContent = 'Nueva Nota';
-                saveBtnText.textContent = 'Crear Nota';
-
-                // Limpiar formulario
-                document.getElementById('noteTitle').value = '';
-                document.getElementById('noteDescription').value = '';
-                document.getElementById('noteCategory').value = 'academica';
-                document.getElementById('notePriority').value = 'media';
-                document.getElementById('noteCreatedAt').value = new Date().toISOString().split('T')[0];
-                document.getElementById('noteDueDate').value = '';
-                document.getElementById('noteStatus').value = 'pendiente';
-                document.getElementById('noteHasReminder').checked = false;
-                document.getElementById('reminderDetails').style.display = 'none';
-                document.getElementById('noteReminderDate').value = '';
-            }
-
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            modal.classList.remove('show');
-            document.body.style.overflow = '';
-            isEditing = false;
-        }
-
-        function saveNote() {
-            // Validar campos requeridos
-            const title = document.getElementById('noteTitle').value.trim();
-            if (!title) {
-                showNotification('error', 'Error', 'El título es obligatorio');
-                return;
-            }
-
-            simulateLoad(() => {
-                if (isEditing && currentItemId) {
-                    // Actualizar nota existente
-                    const index = allData.findIndex(i => i.id === currentItemId);
-                    if (index !== -1) {
-                        allData[index] = {
-                            ...allData[index],
-                            title: title,
-                            description: document.getElementById('noteDescription').value,
-                            category: document.getElementById('noteCategory').value,
-                            priority: document.getElementById('notePriority').value,
-                            createdAt: document.getElementById('noteCreatedAt').value,
-                            dueDate: document.getElementById('noteDueDate').value || null,
-                            status: document.getElementById('noteStatus').value,
-                            reminder: document.getElementById('noteHasReminder').checked,
-                            reminderDate: document.getElementById('noteHasReminder').checked
-                                ? document.getElementById('noteReminderDate').value
-                                : null,
-                            updatedAt: new Date().toISOString().split('T')[0]
-                        };
-
-                        showNotification('success', 'Nota Actualizada', `La nota "${title}" ha sido actualizada correctamente`);
-                    }
-                } else {
-                    // Crear nueva nota
-                    const newId = allData.length > 0 ? Math.max(...allData.map(item => item.id)) + 1 : 1;
-                    const newNote = {
-                        id: newId,
-                        title: title,
-                        description: document.getElementById('noteDescription').value,
-                        category: document.getElementById('noteCategory').value,
-                        priority: document.getElementById('notePriority').value,
-                        createdAt: document.getElementById('noteCreatedAt').value,
-                        dueDate: document.getElementById('noteDueDate').value || null,
-                        status: document.getElementById('noteStatus').value,
-                        reminder: document.getElementById('noteHasReminder').checked,
-                        reminderDate: document.getElementById('noteHasReminder').checked
-                            ? document.getElementById('noteReminderDate').value
-                            : null,
-                        updatedAt: new Date().toISOString().split('T')[0]
-                    };
-
-                    allData.unshift(newNote); // Agregar al inicio
-                    showNotification('success', 'Nota Creada', `La nota "${title}" ha sido creada correctamente`);
-                }
-
-                // Actualizar tabla y cerrar modal
-                filterTable();
-                closeModal();
-            });
-        }
-
-        // ===== Funciones de acciones =====
-        function viewItem(id) {
-            openDetailModal(id);
-        }
-
-        function editItem(id) {
-            openModal(id);
-        }
-
-        function confirmDeleteItem(id) {
-            const item = allData.find(i => i.id === id);
-            if (!item) return;
-
-            // Crear notificación de confirmación
-            const notification = showNotification('warning', 'Confirmar Eliminación',
-                `¿Eliminar "${item.title}" (${generateNoteId(id)})?`, 10000);
-
-            // Agregar botones de acción a la notificación
-            setTimeout(() => {
-                const content = notification.querySelector('.notification-content');
-                const actions = document.createElement('div');
-                actions.style.marginTop = '0.5rem';
-                actions.style.display = 'flex';
-                actions.style.gap = '0.5rem';
-                actions.innerHTML = `
-        <button onclick="deleteItem(${id}, this)" 
-                style="padding: 0.25rem 0.5rem; background: var(--danger); color: white; border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
-          Sí, eliminar
-        </button>
-        <button onclick="closeNotification(this)" 
-                style="padding: 0.25rem 0.5rem; background: var(--border); color: var(--text); border: none; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
-          Cancelar
-        </button>
-      `;
-                content.appendChild(actions);
-            }, 100);
-        }
-
-        function deleteItem(id, button) {
-            const item = allData.find(i => i.id === id);
-            if (!item) return;
-
-            simulateLoad(() => {
-                const index = allData.findIndex(i => i.id === id);
-                if (index !== -1) {
-                    const deletedTitle = allData[index].title;
-                    allData.splice(index, 1);
-                    filterTable();
-
-                    // Cerrar la notificación de confirmación
-                    if (button) {
-                        closeNotification(button);
-                    }
-
-                    showNotification('success', 'Nota Eliminada', `La nota "${deletedTitle}" ha sido eliminada`);
-                }
-            });
-        }
-
-        // ===== Menú de acciones móvil =====
-        const mobileActionsMenu = document.getElementById('mobileActionsMenu');
-
-        function openMobileActions(itemId) {
-            currentItemId = itemId;
-            mobileActionsMenu.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeMobileActions() {
-            mobileActionsMenu.classList.remove('show');
-            document.body.style.overflow = '';
-            currentItemId = null;
-        }
-
-        function handleMobileAction(action) {
-            if (!currentItemId) return;
-
-            closeMobileActions();
-
-            switch (action) {
-                case 'view':
-                    viewItem(currentItemId);
-                    break;
-                case 'edit':
-                    editItem(currentItemId);
-                    break;
-                case 'delete':
-                    confirmDeleteItem(currentItemId);
-                    break;
-            }
-        }
-
-        // ===== Menú móvil =====
-        function toggleMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('show');
-            document.body.style.overflow = menu.classList.contains('show') ? 'hidden' : '';
-        }
-
-        // ===== Secciones =====
-        function showSection(id) {
-            const sections = document.querySelectorAll('section');
-            sections.forEach(sec => sec.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-
-            if (id === 'notas') {
-                setTimeout(() => renderPagination(), 100);
-            }
-        }
-
-        // ===== Event Listeners mejorados =====
-        document.addEventListener('click', (e) => {
-            // Cerrar menú de acciones móvil
-            const mobileMenu = document.getElementById('mobileActionsMenu');
-            if (mobileMenu.classList.contains('show') &&
-                !e.target.closest('.mobile-actions-content') &&
-                !e.target.closest('.mobile-actions-btn')) {
-                closeMobileActions();
-            }
-
-            // Cerrar modal de formulario
-            if (modal.classList.contains('show') &&
-                !e.target.closest('.modal-content') &&
-                e.target.classList.contains('modal')) {
-                closeModal();
-            }
-
-            // Cerrar modal de detalle
-            if (detailModal.classList.contains('show') &&
-                !e.target.closest('.detail-modal-content') &&
-                e.target.classList.contains('detail-modal')) {
-                closeDetailModal();
-            }
-
-            // Cerrar menú móvil
-            const mobileNavMenu = document.getElementById('mobileMenu');
-            if (mobileNavMenu.classList.contains('show') &&
-                !e.target.closest('.mobile-menu') &&
-                !e.target.closest('.menu-toggle')) {
-                toggleMenu();
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeMobileActions();
-                closeModal();
-                closeDetailModal();
-                const mobileNavMenu = document.getElementById('mobileMenu');
-                if (mobileNavMenu.classList.contains('show')) {
-                    toggleMenu();
-                }
-            }
-        });
-
-        // Recalcular paginación al redimensionar
-        window.addEventListener('resize', () => {
-            renderPagination();
-        });
-    </script>
+  // Observar cambios en los modales
+  const observer = new MutationObserver(preventBodyScroll);
+  observer.observe(document.body, { 
+    attributes: true, 
+    attributeFilter: ['class'],
+    subtree: true 
+  });
+</script>
 </body>
-
 </html>
