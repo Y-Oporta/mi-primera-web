@@ -1,1707 +1,1720 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance Pro</title>
-
-<style>
-  /* ===== VARIABLES ===== */
-  :root {
-    --primary: #2563eb;
-    --primary-dark: #1d4ed8;
-    --primary-light: #dbeafe;
-    --income: #10b981;
-    --income-dark: #059669;
-    --income-light: #d1fae5;
-    --expense: #ef4444;
-    --expense-dark: #dc2626;
-    --expense-light: #fee2e2;
-    --bg: #f8fafc;
-    --nav-bg: rgba(255, 255, 255, 0.98);
-    --text: #1e293b;
-    --text-light: #64748b;
-    --text-muted: #94a3b8;
-    --border: #e2e8f0;
-    --modal-bg: rgba(15, 23, 42, 0.7);
-    --hover-bg: #f1f5f9;
-    --card-bg: #ffffff;
-    --shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --info: #3b82f6;
-    --success: #10b981;
-  }
-
-  /* ===== FUENTES PROFESIONALES ===== */
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  
-  * { 
-    margin:0; 
-    padding:0; 
-    box-sizing:border-box; 
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  }
-  
-  body { 
-    background: var(--bg); 
-    color: var(--text); 
-    min-height:100vh; 
-    line-height:1.5; 
-    font-size: 14px;
-    overflow-x: hidden;
-    font-weight: 400;
-    letter-spacing: -0.01em;
-  }
-
-  /* ===== ANIMACIONES ===== */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes slideIn {
-    from { transform: translateX(-20px); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes notificationIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-
-  @keyframes notificationOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-  }
-
-  /* ===== NOTIFICACIONES CUSTOM ===== */
-  .notification-container {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 350px;
-  }
-
-  .notification {
-    background: white;
-    border-radius: 10px;
-    padding: 16px;
-    animation: notificationIn 0.3s ease;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-  }
-
-  .notification.hiding {
-    animation: notificationOut 0.3s ease forwards;
-  }
-
-  .notification.success {
-    border-left: 4px solid var(--success);
-  }
-
-  .notification.error {
-    border-left: 4px solid var(--danger);
-  }
-
-  .notification.warning {
-    border-left: 4px solid var(--warning);
-  }
-
-  .notification.info {
-    border-left: 4px solid var(--info);
-  }
-
-  .notification-icon {
-    font-size: 20px;
-    line-height: 1;
-    font-weight: 600;
-  }
-
-  .notification-content {
-    flex: 1;
-  }
-
-  .notification-title {
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: var(--text);
-    font-size: 0.95rem;
-  }
-
-  .notification-message {
-    font-size: 0.875rem;
-    color: var(--text-light);
-    line-height: 1.4;
-  }
-
-  .notification-close {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: var(--text-muted);
-    padding: 2px;
-    line-height: 1;
-    transition: color 0.2s;
-  }
-
-  .notification-close:hover {
-    color: var(--text);
-  }
-
-  /* ===== NAVBAR ===== */
-  header {
-    position: sticky;
-    top:0;
-    z-index:1000;
-    backdrop-filter: blur(12px);
-    background: var(--nav-bg);
-    border-bottom: 1px solid var(--border);
-    animation: slideIn 0.3s ease;
-  }
-
-  .nav {
-    max-width: 1100px;
-    margin:auto;
-    padding:1rem 1.25rem;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-  }
-
-  .logo { 
-    font-size: 1.4rem; 
-    font-weight:700; 
-    color:var(--primary); 
-    letter-spacing: -0.5px;
-  }
-
-  .menu { 
-    display:flex; 
-    gap:2rem; 
-  }
-  
-  .menu a { 
-    text-decoration:none; 
-    color: var(--text-light); 
-    font-weight:500; 
-    font-size:0.9rem; 
-    transition:all 0.2s; 
-    cursor:pointer;
-    padding: 0.25rem 0;
-    position: relative;
-  }
-  
-  .menu a:hover { 
-    color: var(--primary); 
-  }
-  
-  .menu a.active {
-    color: var(--primary);
-    font-weight: 600;
-  }
-  
-  .menu a.active::after {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: var(--primary);
-    border-radius: 1px;
-  }
-
-  .menu-toggle { 
-    display:none; 
-    font-size:1.25rem; 
-    cursor:pointer; 
-    color: var(--text); 
-    padding: 0.25rem;
-    background: none;
-    border: none;
-    transition: transform 0.3s;
-  }
-
-  /* ===== MENU MÓVIL MEJORADO ===== */
-  .mobile-menu {
-    position: fixed;
-    top:0; 
-    left:0;
-    width:100%; 
-    height:100%;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(10px);
-    display:flex; 
-    flex-direction:column; 
-    justify-content:center; 
-    align-items:center;
-    gap:1.5rem; 
-    transform:translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index:999;
-    padding: 2rem;
-  }
-
-  .mobile-menu.show { 
-    transform:translateX(0); 
-  }
-
-  .mobile-menu a { 
-    font-size:1.1rem; 
-    font-weight:500; 
-    color: var(--text); 
-    padding: 0.75rem 1.5rem;
-    animation: fadeIn 0.3s ease;
-    text-decoration: none;
-    transition: all 0.2s;
-    border-radius: 8px;
-    width: 100%;
-    text-align: center;
-  }
-  
-  .mobile-menu a:hover { 
-    background: var(--primary-light);
-    color: var(--primary);
-  }
-  
-  .mobile-menu a.active {
-    background: var(--primary);
-    color: white;
-  }
-
-  .mobile-close-btn {
-    position: absolute;
-    top: 24px;
-    right: 24px;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text);
-    padding: 0.5rem;
-    transition: transform 0.3s;
-  }
-
-  .mobile-close-btn:hover {
-    transform: rotate(90deg);
-  }
-
-  /* ===== SECCIONES ===== */
-  section { 
-    max-width:1100px; 
-    margin:auto; 
-    padding:1.5rem 1.25rem; 
-    min-height:calc(100vh - 68px); 
-    display:none; 
-    flex-direction:column; 
-    animation: fadeIn 0.3s ease;
-  }
-  
-  section.active { 
-    display:flex; 
-  }
-
-  h1 { 
-    font-size:clamp(1.4rem, 4vw, 2rem); 
-    font-weight:600; 
-    margin-bottom:1.5rem; 
-    text-align:center; 
-    color: var(--text);
-    letter-spacing: -0.025em;
-  }
-
-  /* ===== RESÚMEN FINANCIERO EN ESTADÍSTICAS ===== */
-  .summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 2rem;
-    animation: fadeIn 0.4s ease;
-  }
-
-  .summary-card {
-    background: white;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .summary-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-  }
-
-  .summary-card.income::before {
-    background: linear-gradient(to bottom, var(--income), var(--income-dark));
-  }
-
-  .summary-card.expense::before {
-    background: linear-gradient(to bottom, var(--expense), var(--expense-dark));
-  }
-
-  .summary-card.balance::before {
-    background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
-  }
-
-  .summary-label {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .summary-value {
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: var(--text);
-    font-feature-settings: "tnum";
-    font-variant-numeric: tabular-nums;
-  }
-
-  .summary-value.income {
-    color: var(--income);
-  }
-
-  .summary-value.expense {
-    color: var(--expense);
-  }
-
-  .summary-value.balance {
-    color: var(--primary);
-  }
-
-  .summary-period {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-  }
-
-  /* ===== LOADING ANIMATION ===== */
-  .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--modal-bg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1003;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-
-  .loading-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .loading-spinner {
-    width: 50px;
-    height: 50px;
-    border: 3px solid rgba(255, 255, 255, 0.1);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  /* ===== CONTROLES DE TABLA ===== */
-  .table-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    align-items: center;
-    justify-content: space-between;
-    animation: fadeIn 0.4s ease;
-  }
-
-  .table-header {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 1.5rem;
-  }
-
-  .search-container {
-    flex: 1;
-    min-width: 250px;
-    position: relative;
-  }
-
-  .search-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: white;
-    transition: all 0.3s;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .search-input:focus {
-    outline: none;
-    border-color: var(--primary);
-  }
-
-  .filter-container {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .filter-select {
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: white;
-    color: var(--text);
-    transition: all 0.3s;
-    min-width: 150px;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .filter-select:focus {
-    border-color: var(--primary);
-    outline: none;
-  }
-
-  .clear-filters-btn {
-    padding: 0.75rem 1.25rem;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-light);
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .clear-filters-btn:hover {
-    background: var(--hover-bg);
-    border-color: var(--text-light);
-    color: var(--text);
-  }
-
-  /* ===== BOTÓN PRINCIPAL ÚNICO ===== */
-  .primary-btn { 
-    padding: 0.75rem 1.5rem; 
-    background: var(--primary); 
-    color: white; 
-    border: none; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    transition: all 0.3s; 
-    font-weight: 500;
-    font-size: 0.9rem;
-    letter-spacing: -0.01em;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    animation: fadeIn 0.3s ease;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  .primary-btn:hover { 
-    background: var(--primary-dark); 
-    transform: translateY(-1px);
-  }
-
-  /* ===== TABLA RESPONSIVA ===== */
-  .table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    background: white;
-    margin-bottom: 1.5rem;
-    animation: fadeIn 0.5s ease;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 700px;
-  }
-
-  /* Estilo para escritorio */
-  .desktop-table {
-    display: table;
-  }
-
-  .mobile-table {
-    display: none;
-  }
-
-  th {
-    padding: 1rem 1.25rem;
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-light);
-    background: white;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-
-  td {
-    padding: 1rem 1.25rem;
-    text-align: left;
-    color: var(--text);
-    border-bottom: 1px solid var(--border);
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
-  }
-
-  tr {
-    animation: fadeIn 0.3s ease;
-    animation-fill-mode: both;
-  }
-
-  tr:hover td {
-    background: var(--hover-bg);
-  }
-
-  tr:last-child td {
-    border-bottom: none;
-  }
-
-  /* ===== ESTILOS PARA MÓVIL ===== */
-  .mobile-table {
-    display: none;
-    width: 100%;
-  }
-
-  .mobile-row {
-    background: white;
-    border-bottom: 1px solid var(--border);
-    padding: 1.25rem;
-    animation: fadeIn 0.3s ease;
-    animation-fill-mode: both;
-  }
-
-  .mobile-row-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .mobile-row-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.5rem;
-  }
-
-  .mobile-row-title {
-    font-weight: 600;
-    color: var(--text);
-    font-size: 0.95rem;
-    flex: 1;
-  }
-
-  .mobile-row-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .mobile-detail-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-  }
-
-  .mobile-detail-item:not(:last-child) {
-    border-bottom: 1px solid var(--border);
-  }
-
-  .mobile-detail-label {
-    color: var(--text-light);
-    font-weight: 500;
-    font-size: 0.85rem;
-    min-width: 80px;
-  }
-
-  .mobile-detail-value {
-    color: var(--text);
-    font-size: 0.9rem;
-    text-align: right;
-    flex: 1;
-  }
-
-  .mobile-row-actions {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-  }
-
-  /* ===== COLUMNA ACCIONES ===== */
-  .actions-desktop {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .action-btn {
-    padding: 0.5rem 1rem;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.3s;
-    font-weight: 500;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .action-btn:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-  }
-
-  .action-btn.danger {
-    border-color: var(--danger);
-    color: var(--danger);
-  }
-
-  .action-btn.danger:hover {
-    background: var(--danger);
-    color: white;
-  }
-
-  .mobile-actions-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: var(--text-light);
-    padding: 0.5rem;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-    margin-left: 0.5rem;
-    flex-shrink: 0;
-  }
-
-  .mobile-actions-btn:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-  }
-
-  /* ===== DETALLE MODAL - SIN BORDES ===== */
-  .detail-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--modal-bg);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    z-index: 1004;
-    padding: 1rem;
-  }
-
-  .detail-modal.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .detail-modal-content {
-    background: white;
-    padding: 2rem;
-    width: 100%;
-    max-width: 500px;
-    max-height: 85vh;
-    overflow-y: auto;
-    animation: fadeIn 0.3s ease;
-    position: relative;
-  }
-
-  .detail-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .detail-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text);
-    margin: 0;
-    line-height: 1.3;
-  }
-
-  .detail-id {
-    color: var(--text-light);
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-top: 0.25rem;
-  }
-
-  .close-detail-btn {
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text-light);
-    padding: 0.25rem;
-    transition: color 0.3s;
-    line-height: 1;
-  }
-
-  .close-detail-btn:hover {
-    color: var(--primary);
-  }
-
-  .detail-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .detail-label {
-    color: var(--text-light);
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .detail-value {
-    color: var(--text);
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  .detail-amount {
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-
-  .detail-amount.income {
-    color: var(--income);
-  }
-
-  .detail-amount.expense {
-    color: var(--expense);
-  }
-
-  .detail-type {
-    display: inline-block;
-    padding: 0.5rem 1.25rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-top: 0.25rem;
-    text-align: center;
-    max-width: 120px;
-  }
-
-  /* ===== MODAL DE FORMULARIO COMPLETO ===== */
-  .modal { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: var(--modal-bg);
-    backdrop-filter: blur(4px);
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    opacity: 0; 
-    pointer-events: none; 
-    transition: opacity 0.3s; 
-    z-index: 1001; 
-    padding: 1rem;
-  }
-  
-  .modal.show { 
-    opacity: 1; 
-    pointer-events: auto; 
-  }
-  
-  .modal-content { 
-    background: white; 
-    padding: 2rem; 
-    width: 100%;
-    max-width: 450px; 
-    max-height: 90vh;
-    overflow-y: auto;
-    animation: fadeIn 0.3s ease;
-  }
-  
-  .modal-content h2 { 
-    margin-bottom: 1.5rem; 
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-
-  .form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text);
-    font-weight: 500;
-    font-size: 0.9rem;
-  }
-
-  .form-input, .form-textarea, .form-select { 
-    width: 100%; 
-    padding: 0.75rem 1rem; 
-    border: 1px solid var(--border); 
-    border-radius: 8px; 
-    font-size: 0.9rem;
-    transition: all 0.3s;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  .form-input:focus, .form-textarea:focus, .form-select:focus {
-    border-color: var(--primary);
-    outline: none;
-  }
-  
-  .form-textarea {
-    min-height: 80px;
-    resize: vertical;
-  }
-
-  .radio-group {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.5rem;
-  }
-
-  .radio-option {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .radio-option:hover {
-    border-color: var(--primary);
-  }
-
-  .radio-option.selected {
-    border-color: var(--primary);
-    background: var(--primary-light);
-  }
-
-  .radio-option.income.selected {
-    border-color: var(--income);
-    background: var(--income-light);
-  }
-
-  .radio-option.expense.selected {
-    border-color: var(--expense);
-    background: var(--expense-light);
-  }
-
-  .radio-option input {
-    display: none;
-  }
-
-  .radio-icon {
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
-
-  .radio-icon.income {
-    color: var(--income);
-  }
-
-  .radio-icon.expense {
-    color: var(--expense);
-  }
-
-  .radio-label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text);
-  }
-
-  .form-row {
-    display: flex;
-    gap: 1rem;
-  }
-
-  .form-row .form-group {
-    flex: 1;
-  }
-
-  .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
-  }
-
-  /* ===== PAGINACIÓN ===== */
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-    animation: fadeIn 0.3s ease;
-  }
-
-  .page-btn {
-    padding: 0.5rem 0.75rem;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.3s;
-    min-width: 36px;
-    text-align: center;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .page-btn:hover {
-    background: var(--primary-light);
-    border-color: var(--primary);
-  }
-
-  .page-btn.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-  }
-
-  .page-btn.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .page-btn.disabled:hover {
-    background: white;
-    border-color: var(--border);
-  }
-
-  .page-info {
-    color: var(--text-light);
-    font-size: 0.85rem;
-    margin: 0 0.5rem;
-  }
-
-  /* ===== MENÚ DE ACCIONES PARA MÓVIL ===== */
-  .mobile-actions-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--modal-bg);
-    backdrop-filter: blur(4px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-    z-index: 1002;
-    padding: 1rem;
-  }
-
-  .mobile-actions-menu.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .mobile-actions-content {
-    background: white;
-    padding: 1.5rem;
-    width: 100%;
-    max-width: 280px;
-    animation: fadeIn 0.3s ease;
-  }
-
-  .mobile-action-item {
-    padding: 1rem 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    font-size: 0.9rem;
-    color: var(--text);
-    transition: all 0.3s;
-  }
-
-  .mobile-action-item:not(:last-child) {
-    border-bottom: 1px solid var(--border);
-  }
-
-  .mobile-action-item:hover {
-    color: var(--primary);
-  }
-
-  .mobile-action-item.danger:hover {
-    color: var(--danger);
-  }
-
-  .action-label {
-    font-weight: 500;
-    flex: 1;
-  }
-
-  /* ===== RESPONSIVE ===== */
-  @media (min-width: 769px) {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Pro</title>
+
+  <style>
+    /* ===== VARIABLES ===== */
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-light: #d1fae5;
+      --primary-light-2: #ecfdf5;
+      --income: #10b981;
+      --income-dark: #059669;
+      --income-light: #d1fae5;
+      --expense: #ef4444;
+      --expense-dark: #dc2626;
+      --expense-light: #fee2e2;
+      --bg: #f9fafb;
+      --nav-bg: #ffffff;
+      --text: #111827;
+      --text-light: #6b7280;
+      --text-muted: #9ca3af;
+      --border: #e5e7eb;
+      --modal-bg: rgba(0, 0, 0, 0.5);
+      --hover-bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ===== FUENTES ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      font-size: 14px;
+      overflow-x: hidden;
+    }
+
+    /* ===== ANIMACIONES ===== */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(-20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes notificationIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes notificationOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    /* ===== NOTIFICACIONES ===== */
+    .notification-container {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 350px;
+    }
+
+    .notification {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: var(--shadow-lg);
+      animation: notificationIn 0.3s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+    }
+
+    .notification.hiding {
+      animation: notificationOut 0.3s ease forwards;
+    }
+
+    .notification.success {
+      border-left-color: var(--primary);
+    }
+
+    .notification.error {
+      border-left-color: var(--expense);
+    }
+
+    .notification.warning {
+      border-left-color: #f59e0b;
+    }
+
+    .notification.info {
+      border-left-color: #3b82f6;
+    }
+
+    .notification-icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .notification-content {
+      flex: 1;
+    }
+
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .notification-message {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      line-height: 1.4;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 2px;
+      line-height: 1;
+    }
+
+    /* ===== NAVBAR ===== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+      animation: slideIn 0.3s ease;
+    }
+
+    .nav {
+      max-width: 1100px;
+      margin: auto;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    .menu {
+      display: flex;
+      gap: 1.75rem;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+      cursor: pointer;
+      padding: 0.25rem 0;
+    }
+
+    .menu a:hover {
+      color: var(--primary);
+    }
+
+    .menu a.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+      padding: 0.25rem;
+      background: none;
+      border: none;
+    }
+
+    /* ===== MENU MÓVIL MEJORADO Y CORREGIDO ===== */
+    .mobile-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-bg);
+      display: none;
+      z-index: 999;
+    }
+
+    .mobile-menu-overlay.show {
+      display: block;
+    }
+
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .mobile-menu.show {
+      transform: translateX(0);
+    }
+
+    .mobile-menu-header {
+      padding: 1.5rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mobile-menu-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .mobile-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+      padding: 0.25rem;
+      line-height: 1;
+    }
+
+    .mobile-menu-items {
+      padding: 1rem 0;
+      flex: 1;
+    }
+
+    .mobile-menu-item {
+      display: block;
+      padding: 1rem 1.5rem;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 500;
+      font-size: 1rem;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .mobile-menu-item:hover {
+      background: var(--primary-light-2);
+      color: var(--primary);
+    }
+
+    .mobile-menu-item.active {
+      background: var(--primary-light-2);
+      color: var(--primary);
+      border-left-color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* ===== SECCIONES ===== */
+    section {
+      max-width: 1100px;
+      margin: auto;
+      padding: 1.5rem 1.25rem;
+      min-height: calc(100vh - 68px);
+      display: none;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease;
+    }
+
+    section.active {
+      display: flex;
+    }
+
+    h1 {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    /* ===== RESÚMEN FINANCIERO ===== */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .summary-card {
+      background: white;
+      padding: 1.25rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .summary-card.income {
+      border-top: 3px solid var(--income);
+    }
+
+    .summary-card.expense {
+      border-top: 3px solid var(--expense);
+    }
+
+    .summary-card.balance {
+      border-top: 3px solid var(--primary);
+    }
+
+    .summary-label {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      font-weight: 500;
+    }
+
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .summary-value.income {
+      color: var(--income);
+    }
+
+    .summary-value.expense {
+      color: var(--expense);
+    }
+
+    .summary-value.balance {
+      color: var(--primary);
+    }
+
+    .summary-period {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ===== LOADING ===== */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1003;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .loading-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid var(--primary-light);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* ===== CONTROLES DE TABLA ===== */
+    .table-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+      justify-content: space-between;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .table-header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-container {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: white;
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .filter-container {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-select {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      background: white;
+      color: var(--text);
+      transition: all 0.3s;
+      min-width: 150px;
+    }
+
+    .filter-select:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    .clear-filters-btn {
+      padding: 0.75rem 1.25rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .clear-filters-btn:hover {
+      background: var(--hover-bg);
+      border-color: var(--text-light);
+      color: var(--text);
+    }
+
+    /* ===== BOTÓN PRINCIPAL ===== */
+    .primary-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    /* ===== TABLA RESPONSIVA ===== */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.5s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
     .desktop-table {
       display: table;
     }
-    
+
     .mobile-table {
-      display: none !important;
-    }
-    
-    .actions-mobile {
       display: none;
     }
-  }
 
-  @media (max-width: 768px) {
-    body {
-      font-size: 13px;
-    }
-    
-    .menu { 
-      display: none; 
-    }
-    
-    .menu-toggle { 
-      display: block; 
-    }
-    
-    section { 
-      padding: 1.25rem 1rem; 
-    }
-    
-    h1 {
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
-    }
-    
-    .summary-cards {
-      grid-template-columns: 1fr;
-    }
-    
-    .table-controls {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.75rem;
-    }
-    
-    .table-header {
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    
-    .search-container {
-      width: 100%;
-    }
-    
-    .filter-container {
-      width: 100%;
-      justify-content: space-between;
-    }
-    
-    .filter-select {
-      flex: 1;
-      min-width: 0;
+    th {
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-light);
+      background: white;
       font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
     }
-    
-    .clear-filters-btn {
-      padding: 0.75rem 1rem;
-      font-size: 0.85rem;
+
+    td {
+      padding: 1rem;
+      text-align: left;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+      transition: background-color 0.3s;
     }
-    
-    .primary-btn {
-      width: 100%;
-      justify-content: center;
+
+    tr:hover td {
+      background: var(--hover-bg);
     }
-    
-    /* Mostrar tabla móvil */
-    .desktop-table {
-      display: none !important;
+
+    tr:last-child td {
+      border-bottom: none;
     }
-    
+
+    /* ===== ESTILOS PARA MÓVIL ===== */
     .mobile-table {
-      display: block;
+      display: none;
+      width: 100%;
     }
-    
+
     .mobile-row {
+      background: white;
+      border-bottom: 1px solid var(--border);
       padding: 1rem;
     }
-    
-    .mobile-row:last-child {
-      margin-bottom: 0;
-    }
-    
-    .mobile-detail-label {
-      min-width: 70px;
-      font-size: 0.8rem;
-    }
-    
-    .mobile-detail-value {
-      font-size: 0.8rem;
-    }
-    
-    .mobile-row-title {
-      font-size: 0.85rem;
-    }
-    
-    .detail-modal-content {
-      padding: 1.5rem;
-      max-height: 80vh;
-    }
-    
-    .detail-title {
-      font-size: 1.2rem;
-    }
-    
-    .detail-value {
-      font-size: 0.9rem;
-    }
-    
-    .form-row {
-      flex-direction: column;
-      gap: 0;
-    }
-    
-    .modal-content {
-      padding: 1.5rem;
-      max-height: 85vh;
-    }
-    
-    .pagination {
-      gap: 0.25rem;
-    }
-    
-    .page-btn {
-      padding: 0.4rem 0.6rem;
-      min-width: 32px;
-      font-size: 0.8rem;
-    }
-    
-    .page-info {
-      font-size: 0.8rem;
-    }
-    
-    .notification-container {
-      top: 70px;
-      right: 10px;
-      max-width: 300px;
-    }
-    
-    .notification {
-      padding: 12px;
-      font-size: 0.85rem;
-    }
-  }
 
-  @media (max-width: 480px) {
-    body {
-      font-size: 12px;
+    .mobile-row-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
     }
-    
-    .nav {
-      padding: 0.75rem 1rem;
+
+    .mobile-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
     }
-    
-    .logo {
-      font-size: 1.2rem;
-    }
-    
-    h1 {
-      font-size: 1.2rem;
-    }
-    
-    .mobile-row {
-      padding: 0.875rem;
-    }
-    
-    .mobile-detail-label {
-      min-width: 60px;
-      font-size: 0.75rem;
-    }
-    
-    .mobile-detail-value {
-      font-size: 0.75rem;
-    }
-    
+
     .mobile-row-title {
-      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.9rem;
+      flex: 1;
     }
-    
+
+    .mobile-row-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .mobile-detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+    }
+
+    .mobile-detail-item:not(:last-child) {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-detail-label {
+      color: var(--text-light);
+      font-weight: 500;
+      font-size: 0.8rem;
+      min-width: 80px;
+    }
+
+    .mobile-detail-value {
+      color: var(--text);
+      font-size: 0.85rem;
+      text-align: right;
+      flex: 1;
+    }
+
+    /* ===== COLUMNA ACCIONES ===== */
+    .actions-desktop {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+
+    .action-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .action-btn.danger {
+      border-color: var(--expense);
+      color: var(--expense);
+    }
+
+    .action-btn.danger:hover {
+      background: var(--expense);
+      color: white;
+    }
+
     .mobile-actions-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 0.5rem;
       width: 36px;
       height: 36px;
-      font-size: 1rem;
-      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      margin-left: 0.5rem;
+      flex-shrink: 0;
     }
-    
-    .page-btn {
-      padding: 0.35rem 0.5rem;
-      min-width: 28px;
-      font-size: 0.75rem;
+
+    .mobile-actions-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
     }
-    
+
+    /* ===== DETALLE MODAL ===== */
+    .detail-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 1004;
+      padding: 1rem;
+    }
+
+    .detail-modal.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     .detail-modal-content {
-      padding: 1.25rem;
-      max-height: 75vh;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 500px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: fadeIn 0.3s ease;
     }
-    
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .detail-id {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-top: 0.25rem;
+    }
+
+    .close-detail-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 0.25rem;
+      transition: color 0.3s;
+      line-height: 1;
+    }
+
+    .close-detail-btn:hover {
+      color: var(--primary);
+    }
+
+    .detail-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .detail-label {
+      color: var(--text-light);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .detail-amount {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .detail-amount.income {
+      color: var(--income);
+    }
+
+    .detail-amount.expense {
+      color: var(--expense);
+    }
+
+    .detail-type {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+
+    /* ===== MODAL DE FORMULARIO ===== */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 1001;
+      padding: 1rem;
+    }
+
+    .modal.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     .modal-content {
-      padding: 1.25rem;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 450px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: fadeIn 0.3s ease;
     }
-    
-    .notification-container {
-      max-width: 280px;
+
+    .modal-content h2 {
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
     }
-    
-    .notification {
-      padding: 10px;
+
+    .form-group {
+      margin-bottom: 1.25rem;
     }
-    
-    .notification-title {
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      font-weight: 500;
       font-size: 0.9rem;
     }
-    
-    .notification-message {
-      font-size: 0.8rem;
-    }
-  }
 
-  @media (max-width: 360px) {
-    body {
-      font-size: 11px;
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      transition: all 0.3s;
     }
-    
-    .mobile-detail-label {
-      min-width: 50px;
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
     }
-    
-    .notification-container {
-      max-width: 250px;
+
+    .form-textarea {
+      min-height: 80px;
+      resize: vertical;
     }
-  }
-</style>
+
+    .radio-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .radio-option {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .radio-option:hover {
+      border-color: var(--primary);
+    }
+
+    .radio-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light-2);
+    }
+
+    .radio-option.income.selected {
+      border-color: var(--income);
+    }
+
+    .radio-option.expense.selected {
+      border-color: var(--expense);
+    }
+
+    .radio-option input {
+      display: none;
+    }
+
+    .radio-icon {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .radio-icon.income {
+      color: var(--income);
+    }
+
+    .radio-icon.expense {
+      color: var(--expense);
+    }
+
+    .radio-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ===== PAGINACIÓN ===== */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .page-btn {
+      padding: 0.5rem 0.75rem;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .page-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .page-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .page-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-btn.disabled:hover {
+      background: white;
+      border-color: var(--border);
+    }
+
+    .page-info {
+      color: var(--text-light);
+      font-size: 0.85rem;
+      margin: 0 0.5rem;
+    }
+
+    /* ===== MENÚ DE ACCIONES PARA MÓVIL ===== */
+    .mobile-actions-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 1002;
+      padding: 1rem;
+    }
+
+    .mobile-actions-menu.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-actions-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 280px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .mobile-action-item {
+      padding: 1rem 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      font-size: 0.875rem;
+      color: var(--text);
+      transition: all 0.3s;
+    }
+
+    .mobile-action-item:not(:last-child) {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-action-item:hover {
+      color: var(--primary);
+    }
+
+    .mobile-action-item.danger:hover {
+      color: var(--expense);
+    }
+
+    .action-label {
+      font-weight: 500;
+      flex: 1;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (min-width: 769px) {
+      .desktop-table {
+        display: table;
+      }
+
+      .mobile-table {
+        display: none !important;
+      }
+
+      .actions-mobile {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        font-size: 13px;
+      }
+
+      .menu {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      section {
+        padding: 1.25rem 1rem;
+      }
+
+      h1 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+      }
+
+      .summary-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .table-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+      }
+
+      .table-header {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .search-container {
+        width: 100%;
+      }
+
+      .filter-container {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .filter-select {
+        flex: 1;
+        min-width: 0;
+        font-size: 0.8rem;
+      }
+
+      .clear-filters-btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+      }
+
+      .primary-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .desktop-table {
+        display: none !important;
+      }
+
+      .mobile-table {
+        display: block;
+      }
+
+      .mobile-row {
+        margin-bottom: 0.5rem;
+        border-radius: 6px;
+        padding: 1rem;
+      }
+
+      .mobile-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .mobile-detail-label {
+        min-width: 70px;
+        font-size: 0.75rem;
+      }
+
+      .mobile-detail-value {
+        font-size: 0.75rem;
+      }
+
+      .mobile-row-title {
+        font-size: 0.8rem;
+      }
+
+      .detail-modal-content {
+        padding: 1.5rem;
+        max-height: 80vh;
+      }
+
+      .detail-title {
+        font-size: 1.2rem;
+      }
+
+      .detail-value {
+        font-size: 0.9rem;
+      }
+
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .modal-content {
+        padding: 1.5rem;
+        max-height: 85vh;
+      }
+
+      .radio-group {
+        flex-direction: column;
+      }
+
+      .pagination {
+        gap: 0.25rem;
+      }
+
+      .page-btn {
+        padding: 0.4rem 0.6rem;
+        min-width: 32px;
+        font-size: 0.8rem;
+      }
+
+      .page-info {
+        font-size: 0.8rem;
+      }
+
+      .notification-container {
+        top: 70px;
+        right: 10px;
+        max-width: 300px;
+      }
+
+      .notification {
+        padding: 12px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        font-size: 12px;
+      }
+
+      .nav {
+        padding: 0.75rem 1rem;
+      }
+
+      .logo {
+        font-size: 1.1rem;
+      }
+
+      h1 {
+        font-size: 1.2rem;
+      }
+
+      .mobile-menu {
+        width: 100%;
+      }
+
+      .mobile-row {
+        padding: 0.875rem;
+      }
+
+      .mobile-detail-label {
+        min-width: 60px;
+        font-size: 0.7rem;
+      }
+
+      .mobile-detail-value {
+        font-size: 0.7rem;
+      }
+
+      .mobile-row-title {
+        font-size: 0.75rem;
+      }
+
+      .mobile-actions-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+        padding: 0.25rem;
+      }
+
+      .page-btn {
+        padding: 0.35rem 0.5rem;
+        min-width: 28px;
+        font-size: 0.75rem;
+      }
+
+      .detail-modal-content {
+        padding: 1.25rem;
+        max-height: 75vh;
+      }
+
+      .modal-content {
+        padding: 1.25rem;
+        max-height: 80vh;
+      }
+
+      .notification-container {
+        max-width: 280px;
+      }
+
+      .notification {
+        padding: 10px;
+      }
+
+      .notification-title {
+        font-size: 0.9rem;
+      }
+
+      .notification-message {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      body {
+        font-size: 11px;
+      }
+
+      .mobile-detail-label {
+        min-width: 50px;
+      }
+
+      .notification-container {
+        max-width: 250px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <nav class="nav">
-    <div class="logo">Finance Pro</div>
-    <div class="menu">
-      <a onclick="showSection('inicio')" class="active">Inicio</a>
-      <a onclick="showSection('transacciones')">Transacciones</a>
-      <a onclick="showSection('estadisticas')">Estadísticas</a>
+  <header>
+    <nav class="nav">
+      <div class="logo">Finance Pro</div>
+      <div class="menu">
+        <a onclick="showSection('inicio')" class="active">Inicio</a>
+        <a onclick="showSection('transacciones')">Transacciones</a>
+        <a onclick="showSection('estadisticas')">Estadísticas</a>
+      </div>
+      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
+    </nav>
+  </header>
+
+  <!-- NOTIFICACIONES -->
+  <div class="notification-container" id="notificationContainer"></div>
+
+  <!-- MENU MÓVIL MEJORADO -->
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-header">
+      <div class="mobile-menu-title">Finance Pro</div>
+      <button class="mobile-close-btn" onclick="closeMobileMenu()">×</button>
     </div>
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-  </nav>
-</header>
-
-<!-- NOTIFICACIONES -->
-<div class="notification-container" id="notificationContainer"></div>
-
-<!-- MENU MÓVIL MEJORADO -->
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-close-btn" onclick="toggleMenu()">×</button>
-  <a onclick="showSectionAndClose('inicio')" class="active">Inicio</a>
-  <a onclick="showSectionAndClose('transacciones')">Transacciones</a>
-  <a onclick="showSectionAndClose('estadisticas')">Estadísticas</a>
-</div>
-
-<!-- SECCIONES -->
-<section id="inicio" class="active">
-  <h1>Bienvenido a Finance Pro</h1>
-  <p style="text-align: center; color: var(--text-light); max-width: 600px; font-size: 0.95rem; margin: 0 auto;">
-    Sistema profesional de gestión y control de finanzas personales
-  </p>
-</section>
-
-<section id="transacciones">
-  <h1>Transacciones Financieras</h1>
-  
-  <div class="table-header">
-    <div class="search-container">
-      <input type="text" 
-             class="search-input" 
-             placeholder="Buscar transacciones..." 
-             id="searchInput"
-             oninput="filterTable()">
-    </div>
-    
-    <div class="filter-container">
-      <select class="filter-select" id="filterType" onchange="filterTable()">
-        <option value="">Todos los tipos</option>
-        <option value="ingreso">Ingresos</option>
-        <option value="salida">Salidas</option>
-      </select>
-      
-      <select class="filter-select" id="filterCategory" onchange="filterTable()">
-        <option value="">Todas las categorías</option>
-        <option value="alimentacion">Alimentación</option>
-        <option value="transporte">Transporte</option>
-        <option value="entretenimiento">Entretenimiento</option>
-        <option value="salario">Salario</option>
-        <option value="servicios">Servicios</option>
-      </select>
-      
-      <button class="clear-filters-btn" onclick="clearFilters()">
-        <span>×</span> Limpiar
-      </button>
-    </div>
-    
-    <button class="primary-btn" onclick="openModal()">
-      <span>+</span> Ingresar Movimiento
-    </button>
-  </div>
-  
-  <!-- Tabla para escritorio -->
-  <div class="table-wrapper">
-    <table class="desktop-table">
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Tipo</th>
-          <th>Categoría</th>
-          <th>Observación</th>
-          <th>Monto</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <!-- Los datos se cargan dinámicamente -->
-      </tbody>
-    </table>
-    
-    <!-- Tabla para móvil -->
-    <div class="mobile-table" id="mobileTable">
-      <!-- Los datos móviles se cargan dinámicamente -->
+    <div class="mobile-menu-items">
+      <a class="mobile-menu-item active" onclick="showSectionAndClose('inicio')">Inicio</a>
+      <a class="mobile-menu-item" onclick="showSectionAndClose('transacciones')">Transacciones</a>
+      <a class="mobile-menu-item" onclick="showSectionAndClose('estadisticas')">Estadísticas</a>
     </div>
   </div>
-  
-  <!-- Paginación -->
-  <div class="pagination" id="pagination">
-    <!-- La paginación se genera dinámicamente -->
-  </div>
-</section>
 
-<section id="estadisticas">
-  <h1>Estadísticas Financieras</h1>
-  
-  <!-- Resumen Financiero -->
-  <div class="summary-cards" id="summaryCards">
-    <!-- Se generará dinámicamente -->
-  </div>
-  
-  <div style="text-align: center; color: var(--text-light); margin-top: 2rem;">
-    <p style="font-size: 0.95rem;">
-      Próximamente: Gráficos detallados y análisis de tendencias.
+  <!-- SECCIONES -->
+  <section id="inicio" class="active">
+    <h1>Bienvenido a Finance Pro</h1>
+    <p style="text-align: center; color: var(--text-light); max-width: 600px; font-size: 0.95rem; margin: 0 auto;">
+      Sistema profesional de gestión y control de finanzas personales
     </p>
-  </div>
-</section>
+  </section>
 
-<!-- LOADING OVERLAY -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-</div>
+  <section id="transacciones">
+    <h1>Transacciones Financieras</h1>
 
-<!-- MODAL FORMULARIO (Crear/Editar) -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <h2 id="modalTitle">Ingresar Movimiento</h2>
-    
-    <div class="form-group">
-      <label class="form-label">Tipo *</label>
-      <div class="radio-group" id="typeSelector">
-        <div class="radio-option income" onclick="selectType('ingreso')">
-          <div class="radio-icon income">+</div>
-          <div class="radio-label">Ingreso</div>
-        </div>
-        <div class="radio-option expense" onclick="selectType('salida')">
-          <div class="radio-icon expense">−</div>
-          <div class="radio-label">Salida</div>
-        </div>
+    <div class="table-header">
+      <div class="search-container">
+        <input type="text" class="search-input" placeholder="Buscar transacciones..." id="searchInput"
+          oninput="filterTable()">
       </div>
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Categoría *</label>
-      <select class="form-select" id="transactionCategory">
-        <option value="alimentacion">Alimentación</option>
-        <option value="transporte">Transporte</option>
-        <option value="entretenimiento">Entretenimiento</option>
-        <option value="salario">Salario</option>
-        <option value="inversiones">Inversiones</option>
-        <option value="servicios">Servicios</option>
-        <option value="salud">Salud</option>
-        <option value="educacion">Educación</option>
-        <option value="otros">Otros</option>
-      </select>
-    </div>
-    
-    <div class="form-group">
-      <label class="form-label">Observación</label>
-      <textarea class="form-textarea" id="transactionObservation" placeholder="Descripción de la transacción..."></textarea>
-    </div>
-    
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Monto *</label>
-        <input type="number" 
-               class="form-input" 
-               id="transactionAmount" 
-               placeholder="0.00"
-               step="0.01"
-               min="0.01">
+
+      <div class="filter-container">
+        <select class="filter-select" id="filterType" onchange="filterTable()">
+          <option value="">Todos los tipos</option>
+          <option value="ingreso">Ingresos</option>
+          <option value="salida">Salidas</option>
+        </select>
+
+        <select class="filter-select" id="filterCategory" onchange="filterTable()">
+          <option value="">Todas las categorías</option>
+          <option value="alimentacion">Alimentación</option>
+          <option value="transporte">Transporte</option>
+          <option value="entretenimiento">Entretenimiento</option>
+          <option value="salario">Salario</option>
+          <option value="servicios">Servicios</option>
+        </select>
+
+        <button class="clear-filters-btn" onclick="clearFilters()">
+          <span>×</span> Limpiar
+        </button>
       </div>
-      
-      <div class="form-group">
-        <label class="form-label">Fecha *</label>
-        <input type="date" class="form-input" id="transactionDate">
-      </div>
-    </div>
-    
-    <div class="form-actions">
-      <button type="button" class="action-btn" onclick="closeModal()">Cancelar</button>
-      <button type="button" class="primary-btn" onclick="saveTransaction()" id="saveTransactionBtn">
-        <span id="saveBtnText">Guardar Movimiento</span>
+
+      <button class="primary-btn" onclick="openModal()">
+        <span>+</span> Ingresar Movimiento
       </button>
     </div>
-  </div>
-</div>
 
-<!-- MODAL DE DETALLE -->
-<div class="detail-modal" id="detailModal">
-  <div class="detail-modal-content">
-    <div class="detail-header">
-      <div>
-        <h3 class="detail-title" id="detailTitle">Detalle de Transacción</h3>
-        <div class="detail-id">Fecha: <span id="detailDate">-</span></div>
+    <!-- Tabla para escritorio -->
+    <div class="table-wrapper">
+      <table class="desktop-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Categoría</th>
+            <th>Observación</th>
+            <th>Monto</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Los datos se cargan dinámicamente -->
+        </tbody>
+      </table>
+
+      <!-- Tabla para móvil -->
+      <div class="mobile-table" id="mobileTable">
+        <!-- Los datos móviles se cargan dinámicamente -->
       </div>
-      <button class="close-detail-btn" onclick="closeDetailModal()">×</button>
     </div>
-    
-    <div class="detail-info">
-      <div class="detail-item">
-        <div class="detail-label">TIPO</div>
-        <div class="detail-value">
-          <span id="detailType" class="detail-type">-</span>
+
+    <!-- Paginación -->
+    <div class="pagination" id="pagination">
+      <!-- La paginación se genera dinámicamente -->
+    </div>
+  </section>
+
+  <section id="estadisticas">
+    <h1>Estadísticas Financieras</h1>
+
+    <!-- Resumen Financiero -->
+    <div class="summary-cards" id="summaryCards">
+      <!-- Se generará dinámicamente -->
+    </div>
+
+    <div style="text-align: center; color: var(--text-light); margin-top: 2rem;">
+      <p style="font-size: 0.95rem;">
+        Próximamente: Gráficos detallados y análisis de tendencias.
+      </p>
+    </div>
+  </section>
+
+  <!-- LOADING OVERLAY -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- MODAL FORMULARIO (Crear/Editar) -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Ingresar Movimiento</h2>
+
+      <div class="form-group">
+        <label class="form-label">Tipo *</label>
+        <div class="radio-group" id="typeSelector">
+          <div class="radio-option income" onclick="selectType('ingreso')">
+            <div class="radio-icon income">+</div>
+            <div class="radio-label">Ingreso</div>
+          </div>
+          <div class="radio-option expense" onclick="selectType('salida')">
+            <div class="radio-icon expense">−</div>
+            <div class="radio-label">Salida</div>
+          </div>
         </div>
       </div>
-      
-      <div class="detail-item">
-        <div class="detail-label">CATEGORÍA</div>
-        <div class="detail-value" id="detailCategory">-</div>
+
+      <div class="form-group">
+        <label class="form-label">Categoría *</label>
+        <select class="form-select" id="transactionCategory">
+          <option value="alimentacion">Alimentación</option>
+          <option value="transporte">Transporte</option>
+          <option value="entretenimiento">Entretenimiento</option>
+          <option value="salario">Salario</option>
+          <option value="inversiones">Inversiones</option>
+          <option value="servicios">Servicios</option>
+          <option value="salud">Salud</option>
+          <option value="educacion">Educación</option>
+          <option value="otros">Otros</option>
+        </select>
       </div>
-      
-      <div class="detail-item">
-        <div class="detail-label">OBSERVACIÓN</div>
-        <div class="detail-value" id="detailObservation">-</div>
+
+      <div class="form-group">
+        <label class="form-label">Observación</label>
+        <textarea class="form-textarea" id="transactionObservation"
+          placeholder="Descripción de la transacción..."></textarea>
       </div>
-      
-      <div class="detail-item">
-        <div class="detail-label">MONTO</div>
-        <div class="detail-value">
-          <span id="detailAmount" class="detail-amount">-</span>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Monto *</label>
+          <input type="number" class="form-input" id="transactionAmount" placeholder="0.00" step="0.01" min="0.01">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fecha *</label>
+          <input type="date" class="form-input" id="transactionDate">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="action-btn" onclick="closeModal()">Cancelar</button>
+        <button type="button" class="primary-btn" onclick="saveTransaction()" id="saveTransactionBtn">
+          <span id="saveBtnText">Guardar Movimiento</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE DETALLE -->
+  <div class="detail-modal" id="detailModal">
+    <div class="detail-modal-content">
+      <div class="detail-header">
+        <div>
+          <h3 class="detail-title" id="detailTitle">Detalle de Transacción</h3>
+          <div class="detail-id">Fecha: <span id="detailDate">-</span></div>
+        </div>
+        <button class="close-detail-btn" onclick="closeDetailModal()">×</button>
+      </div>
+
+      <div class="detail-info">
+        <div class="detail-item">
+          <div class="detail-label">TIPO</div>
+          <div class="detail-value">
+            <span id="detailType" class="detail-type">-</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">CATEGORÍA</div>
+          <div class="detail-value" id="detailCategory">-</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">OBSERVACIÓN</div>
+          <div class="detail-value" id="detailObservation">-</div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">MONTO</div>
+          <div class="detail-value">
+            <span id="detailAmount" class="detail-amount">-</span>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MENÚ DE ACCIONES PARA MÓVIL -->
-<div class="mobile-actions-menu" id="mobileActionsMenu">
-  <div class="mobile-actions-content">
-    <h3 style="margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600; color: var(--text);">Acciones</h3>
-    <div class="mobile-action-item" onclick="viewDetailAction()">
-      <span class="action-label">Ver detalle</span>
-    </div>
-    <div class="mobile-action-item" onclick="editAction()">
-      <span class="action-label">Editar</span>
-    </div>
-    <div class="mobile-action-item danger" onclick="deleteAction()">
-      <span class="action-label">Eliminar</span>
-    </div>
-    <div class="mobile-action-item" onclick="closeMobileActions()" style="color: var(--text-light);">
-      <span class="action-label">Cancelar</span>
+  <!-- MENÚ DE ACCIONES PARA MÓVIL -->
+  <div class="mobile-actions-menu" id="mobileActionsMenu">
+    <div class="mobile-actions-content">
+      <h3 style="margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600; color: var(--text);">Acciones</h3>
+      <div class="mobile-action-item" onclick="viewDetailAction()">
+        <span class="action-label">Ver detalle</span>
+      </div>
+      <div class="mobile-action-item" onclick="editAction()">
+        <span class="action-label">Editar</span>
+      </div>
+      <div class="mobile-action-item danger" onclick="deleteAction()">
+        <span class="action-label">Eliminar</span>
+      </div>
+      <div class="mobile-action-item" onclick="closeMobileActions()" style="color: var(--text-light);">
+        <span class="action-label">Cancelar</span>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  // ===== Variables globales =====
-  let currentItemId = null;
-  let currentPage = 1;
-  const itemsPerPage = 10;
-  let allData = [];
-  let filteredData = [];
-  let isEditing = false;
-  let currentTransactionType = 'ingreso';
+  <script>
+    // ===== Variables globales =====
+    let currentItemId = null;
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let allData = [];
+    let filteredData = [];
+    let isEditing = false;
+    let currentTransactionType = 'ingreso';
 
-  // ===== Datos de ejemplo =====
-  const sampleData = [
-    { 
-      id: 1, 
-      date: "2024-01-15",
-      type: "ingreso", 
-      category: "salario", 
-      observation: "Salario mensual", 
-      amount: 2500.00
-    },
-    { 
-      id: 2, 
-      date: "2024-01-16",
-      type: "salida", 
-      category: "alimentacion", 
-      observation: "Compra supermercado", 
-      amount: 150.75
-    },
-    { 
-      id: 3, 
-      date: "2024-01-17",
-      type: "salida", 
-      category: "transporte", 
-      observation: "Gasolina del mes", 
-      amount: 80.50
-    },
-    { 
-      id: 4, 
-      date: "2024-01-18",
-      type: "ingreso", 
-      category: "inversiones", 
-      observation: "Dividendos", 
-      amount: 120.00
-    },
-    { 
-      id: 5, 
-      date: "2024-01-19",
-      type: "salida", 
-      category: "servicios", 
-      observation: "Pago de luz", 
-      amount: 45.30
-    },
-    { 
-      id: 6, 
-      date: "2024-01-20",
-      type: "salida", 
-      category: "entretenimiento", 
-      observation: "Cena restaurante", 
-      amount: 65.00
-    },
-    { 
-      id: 7, 
-      date: "2024-01-21",
-      type: "ingreso", 
-      category: "otros", 
-      observation: "Venta de artículos usados", 
-      amount: 200.00
-    },
-    { 
-      id: 8, 
-      date: "2024-01-22",
-      type: "salida", 
-      category: "salud", 
-      observation: "Consulta médica", 
-      amount: 75.00
-    }
-  ];
+    // ===== Datos de ejemplo =====
+    const sampleData = [
+      {
+        id: 1,
+        date: "2024-01-15",
+        type: "ingreso",
+        category: "salario",
+        observation: "Salario mensual",
+        amount: 2500.00
+      },
+      {
+        id: 2,
+        date: "2024-01-16",
+        type: "salida",
+        category: "alimentacion",
+        observation: "Compra supermercado",
+        amount: 150.75
+      },
+      {
+        id: 3,
+        date: "2024-01-17",
+        type: "salida",
+        category: "transporte",
+        observation: "Gasolina del mes",
+        amount: 80.50
+      },
+      {
+        id: 4,
+        date: "2024-01-18",
+        type: "ingreso",
+        category: "inversiones",
+        observation: "Dividendos",
+        amount: 120.00
+      },
+      {
+        id: 5,
+        date: "2024-01-19",
+        type: "salida",
+        category: "servicios",
+        observation: "Pago de luz",
+        amount: 45.30
+      },
+      {
+        id: 6,
+        date: "2024-01-20",
+        type: "salida",
+        category: "entretenimiento",
+        observation: "Cena restaurante",
+        amount: 65.00
+      },
+      {
+        id: 7,
+        date: "2024-01-21",
+        type: "ingreso",
+        category: "otros",
+        observation: "Venta de artículos usados",
+        amount: 200.00
+      },
+      {
+        id: 8,
+        date: "2024-01-22",
+        type: "salida",
+        category: "salud",
+        observation: "Consulta médica",
+        amount: 75.00
+      }
+    ];
 
-  // ===== Notificaciones Custom =====
-  function showNotification(type, title, message, duration = 4000) {
-    const container = document.getElementById('notificationContainer');
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    
-    const icons = {
-      'success': '✓',
-      'error': '✕',
-      'warning': '⚠',
-      'info': 'ℹ'
-    };
-    
-    notification.innerHTML = `
+    // ===== Notificaciones =====
+    function showNotification(type, title, message, duration = 4000) {
+      const container = document.getElementById('notificationContainer');
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+
+      const icons = {
+        'success': '✓',
+        'error': '✕',
+        'warning': '⚠',
+        'info': 'ℹ'
+      };
+
+      notification.innerHTML = `
       <div class="notification-icon">${icons[type] || 'ℹ'}</div>
       <div class="notification-content">
         <div class="notification-title">${title}</div>
@@ -1709,78 +1722,77 @@
       </div>
       <button class="notification-close" onclick="this.parentElement.remove()">×</button>
     `;
-    
-    container.appendChild(notification);
-    
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.classList.add('hiding');
-        setTimeout(() => {
-          if (notification.parentNode) {
-            notification.remove();
-          }
-        }, 300);
-      }
-    }, duration);
-  }
 
-  // ===== Inicialización =====
-  document.addEventListener('DOMContentLoaded', function() {
-    allData = [...sampleData];
-    filteredData = [...sampleData];
-    updateSummary();
-    renderTable();
-    
-    // Configurar fecha actual por defecto
-    document.getElementById('transactionDate').value = new Date().toISOString().split('T')[0];
-    
-    // Inicializar selección de tipo
-    selectType('ingreso');
-    
-    // Mostrar mensaje de bienvenida
-    setTimeout(() => {
-      showNotification('success', 'Bienvenido', 'Finance Pro cargado correctamente');
-    }, 500);
-  });
+      container.appendChild(notification);
 
-  // ===== Loading Animation =====
-  const loadingOverlay = document.getElementById('loadingOverlay');
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.classList.add('hiding');
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.remove();
+            }
+          }, 300);
+        }
+      }, duration);
+    }
 
-  function showLoading() {
-    loadingOverlay.classList.add('show');
-  }
+    // ===== Inicialización =====
+    document.addEventListener('DOMContentLoaded', function () {
+      allData = [...sampleData];
+      filteredData = [...sampleData];
+      updateSummary();
+      renderTable();
 
-  function hideLoading() {
-    loadingOverlay.classList.remove('show');
-  }
+      // Configurar fecha actual por defecto
+      document.getElementById('transactionDate').value = new Date().toISOString().split('T')[0];
 
-  // ===== Simular carga =====
-  function simulateLoad(callback) {
-    showLoading();
-    setTimeout(() => {
-      callback();
-      hideLoading();
-    }, 300);
-  }
+      // Inicializar selección de tipo
+      selectType('ingreso');
 
-  // ===== Actualizar resumen (en estadísticas) =====
-  function updateSummary() {
-    const summaryCards = document.getElementById('summaryCards');
-    
-    const totalIncome = allData
-      .filter(item => item.type === 'ingreso')
-      .reduce((sum, item) => sum + item.amount, 0);
-    
-    const totalExpense = allData
-      .filter(item => item.type === 'salida')
-      .reduce((sum, item) => sum + item.amount, 0);
-    
-    const balance = totalIncome - totalExpense;
-    
-    const currentMonth = new Date().toLocaleString('es-ES', { month: 'long' });
-    const formattedMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
-    
-    summaryCards.innerHTML = `
+      // Mostrar mensaje de bienvenida
+      setTimeout(() => {
+        showNotification('success', 'Bienvenido', 'Finance Pro cargado correctamente');
+      }, 500);
+    });
+
+    // ===== Loading =====
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    function showLoading() {
+      loadingOverlay.classList.add('show');
+    }
+
+    function hideLoading() {
+      loadingOverlay.classList.remove('show');
+    }
+
+    function simulateLoad(callback) {
+      showLoading();
+      setTimeout(() => {
+        callback();
+        hideLoading();
+      }, 300);
+    }
+
+    // ===== Actualizar resumen =====
+    function updateSummary() {
+      const summaryCards = document.getElementById('summaryCards');
+
+      const totalIncome = allData
+        .filter(item => item.type === 'ingreso')
+        .reduce((sum, item) => sum + item.amount, 0);
+
+      const totalExpense = allData
+        .filter(item => item.type === 'salida')
+        .reduce((sum, item) => sum + item.amount, 0);
+
+      const balance = totalIncome - totalExpense;
+
+      const currentMonth = new Date().toLocaleString('es-ES', { month: 'long' });
+      const formattedMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
+
+      summaryCards.innerHTML = `
       <div class="summary-card income">
         <div class="summary-label">TOTAL INGRESOS</div>
         <div class="summary-value income">$${totalIncome.toFixed(2)}</div>
@@ -1797,54 +1809,37 @@
         <div class="summary-period">${formattedMonth}</div>
       </div>
     `;
-  }
+    }
 
-  // ===== Renderizar tabla =====
-  function renderTable() {
-    simulateLoad(() => {
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const currentData = filteredData.slice(startIndex, endIndex);
-      
-      renderDesktopTable(currentData);
-      renderMobileTable(currentData);
-      renderPagination();
-    });
-  }
+    // ===== Renderizar tabla =====
+    function renderTable() {
+      simulateLoad(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const currentData = filteredData.slice(startIndex, endIndex);
 
-  // ===== Renderizar tabla de escritorio =====
-  function renderDesktopTable(data) {
-    const tableBody = document.getElementById('tableBody');
-    tableBody.innerHTML = '';
-    
-    data.forEach((item, index) => {
-      const row = document.createElement('tr');
-      row.style.animationDelay = `${index * 0.05}s`;
-      row.innerHTML = `
+        renderDesktopTable(currentData);
+        renderMobileTable(currentData);
+        renderPagination();
+      });
+    }
+
+    // ===== Renderizar tabla de escritorio =====
+    function renderDesktopTable(data) {
+      const tableBody = document.getElementById('tableBody');
+      tableBody.innerHTML = '';
+
+      data.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
         <td><strong>${formatDate(item.date)}</strong></td>
         <td>
-          <span style="
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            background: ${item.type === 'ingreso' ? 'var(--income-light)' : 'var(--expense-light)'};
-            color: ${item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)'};
-            display: inline-block;
-          ">
+          <span style="color: ${item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)'}; font-weight: 600;">
             ${item.type === 'ingreso' ? 'Ingreso' : 'Salida'}
           </span>
         </td>
         <td>
-          <span style="
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            background: ${getCategoryColor(item.category).bg};
-            color: ${getCategoryColor(item.category).text};
-            display: inline-block;
-          ">
+          <span style="color: ${getCategoryColor(item.category)}; font-weight: 600;">
             ${getCategoryText(item.category)}
           </span>
         </td>
@@ -1862,33 +1857,25 @@
           </div>
         </td>
       `;
-      tableBody.appendChild(row);
-    });
-  }
+        tableBody.appendChild(row);
+      });
+    }
 
-  // ===== Renderizar tabla móvil =====
-  function renderMobileTable(data) {
-    const mobileTable = document.getElementById('mobileTable');
-    mobileTable.innerHTML = '';
-    
-    data.forEach((item, index) => {
-      const row = document.createElement('div');
-      row.className = 'mobile-row';
-      row.style.animationDelay = `${index * 0.05}s`;
-      row.innerHTML = `
+    // ===== Renderizar tabla móvil =====
+    function renderMobileTable(data) {
+      const mobileTable = document.getElementById('mobileTable');
+      mobileTable.innerHTML = '';
+
+      data.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'mobile-row';
+        row.innerHTML = `
         <div class="mobile-row-content">
           <div class="mobile-row-header">
             <div class="mobile-row-title">
               <strong>${formatDate(item.date)}</strong>
               <div style="margin-top: 0.25rem;">
-                <span style="
-                  padding: 0.25rem 0.75rem;
-                  border-radius: 6px;
-                  font-size: 0.8rem;
-                  font-weight: 600;
-                  background: ${item.type === 'ingreso' ? 'var(--income-light)' : 'var(--expense-light)'};
-                  color: ${item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)'};
-                ">
+                <span style="color: ${item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)'}; font-weight: 600; font-size: 0.8rem;">
                   ${item.type === 'ingreso' ? 'Ingreso' : 'Salida'}
                 </span>
               </div>
@@ -1898,17 +1885,8 @@
           <div class="mobile-row-details">
             <div class="mobile-detail-item">
               <span class="mobile-detail-label">Categoría:</span>
-              <span class="mobile-detail-value">
-                <span style="
-                  padding: 0.25rem 0.75rem;
-                  border-radius: 6px;
-                  font-size: 0.8rem;
-                  font-weight: 600;
-                  background: ${getCategoryColor(item.category).bg};
-                  color: ${getCategoryColor(item.category).text};
-                ">
-                  ${getCategoryText(item.category)}
-                </span>
+              <span class="mobile-detail-value" style="color: ${getCategoryColor(item.category)}; font-weight: 600;">
+                ${getCategoryText(item.category)}
               </span>
             </div>
             <div class="mobile-detail-item">
@@ -1924,296 +1902,296 @@
           </div>
         </div>
       `;
-      mobileTable.appendChild(row);
-    });
-  }
-
-  // ===== Renderizar paginación =====
-  function renderPagination() {
-    const pagination = document.getElementById('pagination');
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    
-    if (totalPages <= 1) {
-      pagination.innerHTML = '';
-      return;
+        mobileTable.appendChild(row);
+      });
     }
-    
-    let paginationHTML = '';
-    
-    paginationHTML += `
+
+    // ===== Renderizar paginación =====
+    function renderPagination() {
+      const pagination = document.getElementById('pagination');
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+
+      let paginationHTML = '';
+
+      paginationHTML += `
       <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" 
               onclick="changePage(${currentPage - 1})" 
               ${currentPage === 1 ? 'disabled' : ''}>
         ←
       </button>
     `;
-    
-    const maxVisiblePages = window.innerWidth < 768 ? 3 : 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-    
-    for (let i = startPage; i <= endPage; i++) {
-      paginationHTML += `
+
+      const maxVisiblePages = window.innerWidth < 768 ? 3 : 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `
         <button class="page-btn ${i === currentPage ? 'active' : ''}" 
                 onclick="changePage(${i})">
           ${i}
         </button>
       `;
-    }
-    
-    paginationHTML += `
+      }
+
+      paginationHTML += `
       <button class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" 
               onclick="changePage(${currentPage + 1})" 
               ${currentPage === totalPages ? 'disabled' : ''}>
         →
       </button>
     `;
-    
-    paginationHTML += `
+
+      paginationHTML += `
       <div class="page-info">
         ${((currentPage - 1) * itemsPerPage) + 1}-${Math.min(currentPage * itemsPerPage, filteredData.length)} de ${filteredData.length}
       </div>
     `;
-    
-    pagination.innerHTML = paginationHTML;
-  }
 
-  // ===== Filtrar tabla =====
-  function filterTable() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const typeFilter = document.getElementById('filterType').value;
-    const categoryFilter = document.getElementById('filterCategory').value;
-    
-    filteredData = allData.filter(item => {
-      const matchesSearch = item.observation.toLowerCase().includes(searchTerm) || 
-                           getCategoryText(item.category).toLowerCase().includes(searchTerm);
-      const matchesType = !typeFilter || item.type === typeFilter;
-      const matchesCategory = !categoryFilter || item.category === categoryFilter;
-      
-      return matchesSearch && matchesType && matchesCategory;
-    });
-    
-    currentPage = 1;
-    renderTable();
-  }
+      pagination.innerHTML = paginationHTML;
+    }
 
-  // ===== Limpiar filtros =====
-  function clearFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('filterType').value = '';
-    document.getElementById('filterCategory').value = '';
-    
-    filteredData = [...allData];
-    currentPage = 1;
-    renderTable();
-    showNotification('info', 'Filtros limpiados', 'Se han restablecido todos los filtros');
-  }
+    // ===== Filtrar tabla =====
+    function filterTable() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const typeFilter = document.getElementById('filterType').value;
+      const categoryFilter = document.getElementById('filterCategory').value;
 
-  // ===== Cambiar página =====
-  function changePage(page) {
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    
-    if (page >= 1 && page <= totalPages && page !== currentPage) {
-      currentPage = page;
+      filteredData = allData.filter(item => {
+        const matchesSearch = item.observation.toLowerCase().includes(searchTerm) ||
+          getCategoryText(item.category).toLowerCase().includes(searchTerm);
+        const matchesType = !typeFilter || item.type === typeFilter;
+        const matchesCategory = !categoryFilter || item.category === categoryFilter;
+
+        return matchesSearch && matchesType && matchesCategory;
+      });
+
+      currentPage = 1;
       renderTable();
     }
-  }
 
-  // ===== Funciones auxiliares =====
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  }
+    // ===== Limpiar filtros =====
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('filterType').value = '';
+      document.getElementById('filterCategory').value = '';
 
-  function getCategoryText(category) {
-    const categoryMap = {
-      'alimentacion': 'Alimentación',
-      'transporte': 'Transporte',
-      'entretenimiento': 'Entretenimiento',
-      'salario': 'Salario',
-      'inversiones': 'Inversiones',
-      'servicios': 'Servicios',
-      'salud': 'Salud',
-      'educacion': 'Educación',
-      'otros': 'Otros'
-    };
-    return categoryMap[category] || category;
-  }
+      filteredData = [...allData];
+      currentPage = 1;
+      renderTable();
+      showNotification('info', 'Filtros limpiados', 'Se han restablecido todos los filtros');
+    }
 
-  function getCategoryColor(category) {
-    const colors = {
-      'alimentacion': { bg: '#fef3c7', text: '#92400e' },
-      'transporte': { bg: '#dbeafe', text: '#1e40af' },
-      'entretenimiento': { bg: '#f3e8ff', text: '#6b21a8' },
-      'salario': { bg: '#d1fae5', text: '#065f46' },
-      'inversiones': { bg: '#fef3c7', text: '#92400e' },
-      'servicios': { bg: '#dcfce7', text: '#166534' },
-      'salud': { bg: '#fce7f3', text: '#9d174d' },
-      'educacion': { bg: '#e0e7ff', text: '#3730a3' },
-      'otros': { bg: '#f3f4f6', text: '#6b7280' }
-    };
-    return colors[category] || { bg: '#f3f4f6', text: '#6b7280' };
-  }
+    // ===== Cambiar página =====
+    function changePage(page) {
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // ===== Modal de Detalle =====
-  const detailModal = document.getElementById('detailModal');
-  
-  function openDetailModal(id) {
-    const item = allData.find(i => i.id === id);
-    if (item) {
-      document.getElementById('detailDate').textContent = formatDate(item.date);
-      document.getElementById('detailTitle').textContent = item.observation;
-      
-      const typeElement = document.getElementById('detailType');
-      typeElement.textContent = item.type === 'ingreso' ? 'Ingreso' : 'Salida';
-      typeElement.style.background = item.type === 'ingreso' ? 'var(--income-light)' : 'var(--expense-light)';
-      typeElement.style.color = item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)';
-      
-      document.getElementById('detailCategory').textContent = getCategoryText(item.category);
-      document.getElementById('detailObservation').textContent = item.observation;
-      
-      const amountElement = document.getElementById('detailAmount');
-      amountElement.textContent = `${item.type === 'ingreso' ? '+' : '-'}$${item.amount.toFixed(2)}`;
-      amountElement.className = `detail-amount ${item.type}`;
-      
-      detailModal.classList.add('show');
+      if (page >= 1 && page <= totalPages && page !== currentPage) {
+        currentPage = page;
+        renderTable();
+      }
+    }
+
+    // ===== Funciones auxiliares =====
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
+
+    function getCategoryText(category) {
+      const categoryMap = {
+        'alimentacion': 'Alimentación',
+        'transporte': 'Transporte',
+        'entretenimiento': 'Entretenimiento',
+        'salario': 'Salario',
+        'inversiones': 'Inversiones',
+        'servicios': 'Servicios',
+        'salud': 'Salud',
+        'educacion': 'Educación',
+        'otros': 'Otros'
+      };
+      return categoryMap[category] || category;
+    }
+
+    function getCategoryColor(category) {
+      const colors = {
+        'alimentacion': '#f59e0b',
+        'transporte': '#3b82f6',
+        'entretenimiento': '#8b5cf6',
+        'salario': '#10b981',
+        'inversiones': '#f59e0b',
+        'servicios': '#10b981',
+        'salud': '#ec4899',
+        'educacion': '#6366f1',
+        'otros': '#6b7280'
+      };
+      return colors[category] || '#6b7280';
+    }
+
+    // ===== Modal de Detalle =====
+    const detailModal = document.getElementById('detailModal');
+
+    function openDetailModal(id) {
+      const item = allData.find(i => i.id === id);
+      if (item) {
+        document.getElementById('detailDate').textContent = formatDate(item.date);
+        document.getElementById('detailTitle').textContent = item.observation;
+
+        const typeElement = document.getElementById('detailType');
+        typeElement.textContent = item.type === 'ingreso' ? 'Ingreso' : 'Salida';
+        typeElement.style.color = item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)';
+
+        document.getElementById('detailCategory').textContent = getCategoryText(item.category);
+        document.getElementById('detailCategory').style.color = getCategoryColor(item.category);
+        document.getElementById('detailObservation').textContent = item.observation;
+
+        const amountElement = document.getElementById('detailAmount');
+        amountElement.textContent = `${item.type === 'ingreso' ? '+' : '-'}$${item.amount.toFixed(2)}`;
+        amountElement.className = `detail-amount ${item.type}`;
+
+        detailModal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeDetailModal() {
+      detailModal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // ===== Modal de formulario =====
+    const modal = document.getElementById('modal');
+
+    function selectType(type) {
+      currentTransactionType = type;
+      const options = document.querySelectorAll('.radio-option');
+      options.forEach(option => {
+        option.classList.remove('selected');
+      });
+
+      const selectedOption = document.querySelector(`.radio-option.${type}`);
+      if (selectedOption) {
+        selectedOption.classList.add('selected');
+      }
+    }
+
+    function openModal(itemId = null) {
+      isEditing = itemId !== null;
+
+      const modalTitle = document.getElementById('modalTitle');
+      const saveBtnText = document.getElementById('saveBtnText');
+
+      if (isEditing && itemId) {
+        const item = allData.find(i => i.id === itemId);
+        if (item) {
+          currentItemId = itemId;
+          modalTitle.textContent = 'Editar Movimiento';
+          saveBtnText.textContent = 'Actualizar';
+          selectType(item.type);
+
+          document.getElementById('transactionCategory').value = item.category;
+          document.getElementById('transactionObservation').value = item.observation;
+          document.getElementById('transactionAmount').value = item.amount;
+          document.getElementById('transactionDate').value = item.date;
+        }
+      } else {
+        currentItemId = null;
+        modalTitle.textContent = 'Ingresar Movimiento';
+        saveBtnText.textContent = 'Guardar Movimiento';
+
+        document.getElementById('transactionCategory').value = 'alimentacion';
+        document.getElementById('transactionObservation').value = '';
+        document.getElementById('transactionAmount').value = '';
+        document.getElementById('transactionDate').value = new Date().toISOString().split('T')[0];
+      }
+
+      modal.classList.add('show');
       document.body.style.overflow = 'hidden';
     }
-  }
 
-  function closeDetailModal() {
-    detailModal.classList.remove('show');
-    document.body.style.overflow = '';
-  }
-
-  // ===== Modal de formulario =====
-  const modal = document.getElementById('modal');
-  
-  function selectType(type) {
-    currentTransactionType = type;
-    const options = document.querySelectorAll('.radio-option');
-    options.forEach(option => {
-      option.classList.remove('selected');
-    });
-    
-    const selectedOption = document.querySelector(`.radio-option.${type}`);
-    if (selectedOption) {
-      selectedOption.classList.add('selected');
+    function closeModal() {
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+      isEditing = false;
     }
-  }
 
-  function openModal(itemId = null) {
-    isEditing = itemId !== null;
-    
-    const modalTitle = document.getElementById('modalTitle');
-    const saveBtnText = document.getElementById('saveBtnText');
-    
-    if (isEditing && itemId) {
-      const item = allData.find(i => i.id === itemId);
-      if (item) {
-        currentItemId = itemId;
-        modalTitle.textContent = 'Editar Movimiento';
-        saveBtnText.textContent = 'Actualizar';
-        selectType(item.type);
-        
-        document.getElementById('transactionCategory').value = item.category;
-        document.getElementById('transactionObservation').value = item.observation;
-        document.getElementById('transactionAmount').value = item.amount;
-        document.getElementById('transactionDate').value = item.date;
+    function saveTransaction() {
+      const category = document.getElementById('transactionCategory').value;
+      const observation = document.getElementById('transactionObservation').value.trim();
+      const amount = parseFloat(document.getElementById('transactionAmount').value);
+      const date = document.getElementById('transactionDate').value;
+
+      if (!amount || amount <= 0) {
+        showNotification('error', 'Error', 'El monto debe ser mayor a 0');
+        return;
       }
-    } else {
-      currentItemId = null;
-      modalTitle.textContent = 'Ingresar Movimiento';
-      saveBtnText.textContent = 'Guardar Movimiento';
-      
-      document.getElementById('transactionCategory').value = 'alimentacion';
-      document.getElementById('transactionObservation').value = '';
-      document.getElementById('transactionAmount').value = '';
-      document.getElementById('transactionDate').value = new Date().toISOString().split('T')[0];
-    }
-    
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
 
-  function closeModal() {
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-    isEditing = false;
-  }
+      if (!date) {
+        showNotification('error', 'Error', 'La fecha es obligatoria');
+        return;
+      }
 
-  function saveTransaction() {
-    const category = document.getElementById('transactionCategory').value;
-    const observation = document.getElementById('transactionObservation').value.trim();
-    const amount = parseFloat(document.getElementById('transactionAmount').value);
-    const date = document.getElementById('transactionDate').value;
-    
-    if (!amount || amount <= 0) {
-      showNotification('error', 'Error', 'El monto debe ser mayor a 0');
-      return;
-    }
-    
-    if (!date) {
-      showNotification('error', 'Error', 'La fecha es obligatoria');
-      return;
-    }
-    
-    simulateLoad(() => {
-      if (isEditing && currentItemId) {
-        const index = allData.findIndex(i => i.id === currentItemId);
-        if (index !== -1) {
-          allData[index] = {
-            ...allData[index],
+      simulateLoad(() => {
+        if (isEditing && currentItemId) {
+          const index = allData.findIndex(i => i.id === currentItemId);
+          if (index !== -1) {
+            allData[index] = {
+              ...allData[index],
+              type: currentTransactionType,
+              category: category,
+              observation: observation || 'Sin observación',
+              amount: amount,
+              date: date
+            };
+
+            showNotification('success', 'Movimiento actualizado', `El movimiento ha sido actualizado correctamente`);
+          }
+        } else {
+          const newId = allData.length > 0 ? Math.max(...allData.map(item => item.id)) + 1 : 1;
+          const newTransaction = {
+            id: newId,
             type: currentTransactionType,
             category: category,
             observation: observation || 'Sin observación',
             amount: amount,
             date: date
           };
-          
-          showNotification('success', 'Movimiento actualizado', `El movimiento ha sido actualizado correctamente`);
+
+          allData.unshift(newTransaction);
+          showNotification('success', 'Movimiento agregado',
+            `${currentTransactionType === 'ingreso' ? 'Ingreso' : 'Salida'} de $${amount.toFixed(2)} agregado correctamente`);
         }
-      } else {
-        const newId = allData.length > 0 ? Math.max(...allData.map(item => item.id)) + 1 : 1;
-        const newTransaction = {
-          id: newId,
-          type: currentTransactionType,
-          category: category,
-          observation: observation || 'Sin observación',
-          amount: amount,
-          date: date
-        };
-        
-        allData.unshift(newTransaction);
-        showNotification('success', 'Movimiento agregado', 
-          `${currentTransactionType === 'ingreso' ? 'Ingreso' : 'Salida'} de $${amount.toFixed(2)} agregado correctamente`);
-      }
-      
-      updateSummary();
-      filterTable();
-      closeModal();
-    });
-  }
 
-  // ===== Funciones de edición y eliminación =====
-  function editItem(id) {
-    openModal(id);
-  }
+        updateSummary();
+        filterTable();
+        closeModal();
+      });
+    }
 
-  function deleteItem(id) {
-    const item = allData.find(i => i.id === id);
-    if (item) {
-      const notification = document.createElement('div');
-      notification.className = 'notification warning';
-      notification.innerHTML = `
+    // ===== Funciones de edición y eliminación =====
+    function editItem(id) {
+      openModal(id);
+    }
+
+    function deleteItem(id) {
+      const item = allData.find(i => i.id === id);
+      if (item) {
+        const notification = document.createElement('div');
+        notification.className = 'notification warning';
+        notification.innerHTML = `
         <div class="notification-icon">?</div>
         <div class="notification-content">
           <div class="notification-title">Confirmar eliminación</div>
@@ -2221,7 +2199,7 @@
           <div style="display: flex; gap: 10px; margin-top: 10px;">
             <button onclick="confirmDelete(${id}, this.parentElement.parentElement.parentElement)" style="
               padding: 6px 12px;
-              background: var(--danger);
+              background: var(--expense);
               color: white;
               border: none;
               border-radius: 4px;
@@ -2240,185 +2218,169 @@
           </div>
         </div>
       `;
-      
-      document.getElementById('notificationContainer').appendChild(notification);
-    }
-  }
 
-  function confirmDelete(id, notificationElement) {
-    simulateLoad(() => {
-      const index = allData.findIndex(i => i.id === id);
-      if (index !== -1) {
-        const item = allData[index];
-        allData.splice(index, 1);
-        updateSummary();
-        filterTable();
-        closeMobileActions();
-        
-        if (notificationElement) {
-          notificationElement.remove();
+        document.getElementById('notificationContainer').appendChild(notification);
+      }
+    }
+
+    function confirmDelete(id, notificationElement) {
+      simulateLoad(() => {
+        const index = allData.findIndex(i => i.id === id);
+        if (index !== -1) {
+          const item = allData[index];
+          allData.splice(index, 1);
+          updateSummary();
+          filterTable();
+          closeMobileActions();
+
+          if (notificationElement) {
+            notificationElement.remove();
+          }
+
+          showNotification('success', 'Movimiento eliminado', 'El movimiento ha sido eliminado correctamente');
         }
-        
-        showNotification('success', 'Movimiento eliminado', 'El movimiento ha sido eliminado correctamente');
-      }
-    });
-  }
+      });
+    }
 
-  // ===== Menú móvil CORREGIDO =====
-  let isMenuOpen = false;
+    // ===== Menú móvil CORREGIDO =====
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      const overlay = document.getElementById('mobileMenuOverlay');
 
-  function toggleMenu(){
-    const mobileMenu = document.getElementById('mobileMenu');
-    isMenuOpen = !isMenuOpen;
-    
-    if (isMenuOpen) {
-      mobileMenu.classList.add('show');
-      document.body.style.overflow = 'hidden';
-      document.addEventListener('click', handleOutsideClick);
-    } else {
+      mobileMenu.classList.toggle('show');
+      overlay.classList.toggle('show');
+      document.body.style.overflow = mobileMenu.classList.contains('show') ? 'hidden' : '';
+    }
+
+    function closeMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      const overlay = document.getElementById('mobileMenuOverlay');
+
       mobileMenu.classList.remove('show');
+      overlay.classList.remove('show');
       document.body.style.overflow = '';
-      document.removeEventListener('click', handleOutsideClick);
     }
-  }
 
-  function handleOutsideClick(e) {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const menuToggle = document.querySelector('.menu-toggle');
-    
-    if (!mobileMenu.contains(e.target) && !menuToggle.contains(e.target)) {
-      toggleMenu();
+    function showSectionAndClose(id) {
+      showSection(id);
+      closeMobileMenu();
     }
-  }
 
-  // ===== Nueva función para cerrar menú automáticamente =====
-  function showSectionAndClose(id) {
-    showSection(id);
-    toggleMenu(); // Esto cierra automáticamente el menú
-  }
+    // ===== Secciones =====
+    function showSection(id) {
+      const sections = document.querySelectorAll('section');
+      const menuItems = document.querySelectorAll('.menu a');
+      const mobileMenuItems = document.querySelectorAll('.mobile-menu-item');
 
-  // ===== Secciones =====
-  function showSection(id){
-    const sections = document.querySelectorAll('section');
-    const menuItems = document.querySelectorAll('.menu a');
-    const mobileMenuItems = document.querySelectorAll('.mobile-menu a');
-    
-    // Remover clase active de todas las secciones
-    sections.forEach(sec => sec.classList.remove('active'));
-    
-    // Remover clase active de todos los items del menú
-    menuItems.forEach(item => item.classList.remove('active'));
-    mobileMenuItems.forEach(item => item.classList.remove('active'));
-    
-    // Activar sección seleccionada
-    document.getElementById(id).classList.add('active');
-    
-    // Activar item del menú seleccionado
-    document.querySelectorAll(`.menu a, .mobile-menu a`).forEach(item => {
-      if (item.getAttribute('onclick')?.includes(`'${id}'`)) {
-        item.classList.add('active');
+      sections.forEach(sec => sec.classList.remove('active'));
+      menuItems.forEach(item => item.classList.remove('active'));
+      mobileMenuItems.forEach(item => item.classList.remove('active'));
+
+      document.getElementById(id).classList.add('active');
+
+      menuItems.forEach(item => {
+        if (item.getAttribute('onclick')?.includes(`'${id}'`)) {
+          item.classList.add('active');
+        }
+      });
+
+      mobileMenuItems.forEach(item => {
+        if (item.getAttribute('onclick')?.includes(`'${id}'`)) {
+          item.classList.add('active');
+        }
+      });
+
+      if (id === 'transacciones') {
+        setTimeout(() => {
+          renderPagination();
+        }, 100);
+      } else if (id === 'estadisticas') {
+        updateSummary();
+      }
+    }
+
+    // ===== Menú de acciones para móvil =====
+    const mobileActionsMenu = document.getElementById('mobileActionsMenu');
+
+    function openMobileActions(itemId) {
+      currentItemId = itemId;
+      mobileActionsMenu.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileActions() {
+      mobileActionsMenu.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function viewDetailAction() {
+      if (currentItemId) {
+        openDetailModal(currentItemId);
+        closeMobileActions();
+      }
+    }
+
+    function editAction() {
+      if (currentItemId) {
+        editItem(currentItemId);
+        closeMobileActions();
+      }
+    }
+
+    function deleteAction() {
+      if (currentItemId) {
+        deleteItem(currentItemId);
+        closeMobileActions();
+      }
+    }
+
+    // ===== Event Listeners =====
+    document.addEventListener('click', (e) => {
+      if (mobileActionsMenu.classList.contains('show') &&
+        !e.target.closest('.mobile-actions-content') &&
+        !e.target.closest('.mobile-actions-btn')) {
+        closeMobileActions();
+      }
+
+      if (modal.classList.contains('show') &&
+        !e.target.closest('.modal-content') &&
+        e.target.classList.contains('modal')) {
+        closeModal();
+      }
+
+      if (detailModal.classList.contains('show') &&
+        !e.target.closest('.detail-modal-content') &&
+        e.target.classList.contains('detail-modal')) {
+        closeDetailModal();
       }
     });
-    
-    if (id === 'transacciones') {
-      setTimeout(() => {
-        renderPagination();
-      }, 100);
-    } else if (id === 'estadisticas') {
-      updateSummary();
-    }
-    
-    // Cerrar menú móvil si está abierto
-    if (isMenuOpen) {
-      toggleMenu();
-    }
-  }
 
-  // ===== Menú de acciones para móvil =====
-  const mobileActionsMenu = document.getElementById('mobileActionsMenu');
-  
-  function openMobileActions(itemId) {
-    currentItemId = itemId;
-    mobileActionsMenu.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMobileActions();
+        closeModal();
+        closeDetailModal();
+      }
+    });
 
-  function closeMobileActions() {
-    mobileActionsMenu.classList.remove('show');
-    document.body.style.overflow = '';
-  }
-
-  // Acciones del menú móvil
-  function viewDetailAction() {
-    if (currentItemId) {
-      openDetailModal(currentItemId);
-      closeMobileActions();
-    }
-  }
-
-  function editAction() {
-    if (currentItemId) {
-      editItem(currentItemId);
-      closeMobileActions();
-    }
-  }
-
-  function deleteAction() {
-    if (currentItemId) {
-      deleteItem(currentItemId);
-      closeMobileActions();
-    }
-  }
-
-  // ===== Event Listeners =====
-  document.addEventListener('click', (e) => {
-    // Cerrar menú de acciones móvil
-    if(mobileActionsMenu.classList.contains('show') && 
-       !e.target.closest('.mobile-actions-content') && 
-       !e.target.closest('.mobile-actions-btn')) {
-      closeMobileActions();
-    }
-    
-    // Cerrar modal de formulario
-    if(modal.classList.contains('show') && 
-       !e.target.closest('.modal-content') && 
-       e.target.classList.contains('modal')) {
-      closeModal();
-    }
-    
-    // Cerrar modal de detalle
-    if(detailModal.classList.contains('show') && 
-       !e.target.closest('.detail-modal-content') && 
-       e.target.classList.contains('detail-modal')) {
-      closeDetailModal();
-    }
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape') {
-      closeMobileActions();
-      closeModal();
-      closeDetailModal();
-    }
-  });
-
-  function preventScroll(e) {
-    if (modal.classList.contains('show') || 
-        detailModal.classList.contains('show') || 
+    function preventScroll(e) {
+      if (modal.classList.contains('show') ||
+        detailModal.classList.contains('show') ||
         mobileActionsMenu.classList.contains('show') ||
         document.getElementById('mobileMenu').classList.contains('show')) {
-      e.preventDefault();
+        e.preventDefault();
+      }
     }
-  }
 
-  document.addEventListener('touchmove', preventScroll, { passive: false });
+    document.addEventListener('touchmove', preventScroll, { passive: false });
 
-  window.addEventListener('resize', () => {
-    renderPagination();
-  });
+    window.addEventListener('resize', () => {
+      renderPagination();
+    });
 
-  // Inicializar menú activo
-  showSection('inicio');
-</script>
+    // Inicializar
+    showSection('inicio');
+  </script>
 </body>
+
 </html>
