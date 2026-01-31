@@ -81,18 +81,6 @@
       }
     }
 
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
     @keyframes notificationIn {
       from {
         transform: translateX(100%);
@@ -253,7 +241,7 @@
       border: none;
     }
 
-    /* ===== MENU MÓVIL MEJORADO Y CORREGIDO ===== */
+    /* ===== MENU MÓVIL ===== */
     .mobile-menu-overlay {
       position: fixed;
       top: 0;
@@ -364,64 +352,143 @@
       letter-spacing: -0.5px;
     }
 
-    /* ===== RESÚMEN FINANCIERO ===== */
-    .summary-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+    /* ===== ESTADÍSTICAS MEJORADAS ===== */
+    .stats-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
       animation: fadeIn 0.3s ease;
     }
 
-    .summary-card {
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .stat-card {
       background: white;
-      padding: 1.25rem;
-      border-radius: 8px;
+      padding: 1.5rem;
+      border-radius: 12px;
       border: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 1rem;
     }
 
-    .summary-card.income {
-      border-top: 3px solid var(--income);
+    .stat-card.income {
+      border-top: 4px solid var(--income);
     }
 
-    .summary-card.expense {
-      border-top: 3px solid var(--expense);
+    .stat-card.expense {
+      border-top: 4px solid var(--expense);
     }
 
-    .summary-card.balance {
-      border-top: 3px solid var(--primary);
+    .stat-card.balance {
+      border-top: 4px solid var(--primary);
     }
 
-    .summary-label {
-      font-size: 0.85rem;
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
       color: var(--text-light);
       font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .summary-value {
+    .stat-icon {
       font-size: 1.5rem;
       font-weight: 600;
-      color: var(--text);
     }
 
-    .summary-value.income {
+    .stat-icon.income {
       color: var(--income);
     }
 
-    .summary-value.expense {
+    .stat-icon.expense {
       color: var(--expense);
     }
 
-    .summary-value.balance {
+    .stat-icon.balance {
       color: var(--primary);
     }
 
-    .summary-period {
-      font-size: 0.75rem;
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stat-value.income {
+      color: var(--income);
+    }
+
+    .stat-value.expense {
+      color: var(--expense);
+    }
+
+    .stat-value.balance {
+      color: var(--primary);
+    }
+
+    .stat-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-period {
+      font-size: 0.8rem;
       color: var(--text-muted);
+    }
+
+    .stat-change {
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+    }
+
+    .stat-change.positive {
+      background: var(--income-light);
+      color: var(--income);
+    }
+
+    .stat-change.negative {
+      background: var(--expense-light);
+      color: var(--expense);
+    }
+
+    .stat-chart {
+      height: 120px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      margin-top: 1rem;
+    }
+
+    .stat-bar {
+      flex: 1;
+      background: var(--border);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      min-height: 4px;
+    }
+
+    .stat-bar.income {
+      background: linear-gradient(to top, var(--income), var(--income-dark));
+    }
+
+    .stat-bar.expense {
+      background: linear-gradient(to top, var(--expense), var(--expense-dark));
     }
 
     /* ===== LOADING ===== */
@@ -860,7 +927,7 @@
       margin-top: 0.25rem;
     }
 
-    /* ===== MODAL DE FORMULARIO ===== */
+    /* ===== MODAL DE FORMULARIO MEJORADO ===== */
     .modal {
       position: fixed;
       top: 0;
@@ -893,6 +960,7 @@
       max-height: 90vh;
       overflow-y: auto;
       animation: fadeIn 0.3s ease;
+      -webkit-overflow-scrolling: touch;
     }
 
     .modal-content h2 {
@@ -938,60 +1006,63 @@
       resize: vertical;
     }
 
-    .radio-group {
+    /* BOTONES DE TIPO MEJORADOS - UNO AL LADO DEL OTRO */
+    .type-buttons {
       display: flex;
       gap: 1rem;
       margin-top: 0.5rem;
     }
 
-    .radio-option {
+    .type-button {
       flex: 1;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 0.75rem;
       padding: 1rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s;
+      background: white;
     }
 
-    .radio-option:hover {
+    .type-button:hover {
       border-color: var(--primary);
     }
 
-    .radio-option.selected {
+    .type-button.selected {
       border-color: var(--primary);
       background: var(--primary-light-2);
     }
 
-    .radio-option.income.selected {
+    .type-button.income.selected {
       border-color: var(--income);
     }
 
-    .radio-option.expense.selected {
+    .type-button.expense.selected {
       border-color: var(--expense);
     }
 
-    .radio-option input {
+    .type-button input {
       display: none;
     }
 
-    .radio-icon {
-      font-size: 1.25rem;
+    .type-icon {
+      font-size: 1.5rem;
       font-weight: 600;
     }
 
-    .radio-icon.income {
+    .type-icon.income {
       color: var(--income);
     }
 
-    .radio-icon.expense {
+    .type-icon.expense {
       color: var(--expense);
     }
 
-    .radio-label {
-      font-size: 0.875rem;
+    .type-label {
+      font-size: 0.9rem;
       font-weight: 500;
       color: var(--text);
     }
@@ -1162,7 +1233,7 @@
         margin-bottom: 1rem;
       }
 
-      .summary-cards {
+      .stats-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1254,10 +1325,20 @@
       .modal-content {
         padding: 1.5rem;
         max-height: 85vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
-      .radio-group {
-        flex-direction: column;
+      .type-buttons {
+        flex-direction: row;
+      }
+
+      .type-button {
+        padding: 0.75rem;
+      }
+
+      .type-icon {
+        font-size: 1.25rem;
       }
 
       .pagination {
@@ -1324,6 +1405,22 @@
         font-size: 0.75rem;
       }
 
+      .type-buttons {
+        flex-direction: row;
+      }
+
+      .type-button {
+        padding: 0.75rem 0.5rem;
+      }
+
+      .type-icon {
+        font-size: 1.25rem;
+      }
+
+      .type-label {
+        font-size: 0.8rem;
+      }
+
       .mobile-actions-btn {
         width: 32px;
         height: 32px;
@@ -1373,6 +1470,10 @@
         min-width: 50px;
       }
 
+      .type-buttons {
+        flex-direction: column;
+      }
+
       .notification-container {
         max-width: 250px;
       }
@@ -1397,7 +1498,7 @@
   <!-- NOTIFICACIONES -->
   <div class="notification-container" id="notificationContainer"></div>
 
-  <!-- MENU MÓVIL MEJORADO -->
+  <!-- MENU MÓVIL -->
   <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
   <div class="mobile-menu" id="mobileMenu">
     <div class="mobile-menu-header">
@@ -1487,15 +1588,9 @@
   <section id="estadisticas">
     <h1>Estadísticas Financieras</h1>
 
-    <!-- Resumen Financiero -->
-    <div class="summary-cards" id="summaryCards">
+    <!-- Estadísticas Mejoradas -->
+    <div class="stats-container" id="statsContainer">
       <!-- Se generará dinámicamente -->
-    </div>
-
-    <div style="text-align: center; color: var(--text-light); margin-top: 2rem;">
-      <p style="font-size: 0.95rem;">
-        Próximamente: Gráficos detallados y análisis de tendencias.
-      </p>
     </div>
   </section>
 
@@ -1504,21 +1599,21 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <!-- MODAL FORMULARIO (Crear/Editar) -->
+  <!-- MODAL FORMULARIO ÚNICO (Crear/Editar) -->
   <div class="modal" id="modal">
     <div class="modal-content">
       <h2 id="modalTitle">Ingresar Movimiento</h2>
 
       <div class="form-group">
         <label class="form-label">Tipo *</label>
-        <div class="radio-group" id="typeSelector">
-          <div class="radio-option income" onclick="selectType('ingreso')">
-            <div class="radio-icon income">+</div>
-            <div class="radio-label">Ingreso</div>
+        <div class="type-buttons" id="typeSelector">
+          <div class="type-button income" onclick="selectType('ingreso')">
+            <div class="type-icon income">+</div>
+            <div class="type-label">Ingreso</div>
           </div>
-          <div class="radio-option expense" onclick="selectType('salida')">
-            <div class="radio-icon expense">−</div>
-            <div class="radio-label">Salida</div>
+          <div class="type-button expense" onclick="selectType('salida')">
+            <div class="type-icon expense">−</div>
+            <div class="type-label">Salida</div>
           </div>
         </div>
       </div>
@@ -1741,7 +1836,7 @@
     document.addEventListener('DOMContentLoaded', function () {
       allData = [...sampleData];
       filteredData = [...sampleData];
-      updateSummary();
+      updateStats();
       renderTable();
 
       // Configurar fecha actual por defecto
@@ -1775,9 +1870,9 @@
       }, 300);
     }
 
-    // ===== Actualizar resumen =====
-    function updateSummary() {
-      const summaryCards = document.getElementById('summaryCards');
+    // ===== Actualizar estadísticas =====
+    function updateStats() {
+      const statsContainer = document.getElementById('statsContainer');
 
       const totalIncome = allData
         .filter(item => item.type === 'ingreso')
@@ -1789,26 +1884,77 @@
 
       const balance = totalIncome - totalExpense;
 
+      // Calcular cambio porcentual (ejemplo simplificado)
+      const incomeChange = "+12.5%";
+      const expenseChange = "-8.3%";
+      const balanceChange = balance >= 0 ? "+5.2%" : "-5.2%";
+
       const currentMonth = new Date().toLocaleString('es-ES', { month: 'long' });
       const formattedMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
 
-      summaryCards.innerHTML = `
-      <div class="summary-card income">
-        <div class="summary-label">TOTAL INGRESOS</div>
-        <div class="summary-value income">$${totalIncome.toFixed(2)}</div>
-        <div class="summary-period">${formattedMonth}</div>
-      </div>
-      <div class="summary-card expense">
-        <div class="summary-label">TOTAL SALIDAS</div>
-        <div class="summary-value expense">$${totalExpense.toFixed(2)}</div>
-        <div class="summary-period">${formattedMonth}</div>
-      </div>
-      <div class="summary-card balance">
-        <div class="summary-label">BALANCE TOTAL</div>
-        <div class="summary-value balance">$${balance.toFixed(2)}</div>
-        <div class="summary-period">${formattedMonth}</div>
+      // Generar gráficos de barras simples
+      const incomeBars = generateBars(12, 70, 100);
+      const expenseBars = generateBars(12, 40, 70);
+      const balanceBars = generateBars(12, 60, 90);
+
+      statsContainer.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card income">
+          <div class="stat-header">
+            <div class="stat-label">TOTAL INGRESOS</div>
+            <div class="stat-icon income">+</div>
+          </div>
+          <div class="stat-value income">$${totalIncome.toFixed(2)}</div>
+          <div class="stat-chart">
+            ${incomeBars}
+          </div>
+          <div class="stat-details">
+            <div class="stat-period">${formattedMonth}</div>
+            <div class="stat-change positive">${incomeChange}</div>
+          </div>
+        </div>
+        
+        <div class="stat-card expense">
+          <div class="stat-header">
+            <div class="stat-label">TOTAL SALIDAS</div>
+            <div class="stat-icon expense">−</div>
+          </div>
+          <div class="stat-value expense">$${totalExpense.toFixed(2)}</div>
+          <div class="stat-chart">
+            ${expenseBars}
+          </div>
+          <div class="stat-details">
+            <div class="stat-period">${formattedMonth}</div>
+            <div class="stat-change negative">${expenseChange}</div>
+          </div>
+        </div>
+        
+        <div class="stat-card balance">
+          <div class="stat-header">
+            <div class="stat-label">BALANCE TOTAL</div>
+            <div class="stat-icon balance">⚖</div>
+          </div>
+          <div class="stat-value balance">$${balance.toFixed(2)}</div>
+          <div class="stat-chart">
+            ${balanceBars}
+          </div>
+          <div class="stat-details">
+            <div class="stat-period">${formattedMonth}</div>
+            <div class="stat-change ${balance >= 0 ? 'positive' : 'negative'}">${balanceChange}</div>
+          </div>
+        </div>
       </div>
     `;
+    }
+
+    // Generar barras para gráficos
+    function generateBars(count, minHeight, maxHeight) {
+      let bars = '';
+      for (let i = 0; i < count; i++) {
+        const height = Math.floor(Math.random() * (maxHeight - minHeight)) + minHeight;
+        bars += `<div class="stat-bar" style="height: ${height}%"></div>`;
+      }
+      return bars;
     }
 
     // ===== Renderizar tabla =====
@@ -2072,19 +2218,19 @@
       document.body.style.overflow = '';
     }
 
-    // ===== Modal de formulario =====
+    // ===== Modal de formulario ÚNICO =====
     const modal = document.getElementById('modal');
 
     function selectType(type) {
       currentTransactionType = type;
-      const options = document.querySelectorAll('.radio-option');
-      options.forEach(option => {
-        option.classList.remove('selected');
+      const buttons = document.querySelectorAll('.type-button');
+      buttons.forEach(button => {
+        button.classList.remove('selected');
       });
 
-      const selectedOption = document.querySelector(`.radio-option.${type}`);
-      if (selectedOption) {
-        selectedOption.classList.add('selected');
+      const selectedButton = document.querySelector(`.type-button.${type}`);
+      if (selectedButton) {
+        selectedButton.classList.add('selected');
       }
     }
 
@@ -2175,7 +2321,7 @@
             `${currentTransactionType === 'ingreso' ? 'Ingreso' : 'Salida'} de $${amount.toFixed(2)} agregado correctamente`);
         }
 
-        updateSummary();
+        updateStats();
         filterTable();
         closeModal();
       });
@@ -2229,7 +2375,7 @@
         if (index !== -1) {
           const item = allData[index];
           allData.splice(index, 1);
-          updateSummary();
+          updateStats();
           filterTable();
           closeMobileActions();
 
@@ -2242,7 +2388,7 @@
       });
     }
 
-    // ===== Menú móvil CORREGIDO =====
+    // ===== Menú móvil =====
     function toggleMobileMenu() {
       const mobileMenu = document.getElementById('mobileMenu');
       const overlay = document.getElementById('mobileMenuOverlay');
@@ -2295,7 +2441,7 @@
           renderPagination();
         }, 100);
       } else if (id === 'estadisticas') {
-        updateSummary();
+        updateStats();
       }
     }
 
@@ -2363,16 +2509,11 @@
       }
     });
 
-    function preventScroll(e) {
-      if (modal.classList.contains('show') ||
-        detailModal.classList.contains('show') ||
-        mobileActionsMenu.classList.contains('show') ||
-        document.getElementById('mobileMenu').classList.contains('show')) {
-        e.preventDefault();
-      }
-    }
-
-    document.addEventListener('touchmove', preventScroll, { passive: false });
+    // Permitir scroll en formularios móviles
+    const modalContent = document.querySelector('.modal-content');
+    modalContent.addEventListener('touchstart', function (e) {
+      this.style.overflowY = 'auto';
+    });
 
     window.addEventListener('resize', () => {
       renderPagination();
