@@ -352,7 +352,7 @@
       letter-spacing: -0.5px;
     }
 
-    /* ===== ESTADÍSTICAS MEJORADAS ===== */
+    /* ===== ESTADÍSTICAS ===== */
     .stats-container {
       display: flex;
       flex-direction: column;
@@ -465,30 +465,6 @@
     .stat-change.negative {
       background: var(--expense-light);
       color: var(--expense);
-    }
-
-    .stat-chart {
-      height: 120px;
-      display: flex;
-      align-items: flex-end;
-      gap: 4px;
-      margin-top: 1rem;
-    }
-
-    .stat-bar {
-      flex: 1;
-      background: var(--border);
-      border-radius: 4px 4px 0 0;
-      position: relative;
-      min-height: 4px;
-    }
-
-    .stat-bar.income {
-      background: linear-gradient(to top, var(--income), var(--income-dark));
-    }
-
-    .stat-bar.expense {
-      background: linear-gradient(to top, var(--expense), var(--expense-dark));
     }
 
     /* ===== LOADING ===== */
@@ -927,7 +903,7 @@
       margin-top: 0.25rem;
     }
 
-    /* ===== MODAL DE FORMULARIO MEJORADO ===== */
+    /* ===== MODAL DE FORMULARIO CORREGIDO ===== */
     .modal {
       position: fixed;
       top: 0;
@@ -959,6 +935,8 @@
       max-width: 450px;
       max-height: 90vh;
       overflow-y: auto;
+      overflow-x: hidden;
+      /* CORREGIDO: Previene scroll horizontal */
       animation: fadeIn 0.3s ease;
       -webkit-overflow-scrolling: touch;
     }
@@ -991,6 +969,8 @@
       border-radius: 6px;
       font-size: 0.875rem;
       transition: all 0.3s;
+      box-sizing: border-box;
+      /* CORREGIDO: Asegura tamaño consistente */
     }
 
     .form-input:focus,
@@ -1006,7 +986,7 @@
       resize: vertical;
     }
 
-    /* BOTONES DE TIPO MEJORADOS - UNO AL LADO DEL OTRO */
+    /* BOTONES DE TIPO - CORREGIDOS */
     .type-buttons {
       display: flex;
       gap: 1rem;
@@ -1025,6 +1005,8 @@
       cursor: pointer;
       transition: all 0.3s;
       background: white;
+      min-width: 0;
+      /* CORREGIDO: Previene desbordamiento */
     }
 
     .type-button:hover {
@@ -1051,6 +1033,8 @@
     .type-icon {
       font-size: 1.5rem;
       font-weight: 600;
+      flex-shrink: 0;
+      /* CORREGIDO: Previene compresión */
     }
 
     .type-icon.income {
@@ -1065,8 +1049,11 @@
       font-size: 0.9rem;
       font-weight: 500;
       color: var(--text);
+      white-space: nowrap;
+      /* CORREGIDO: Previene salto de línea */
     }
 
+    /* FILA DE FORMULARIO - CORREGIDA */
     .form-row {
       display: flex;
       gap: 1rem;
@@ -1074,6 +1061,40 @@
 
     .form-row .form-group {
       flex: 1;
+      min-width: 0;
+      /* CORREGIDO: Permite que los campos se ajusten */
+    }
+
+    /* CORREGIDO: Campos de fecha y monto del mismo tamaño */
+    .form-row .form-input {
+      width: 100%;
+    }
+
+    /* CORREGIDO: Campo de fecha específico */
+    input[type="date"].form-input {
+      appearance: none;
+      -webkit-appearance: none;
+      min-height: 44px;
+      /* Tamaño táctil mínimo */
+    }
+
+    /* CORREGIDO: Campo de número específico */
+    input[type="number"].form-input {
+      min-height: 44px;
+      /* Tamaño táctil mínimo */
+    }
+
+    /* CORREGIDO: Select específico */
+    .form-select {
+      min-height: 44px;
+      /* Tamaño táctil mínimo */
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 12px;
+      padding-right: 2.5rem;
     }
 
     .form-actions {
@@ -1317,6 +1338,7 @@
         font-size: 0.9rem;
       }
 
+      /* CORREGIDO: Formulario móvil */
       .form-row {
         flex-direction: column;
         gap: 0;
@@ -1326,6 +1348,7 @@
         padding: 1.5rem;
         max-height: 85vh;
         overflow-y: auto;
+        overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
       }
 
@@ -1334,11 +1357,27 @@
       }
 
       .type-button {
-        padding: 0.75rem;
+        padding: 0.75rem 0.5rem;
+        min-height: 44px;
       }
 
       .type-icon {
         font-size: 1.25rem;
+      }
+
+      .type-label {
+        font-size: 0.8rem;
+      }
+
+      /* CORREGIDO: Todos los campos del mismo tamaño en móvil */
+      .form-input,
+      .form-select,
+      input[type="date"],
+      input[type="number"] {
+        min-height: 44px;
+        font-size: 16px;
+        /* Previene zoom en iOS */
+        width: 100%;
       }
 
       .pagination {
@@ -1410,15 +1449,15 @@
       }
 
       .type-button {
-        padding: 0.75rem 0.5rem;
+        padding: 0.75rem 0.25rem;
       }
 
       .type-icon {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
       }
 
       .type-label {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
       }
 
       .mobile-actions-btn {
@@ -1442,6 +1481,13 @@
       .modal-content {
         padding: 1.25rem;
         max-height: 80vh;
+      }
+
+      /* CORREGIDO: Campos aún más pequeños en móvil */
+      .form-input,
+      .form-select {
+        padding: 0.5rem 0.75rem;
+        min-height: 40px;
       }
 
       .notification-container {
@@ -1472,6 +1518,10 @@
 
       .type-buttons {
         flex-direction: column;
+      }
+
+      .type-button {
+        width: 100%;
       }
 
       .notification-container {
@@ -1588,7 +1638,7 @@
   <section id="estadisticas">
     <h1>Estadísticas Financieras</h1>
 
-    <!-- Estadísticas Mejoradas -->
+    <!-- Estadísticas -->
     <div class="stats-container" id="statsContainer">
       <!-- Se generará dinámicamente -->
     </div>
@@ -1599,7 +1649,7 @@
     <div class="loading-spinner"></div>
   </div>
 
-  <!-- MODAL FORMULARIO ÚNICO (Crear/Editar) -->
+  <!-- MODAL FORMULARIO CORREGIDO -->
   <div class="modal" id="modal">
     <div class="modal-content">
       <h2 id="modalTitle">Ingresar Movimiento</h2>
@@ -1892,11 +1942,6 @@
       const currentMonth = new Date().toLocaleString('es-ES', { month: 'long' });
       const formattedMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
 
-      // Generar gráficos de barras simples
-      const incomeBars = generateBars(12, 70, 100);
-      const expenseBars = generateBars(12, 40, 70);
-      const balanceBars = generateBars(12, 60, 90);
-
       statsContainer.innerHTML = `
       <div class="stats-grid">
         <div class="stat-card income">
@@ -1905,9 +1950,6 @@
             <div class="stat-icon income">+</div>
           </div>
           <div class="stat-value income">$${totalIncome.toFixed(2)}</div>
-          <div class="stat-chart">
-            ${incomeBars}
-          </div>
           <div class="stat-details">
             <div class="stat-period">${formattedMonth}</div>
             <div class="stat-change positive">${incomeChange}</div>
@@ -1920,9 +1962,6 @@
             <div class="stat-icon expense">−</div>
           </div>
           <div class="stat-value expense">$${totalExpense.toFixed(2)}</div>
-          <div class="stat-chart">
-            ${expenseBars}
-          </div>
           <div class="stat-details">
             <div class="stat-period">${formattedMonth}</div>
             <div class="stat-change negative">${expenseChange}</div>
@@ -1935,9 +1974,6 @@
             <div class="stat-icon balance">⚖</div>
           </div>
           <div class="stat-value balance">$${balance.toFixed(2)}</div>
-          <div class="stat-chart">
-            ${balanceBars}
-          </div>
           <div class="stat-details">
             <div class="stat-period">${formattedMonth}</div>
             <div class="stat-change ${balance >= 0 ? 'positive' : 'negative'}">${balanceChange}</div>
@@ -1945,16 +1981,6 @@
         </div>
       </div>
     `;
-    }
-
-    // Generar barras para gráficos
-    function generateBars(count, minHeight, maxHeight) {
-      let bars = '';
-      for (let i = 0; i < count; i++) {
-        const height = Math.floor(Math.random() * (maxHeight - minHeight)) + minHeight;
-        bars += `<div class="stat-bar" style="height: ${height}%"></div>`;
-      }
-      return bars;
     }
 
     // ===== Renderizar tabla =====
@@ -2218,7 +2244,7 @@
       document.body.style.overflow = '';
     }
 
-    // ===== Modal de formulario ÚNICO =====
+    // ===== Modal de formulario =====
     const modal = document.getElementById('modal');
 
     function selectType(type) {
@@ -2509,10 +2535,12 @@
       }
     });
 
-    // Permitir scroll en formularios móviles
+    // Prevenir scroll horizontal en formularios
     const modalContent = document.querySelector('.modal-content');
-    modalContent.addEventListener('touchstart', function (e) {
-      this.style.overflowY = 'auto';
+    modalContent.addEventListener('scroll', function (e) {
+      if (this.scrollLeft !== 0) {
+        this.scrollLeft = 0;
+      }
     });
 
     window.addEventListener('resize', () => {
