@@ -1,26 +1,6 @@
 // firebase-config.js
 // Configuración de Firebase
 
-// Importaciones desde CDN
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-    getFirestore,
-    collection,
-    doc,
-    setDoc,
-    getDoc,
-    getDocs,
-    updateDoc,
-    deleteDoc,
-    query,
-    where,
-    orderBy,
-    limit,
-    serverTimestamp,
-    enableIndexedDbPersistence
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// Tu configuración
 const firebaseConfig = {
     apiKey: "AIzaSyD8rpYKIsjLw6yOldNBlIyJSI6MSvAKF_k",
     authDomain: "produccion-codex.firebaseapp.com",
@@ -31,18 +11,63 @@ const firebaseConfig = {
 };
 
 // Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let db = null;
+let firebaseInicializado = false;
 
-// Habilitar persistencia offline
-enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code == 'failed-precondition') {
-        console.log('Persistencia falló - múltiples pestañas abiertas');
-    } else if (err.code == 'unimplemented') {
-        console.log('Persistencia no soportada');
-    }
-});
+function inicializarFirebase() {
+    return new Promise((resolve, reject) => {
+        try {
+            if (typeof firebase !== 'undefined' && !firebaseInicializado) {
+                // Inicializar Firebase
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
 
-console.log("🔥 Firebase conectado");
+                // Obtener instancia de Firestore
+                db = firebase.firestore();
 
-export { db, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, limit, serverTimestamp };
+                // Configurar settings
+                db.settings({
+                    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+                });
+
+                // Habilitar persistencia offline
+                db.enablePersistence()
+                    .then(() => {
+                        console.log('Persistencia offline habilitada');
+                    })
+                    .catch((err) => {
+                        if (err.code == 'failed-precondition') {
+                            console.log('Persistencia falló - múltiples pestañas abiertas');
+                        } else if (err.code == 'unimplemented') {
+                            console.log('Persistencia no soportada');
+                        }
+                    });
+
+                firebaseInicializado = true;
+                console.log("🔥 Firebase conectado");
+                resolve(db);
+            } else {
+                resolve(db);
+            }
+        } catch (error) {
+            console.error('Error inicializando Firebase:', error);
+            reject(error);
+        }
+    });
+}
+
+// Función para obtener Firestore
+function getFirestore() {
+    return db;
+}
+
+// Función para verificar si Firebase está conectado
+function isFirebaseConnected() {
+    return firebaseInicializado && db !== null;
+}
+
+// Hacer funciones globales
+window.inicializarFirebase = inicializarFirebase;
+window.getFirestore = getFirestore;
+window.isFirebaseConnected = isFirebaseConnected;

@@ -32,7 +32,6 @@
             color: var(--charcoal);
         }
 
-        /* Notificaciones */
         .notificacion {
             position: fixed;
             top: 20px;
@@ -76,7 +75,6 @@
             }
         }
 
-        /* Login */
         .login-container {
             max-width: 400px;
             margin: 50px auto;
@@ -109,10 +107,6 @@
             font-weight: bold;
         }
 
-        .login-container button:hover {
-            opacity: 0.9;
-        }
-
         .login-footer {
             text-align: center;
             margin-top: 15px;
@@ -124,7 +118,6 @@
             cursor: pointer;
         }
 
-        /* Header con usuario */
         .user-header {
             display: flex;
             justify-content: space-between;
@@ -170,12 +163,6 @@
             cursor: pointer;
         }
 
-        .logout-btn:hover {
-            background: var(--rojo-texto);
-            color: white;
-        }
-
-        /* Tabs Navigation */
         .tabs {
             display: flex;
             gap: 5px;
@@ -201,11 +188,6 @@
         .tab-btn.active {
             background: var(--charcoal);
             color: var(--blanco);
-        }
-
-        .tab-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .content-section {
@@ -277,7 +259,6 @@
             border-color: var(--azul-texto);
         }
 
-        /* Tablas */
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -338,7 +319,6 @@
             border: 1px solid var(--rojo-texto);
         }
 
-        /* Formulario */
         .form-container {
             display: none;
             background: var(--gris-fondo);
@@ -386,13 +366,6 @@
             background-color: var(--verde-claro);
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: 1px solid var(--celeste-texto);
-        }
-
-        /* Sugerencias */
         .sugerencias {
             position: absolute;
             top: 100%;
@@ -417,7 +390,6 @@
             background: var(--celeste-claro);
         }
 
-        /* Card de Grupo Histórico */
         .group-card {
             border: 1px solid var(--gris-borde);
             margin-bottom: 15px;
@@ -455,7 +427,6 @@
             border-left: 3px solid var(--azul-texto);
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -484,7 +455,6 @@
             width: 95%;
         }
 
-        /* Estilos para edición de registros */
         .edit-registros-container {
             max-height: 600px;
             overflow-y: auto;
@@ -525,10 +495,6 @@
             font-size: 11px;
         }
 
-        .edit-registros-tabla input:focus {
-            outline: 1px solid var(--celeste-texto);
-        }
-
         .btn-eliminar-registro {
             background: var(--rojo-claro);
             color: var(--rojo-texto);
@@ -555,12 +521,6 @@
             cursor: pointer;
         }
 
-        .btn-agregar-registro:hover {
-            background: var(--verde-texto);
-            color: white;
-        }
-
-        /* Tabla de detalles */
         .detalle-tabla-container {
             overflow-x: auto;
             max-height: 500px;
@@ -582,7 +542,6 @@
             font-weight: normal;
         }
 
-        /* Tabla de usuarios */
         .usuarios-table {
             width: 100%;
             border-collapse: collapse;
@@ -621,7 +580,6 @@
             border: 1px solid var(--gris-borde);
         }
 
-        /* Tabla de bitácora */
         .bitacora-table {
             width: 100%;
             border-collapse: collapse;
@@ -688,16 +646,17 @@
     <div id="notificacionContainer"></div>
     <div id="app"></div>
 
-    <!-- Incluir la base de datos -->
-    <script src="database.js" type="module"></script>
+    <!-- Cargar Firebase primero -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
-    <script type="module">
-        import { db as firebaseDb } from './firebase-config.js';
+    <!-- Luego tus archivos -->
+    <script src="firebase-config.js"></script>
+    <script src="database.js"></script>
 
-        // Estado de la aplicación
+    <!-- Script principal -->
+    <script>
         let datosDiarios = JSON.parse(localStorage.getItem("eyp_diario")) || [];
-
-        // Variables para autocompletado
         let timeoutId;
         let currentEditMode = false;
 
@@ -718,7 +677,6 @@
             }, 3000);
         };
 
-        // Función para confirmar acciones
         function confirmarAccion(mensaje, callback) {
             if (confirm(mensaje)) {
                 callback();
@@ -727,7 +685,6 @@
             return false;
         }
 
-        // Comandos de teclado
         document.addEventListener('keydown', function (e) {
             if (e.ctrlKey && e.key === 'g') {
                 e.preventDefault();
@@ -771,8 +728,7 @@
             }
         }
 
-        // Renderizar la aplicación según el estado de sesión
-        function renderizarApp() {
+        async function renderizarApp() {
             const app = document.getElementById('app');
 
             if (!db.haySesion()) {
@@ -782,7 +738,6 @@
             }
         }
 
-        // Mostrar pantalla de login
         function mostrarLogin() {
             const app = document.getElementById('app');
             app.innerHTML = `
@@ -798,7 +753,6 @@
             `;
         }
 
-        // Iniciar sesión
         window.iniciarSesion = async function () {
             const username = document.getElementById('login-username').value;
             const password = document.getElementById('login-password').value;
@@ -813,7 +767,6 @@
             }
         };
 
-        // Mostrar formulario de recuperación de contraseña
         window.mostrarRecuperarPassword = function () {
             const modal = document.createElement('div');
             modal.className = 'modal';
@@ -840,7 +793,6 @@
             document.body.appendChild(modal);
         };
 
-        // Recuperar contraseña
         window.recuperarPassword = function () {
             const username = document.getElementById('rec-username').value;
             const respuesta = document.getElementById('rec-respuesta').value;
@@ -855,7 +807,6 @@
             }
         };
 
-        // Cerrar sesión
         window.cerrarSesion = async function () {
             confirmarAccion('¿Cerrar sesión?', async () => {
                 await db.cerrarSesion();
@@ -863,7 +814,6 @@
             });
         };
 
-        // Cambiar contraseña
         window.mostrarCambiarPassword = function (esAdmin = false) {
             const usuario = db.getUsuarioActual();
 
@@ -919,7 +869,6 @@
             }
         };
 
-        // Mostrar sistema principal
         function mostrarSistema() {
             const usuario = db.getUsuarioActual();
             const esAdmin = db.esAdministrador();
@@ -1067,7 +1016,6 @@
                 </section>
                 ` : ''}
 
-                <!-- Modal para datos del encargado con observaciones -->
                 <div id="modalGrupo" class="modal">
                     <div class="modal-content">
                         <h3 id="tituloModalGrupo">Datos del Encargado</h3>
@@ -1086,7 +1034,6 @@
                     </div>
                 </div>
 
-                <!-- Modal para ver detalles del grupo -->
                 <div id="modalDetalleGrupo" class="modal">
                     <div class="modal-content modal-lg">
                         <h3 id="detGrupoTitulo">Detalles del Grupo</h3>
@@ -1119,7 +1066,6 @@
                     </div>
                 </div>
 
-                <!-- Modal para editar registros del grupo -->
                 <div id="modalEditarRegistrosGrupo" class="modal">
                     <div class="modal-content modal-lg">
                         <h3 id="editRegistrosTitulo" style="color:var(--charcoal); margin-bottom:15px;">Editando Registros del Grupo</h3>
@@ -1146,9 +1092,7 @@
                                         <th>ACCIÓN</th>
                                     </tr>
                                 </thead>
-                                <tbody id="editRegistrosBody">
-                                    <!-- Aquí se generarán dinámicamente los registros editables -->
-                                </tbody>
+                                <tbody id="editRegistrosBody"></tbody>
                             </table>
                         </div>
                         
@@ -1164,10 +1108,7 @@
                 </div>
             `;
 
-            // Configurar eventos de autocompletado
             configurarAutocompletado();
-
-            // Renderizar datos
             renderizarDiario();
             if (db.tienePermiso('verHistorialGrupos')) {
                 renderizarHistorial();
@@ -1177,7 +1118,6 @@
             }
         }
 
-        // Configurar eventos de autocompletado
         function configurarAutocompletado() {
             const inputCodigo = document.getElementById('codigo');
             const inputCodActividad = document.getElementById('codActividad');
@@ -1282,7 +1222,6 @@
             }
         }
 
-        // Funciones del sistema principal
         function switchTab(tabId) {
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1414,7 +1353,6 @@
             });
         }
 
-        // GRUPOS con observaciones
         function abrirModalGrupo() {
             if (datosDiarios.length === 0) {
                 mostrarNotificacion("No hay registros para guardar en el grupo", 'error');
@@ -1827,7 +1765,6 @@
             mostrarNotificacion("Archivo produccion_diaria.csv descargado", 'exito');
         }
 
-        // Funciones de bitácora
         function renderizarBitacora(filtros = {}) {
             let tbody = document.getElementById("tablaBitacora");
             if (!tbody) return;
@@ -1837,7 +1774,6 @@
 
             let registros = db.getBitacora(filtros);
 
-            // Si no puede ver todo, filtrar solo sus acciones
             if (!puedeVerTodos) {
                 registros = registros.filter(r => r.usuario === usuario.username);
             }
@@ -1899,7 +1835,6 @@
             renderizarBitacora();
         };
 
-        // Panel de Administración de Usuarios
         window.mostrarPanelUsuarios = function () {
             if (!db.tienePermiso('gestionarUsuarios')) {
                 mostrarNotificacion('No tiene permiso para gestionar usuarios', 'error');
@@ -1973,7 +1908,6 @@
             document.body.appendChild(modal);
         };
 
-        // Mostrar formulario de nuevo usuario
         window.mostrarFormularioNuevoUsuario = function () {
             document.querySelector('.modal').remove();
 
@@ -2048,7 +1982,6 @@
             document.body.appendChild(modal);
         };
 
-        // Guardar nuevo usuario
         window.guardarNuevoUsuario = async function () {
             const permisos = {
                 verAdminDB: document.getElementById('perm-verAdminDB').checked,
@@ -2082,13 +2015,11 @@
             }
         };
 
-        // Volver al panel de usuarios
         window.volverPanelUsuarios = function () {
             document.querySelector('.modal').remove();
             mostrarPanelUsuarios();
         };
 
-        // Editar usuario
         window.editarUsuarioForm = function (id) {
             const usuario = db.getUsuarios().find(u => u.id === id);
             if (!usuario) return;
@@ -2167,7 +2098,6 @@
             document.body.appendChild(modal);
         };
 
-        // Guardar edición de usuario
         window.guardarEdicionUsuario = async function () {
             const id = parseInt(document.getElementById('edit-usuario-id').value);
 
@@ -2211,7 +2141,6 @@
             }
         };
 
-        // Toggle usuario activo
         window.toggleUsuarioActivo = async function (id) {
             const resultado = await db.toggleUsuarioActivo(id);
             if (resultado.success) {
@@ -2223,7 +2152,6 @@
             }
         };
 
-        // Eliminar usuario
         window.eliminarUsuarioConfirm = async function (id) {
             if (confirm('¿Está seguro de eliminar este usuario?')) {
                 const resultado = await db.eliminarUsuario(id);
@@ -2237,7 +2165,6 @@
             }
         };
 
-        // Mostrar panel de Admin DB
         window.mostrarPanelAdminDB = function () {
             if (!db.tienePermiso('verAdminDB')) {
                 mostrarNotificacion('No tiene permiso para ver esta sección', 'error');
@@ -2299,7 +2226,6 @@
             document.body.appendChild(modal);
         };
 
-        // Hacer funciones globales
         window.switchTab = switchTab;
         window.abrirFormulario = abrirFormulario;
         window.guardar = guardar;
@@ -2322,8 +2248,18 @@
         window.descargarGrupoCSV = descargarGrupoCSV;
         window.exportarExcel = exportarExcel;
 
-        // Inicializar la aplicación
-        renderizarApp();
+        // Inicializar la aplicación después de que todo cargue
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                if (typeof inicializarFirebase === 'function') {
+                    await inicializarFirebase();
+                }
+                renderizarApp();
+            } catch (error) {
+                console.error('Error inicializando:', error);
+                renderizarApp();
+            }
+        });
     </script>
 </body>
 

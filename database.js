@@ -1,4 +1,4 @@
-// database.js - Base de datos local con Firebase y bitácora
+// database.js - Base de datos local con Firebase
 
 class LocalDatabase {
     constructor() {
@@ -7,22 +7,28 @@ class LocalDatabase {
         this.trabajadores = [];
         this.actividades = [];
         this.bitacora = [];
+        this.historialGrupos = [];
+        this.contadorGrupo = 1;
         this.usuarioActual = null;
         this.conectado = false;
         this.sincronizando = false;
         this.init();
     }
 
-    async init() {
+    init() {
         this.cargarDatosLocales();
-        await this.inicializarFirebase();
-        this.iniciarEscuchas();
+        this.inicializarFirebase();
         this.verificarSesion();
     }
 
     cargarDatosLocales() {
         // Cargar usuarios locales
-        this.usuarios = JSON.parse(localStorage.getItem('eyp_usuarios')) || this.crearAdminInicial();
+        const usuariosGuardados = localStorage.getItem('eyp_usuarios');
+        if (usuariosGuardados) {
+            this.usuarios = JSON.parse(usuariosGuardados);
+        } else {
+            this.usuarios = this.crearAdminInicial();
+        }
 
         // Cargar trabajadores locales
         this.trabajadores = JSON.parse(localStorage.getItem('eyp_trabajadores')) || [
@@ -79,178 +85,6 @@ class LocalDatabase {
         return admin;
     }
 
-    async inicializarFirebase() {
-        try {
-            const { db: firebaseDb } = await import('./firebase-config.js');
-            this.db = firebaseDb;
-            this.conectado = true;
-            console.log('Firebase inicializado');
-        } catch (error) {
-            console.log('Modo offline - Firebase no disponible');
-            this.conectado = false;
-        }
-    }
-
-    async iniciarEscuchas() {
-        if (!this.conectado) return;
-
-        try {
-            const { collection, query, where, getDocs } = await import('./firebase-config.js');
-
-            // Escuchar cambios en usuarios
-            const usuariosRef = collection(this.db, 'usuarios');
-            const usuariosSnapshot = await getDocs(usuariosRef);
-            if (!usuariosSnapshot.empty) {
-                const usuariosFirebase = [];
-                usuariosSnapshot.forEach(doc => {
-                    usuariosFirebase.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Fusionar datos locales con Firebase (prioridad a Firebase)
-                this.fusionarDatos('usuarios', usuariosFirebase);
-            } else {
-                // Subir datos locales a Firebase
-                await this.subirDatosLocales();
-            }
-        } catch (error) {
-            console.log('Error en escuchas:', error);
-        }
-    }
-
-    fusionarDatos(tipo, datosFirebase) {
-        switch (tipo) {
-            case 'usuarios':
-                // Mantener usuarios locales que no están en Firebase
-                const usuariosLocalesMap = new Map(this.usuarios.map(u => [u.username, u]));
-                datosFirebase.forEach(u => {
-                    if (!usuariosLocalesMap.has(u.username)) {
-                        this.usuarios.push(u);
-                    }
-                });
-                localStorage.setItem('eyp_usuarios', JSON.stringify(this.usuarios));
-                break;
-
-            case 'trabajadores':
-                const trabajadoresFirebase = datosFirebase;
-                this.trabajadores = [...new Map([...this.trabajadores, ...trabajadoresFirebase].map(t => [t.codigo, t])).values()];
-                localStorage.setItem('eyp_trabajadores', JSON.stringify(this.trabajadores));
-                break;
-
-            case 'actividades':
-                const actividadesFirebase = datosFirebase;
-                this.actividades = [...new Map([...this.actividades, ...actividadesFirebase].map(a => [a.codigo, a])).values()];
-                localStorage.setItem('eyp_actividades', JSON.stringify(this.actividades));
-                break;
-
-            case 'historialGrupos':
-                const gruposFirebase = datosFirebase;
-                const gruposMap = new Map(this.historialGrupos.map(g => [g.idGrupo, g]));
-                gruposFirebase.forEach(g => gruposMap.set(g.idGrupo, g));
-                this.historialGrupos = Array.from(gruposMap.values()).sort((a, b) =>
-                    new Date(b.fechaCreacion) - new Date(a.fechaCreacion)
-                );
-                localStorage.setItem('eyp_historial', JSON.stringify(this.historialGrupos));
-                break;
-        }
-    }
-
-    async subirDatosLocales() {
-        if (!this.conectado) return;
-
-        try {
-            const { doc, setDoc, collection } = await import('./firebase-config.js');
-
-            // Subir usuarios
-            for (const usuario of this.usuarios) {
-                const usuarioRef = doc(collection(this.db, 'usuarios'), usuario.username);
-                await setDoc(usuarioRef, {
-                    ...usuario,
-                    password: undefined,
-                    respuestaSeguridad: undefined,
-                    ultimaSincronizacion: new Date().toISOString()
-                });
-            }
-
-            // Subir trabajadores
-            for (const trabajador of this.trabajadores) {
-                const trabajadorRef = doc(collection(this.db, 'trabajadores'), trabajador.codigo);
-                await setDoc(trabajadorRef, trabajador);
-            }
-
-            // Subir actividades
-            for (const actividad of this.actividades) {
-                const actividadRef = doc(collection(this.db, 'actividades'), actividad.codigo);
-                await setDoc(actividadRef, actividad);
-            }
-
-            // Subir grupos históricos
-            for (const grupo of this.historialGrupos) {
-                const grupoRef = doc(collection(this.db, 'grupos'), grupo.idGrupo);
-                await setDoc(grupoRef, grupo);
-            }
-
-            console.log('Datos locales subidos a Firebase');
-        } catch (error) {
-            console.log('Error subiendo datos:', error);
-        }
-    }
-
-    async registrarEnBitacora(accion, detalles, tipo = 'info') {
-        const entrada = {
-            id: Date.now() + Math.random().toString(36).substr(2, 9),
-            timestamp: new Date().toISOString(),
-            usuario: this.usuarioActual ? this.usuarioActual.username : 'sistema',
-            usuarioNombre: this.usuarioActual ? this.usuarioActual.nombre : 'Sistema',
-            accion: accion,
-            detalles: detalles,
-            tipo: tipo
-        };
-
-        this.bitacora.unshift(entrada);
-
-        // Mantener solo últimos 1000 registros
-        if (this.bitacora.length > 1000) {
-            this.bitacora = this.bitacora.slice(0, 1000);
-        }
-
-        localStorage.setItem('eyp_bitacora', JSON.stringify(this.bitacora));
-
-        // Subir a Firebase si hay conexión
-        if (this.conectado) {
-            try {
-                const { doc, setDoc, collection } = await import('./firebase-config.js');
-                const bitacoraRef = doc(collection(this.db, 'bitacora'), entrada.id.toString());
-                await setDoc(bitacoraRef, entrada);
-            } catch (error) {
-                console.log('Error subiendo bitácora:', error);
-            }
-        }
-
-        return entrada;
-    }
-
-    getBitacora(filtros = {}) {
-        let resultados = [...this.bitacora];
-
-        if (filtros.usuario) {
-            resultados = resultados.filter(e => e.usuario === filtros.usuario);
-        }
-
-        if (filtros.desde) {
-            resultados = resultados.filter(e => new Date(e.timestamp) >= new Date(filtros.desde));
-        }
-
-        if (filtros.hasta) {
-            resultados = resultados.filter(e => new Date(e.timestamp) <= new Date(filtros.hasta));
-        }
-
-        if (filtros.accion) {
-            resultados = resultados.filter(e => e.accion.includes(filtros.accion));
-        }
-
-        return resultados;
-    }
-
     descifrar(base64) {
         try {
             return atob(base64);
@@ -260,6 +94,7 @@ class LocalDatabase {
     }
 
     hashPassword(password) {
+        if (!password) return '';
         let hash = 0;
         for (let i = 0; i < password.length; i++) {
             const char = password.charCodeAt(i);
@@ -271,6 +106,63 @@ class LocalDatabase {
 
     verificarPassword(passwordIngresada, passwordAlmacenada) {
         return this.hashPassword(passwordIngresada) === passwordAlmacenada;
+    }
+
+    inicializarFirebase() {
+        if (typeof isFirebaseConnected === 'function' && isFirebaseConnected()) {
+            this.db = getFirestore();
+            this.conectado = true;
+            console.log('Firebase conectado');
+            this.subirDatosLocales();
+        } else {
+            console.log('Modo offline - Firebase no disponible');
+            this.conectado = false;
+        }
+    }
+
+    async subirDatosLocales() {
+        if (!this.conectado || !this.db) return;
+
+        try {
+            // Subir usuarios
+            for (const usuario of this.usuarios) {
+                const usuarioLimpio = {
+                    id: usuario.id,
+                    username: usuario.username,
+                    nombre: usuario.nombre,
+                    rol: usuario.rol,
+                    activo: usuario.activo,
+                    permisos: usuario.permisos,
+                    preguntaSeguridad: usuario.preguntaSeguridad || '',
+                    ultimaSincronizacion: new Date().toISOString()
+                };
+
+                const usuarioRef = this.db.collection('usuarios').doc(usuario.username);
+                await usuarioRef.set(usuarioLimpio, { merge: true });
+            }
+
+            // Subir trabajadores
+            for (const trabajador of this.trabajadores) {
+                const trabajadorRef = this.db.collection('trabajadores').doc(trabajador.codigo);
+                await trabajadorRef.set(trabajador, { merge: true });
+            }
+
+            // Subir actividades
+            for (const actividad of this.actividades) {
+                const actividadRef = this.db.collection('actividades').doc(actividad.codigo);
+                await actividadRef.set(actividad, { merge: true });
+            }
+
+            // Subir grupos históricos
+            for (const grupo of this.historialGrupos) {
+                const grupoRef = this.db.collection('grupos').doc(grupo.idGrupo);
+                await grupoRef.set(grupo, { merge: true });
+            }
+
+            console.log('Datos locales subidos a Firebase');
+        } catch (error) {
+            console.log('Error subiendo datos:', error);
+        }
     }
 
     verificarSesion() {
@@ -421,8 +313,8 @@ class LocalDatabase {
                 cambiarPassword: false,
                 verBitacora: false
             },
-            preguntaSeguridad: usuarioData.preguntaSeguridad,
-            respuestaSeguridad: this.hashPassword(usuarioData.respuestaSeguridad)
+            preguntaSeguridad: usuarioData.preguntaSeguridad || '',
+            respuestaSeguridad: this.hashPassword(usuarioData.respuestaSeguridad || '')
         };
 
         this.usuarios.push(nuevoUsuario);
@@ -447,8 +339,6 @@ class LocalDatabase {
             return { success: false, message: 'Usuario no encontrado' };
         }
 
-        const usuarioOriginal = { ...this.usuarios[index] };
-
         if (usuarioData.username && usuarioData.username !== this.usuarios[index].username) {
             if (this.usuarios.some(u => u.username === usuarioData.username)) {
                 return { success: false, message: 'El nombre de usuario ya existe' };
@@ -466,7 +356,7 @@ class LocalDatabase {
 
         await this.registrarEnBitacora(
             'Usuario editado',
-            `Se editó usuario ${usuarioOriginal.nombre}`,
+            `Se editó usuario ${this.usuarios[index].nombre}`,
             'administrativo'
         );
 
@@ -621,7 +511,6 @@ class LocalDatabase {
         localStorage.setItem('eyp_actividades', JSON.stringify(this.actividades));
     }
 
-    // Métodos para grupos con observaciones
     async guardarGrupo(datosGrupo) {
         if (!this.usuarioActual) {
             return { success: false, message: 'No hay sesión activa' };
@@ -648,9 +537,6 @@ class LocalDatabase {
         localStorage.setItem('eyp_historial', JSON.stringify(this.historialGrupos));
         localStorage.setItem('eyp_contador', this.contadorGrupo);
 
-        // Limpiar datos diarios
-        localStorage.setItem('eyp_diario', JSON.stringify([]));
-
         await this.registrarEnBitacora(
             'Grupo guardado',
             `Se guardó grupo ${codigoGenerado} con ${datosGrupo.registros.length} registros`,
@@ -665,8 +551,6 @@ class LocalDatabase {
             return { success: false, message: 'No hay sesión activa' };
         }
 
-        const grupoOriginal = { ...this.historialGrupos[index] };
-
         this.historialGrupos[index] = {
             ...this.historialGrupos[index],
             ...datosActualizados,
@@ -678,11 +562,55 @@ class LocalDatabase {
 
         await this.registrarEnBitacora(
             'Grupo editado',
-            `Se editó grupo ${grupoOriginal.idGrupo}`,
+            `Se editó grupo ${this.historialGrupos[index].idGrupo}`,
             'grupo'
         );
 
         return { success: true, message: 'Grupo actualizado correctamente' };
+    }
+
+    async registrarEnBitacora(accion, detalles, tipo = 'info') {
+        const entrada = {
+            id: Date.now() + Math.random().toString(36).substr(2, 9),
+            timestamp: new Date().toISOString(),
+            usuario: this.usuarioActual ? this.usuarioActual.username : 'sistema',
+            usuarioNombre: this.usuarioActual ? this.usuarioActual.nombre : 'Sistema',
+            accion: accion,
+            detalles: detalles,
+            tipo: tipo
+        };
+
+        this.bitacora.unshift(entrada);
+
+        if (this.bitacora.length > 1000) {
+            this.bitacora = this.bitacora.slice(0, 1000);
+        }
+
+        localStorage.setItem('eyp_bitacora', JSON.stringify(this.bitacora));
+
+        return entrada;
+    }
+
+    getBitacora(filtros = {}) {
+        let resultados = [...this.bitacora];
+
+        if (filtros.usuario) {
+            resultados = resultados.filter(e => e.usuario === filtros.usuario);
+        }
+
+        if (filtros.desde) {
+            resultados = resultados.filter(e => new Date(e.timestamp) >= new Date(filtros.desde));
+        }
+
+        if (filtros.hasta) {
+            resultados = resultados.filter(e => new Date(e.timestamp) <= new Date(filtros.hasta));
+        }
+
+        if (filtros.accion) {
+            resultados = resultados.filter(e => e.accion.includes(filtros.accion));
+        }
+
+        return resultados;
     }
 
     mostrarNotificacion(mensaje, tipo) {
@@ -696,3 +624,4 @@ class LocalDatabase {
 
 // Inicializar la base de datos
 const db = new LocalDatabase();
+window.db = db;
