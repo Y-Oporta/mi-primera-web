@@ -2,2554 +2,2329 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance Pro</title>
-
-  <style>
-    /* ===== VARIABLES ===== */
-    :root {
-      --primary: #10b981;
-      --primary-dark: #059669;
-      --primary-light: #d1fae5;
-      --primary-light-2: #ecfdf5;
-      --income: #10b981;
-      --income-dark: #059669;
-      --income-light: #d1fae5;
-      --expense: #ef4444;
-      --expense-dark: #dc2626;
-      --expense-light: #fee2e2;
-      --bg: #f9fafb;
-      --nav-bg: #ffffff;
-      --text: #111827;
-      --text-light: #6b7280;
-      --text-muted: #9ca3af;
-      --border: #e5e7eb;
-      --modal-bg: rgba(0, 0, 0, 0.5);
-      --hover-bg: #f3f4f6;
-      --card-bg: #ffffff;
-      --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    /* ===== FUENTES ===== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      line-height: 1.5;
-      font-size: 14px;
-      overflow-x: hidden;
-    }
-
-    /* ===== ANIMACIONES ===== */
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(-20px);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes notificationIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes notificationOut {
-      from {
-        transform: translateX(0);
-        opacity: 1;
-      }
-
-      to {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-    }
-
-    /* ===== NOTIFICACIONES ===== */
-    .notification-container {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: 350px;
-    }
-
-    .notification {
-      background: white;
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: var(--shadow-lg);
-      animation: notificationIn 0.3s ease;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--primary);
-    }
-
-    .notification.hiding {
-      animation: notificationOut 0.3s ease forwards;
-    }
-
-    .notification.success {
-      border-left-color: var(--primary);
-    }
-
-    .notification.error {
-      border-left-color: var(--expense);
-    }
-
-    .notification.warning {
-      border-left-color: #f59e0b;
-    }
-
-    .notification.info {
-      border-left-color: #3b82f6;
-    }
-
-    .notification-icon {
-      font-size: 20px;
-      line-height: 1;
-    }
-
-    .notification-content {
-      flex: 1;
-    }
-
-    .notification-title {
-      font-weight: 600;
-      margin-bottom: 4px;
-      color: var(--text);
-    }
-
-    .notification-message {
-      font-size: 0.875rem;
-      color: var(--text-light);
-      line-height: 1.4;
-    }
-
-    .notification-close {
-      background: none;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      color: var(--text-muted);
-      padding: 2px;
-      line-height: 1;
-    }
-
-    /* ===== NAVBAR ===== */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: var(--nav-bg);
-      border-bottom: 1px solid var(--border);
-      animation: slideIn 0.3s ease;
-    }
-
-    .nav {
-      max-width: 1100px;
-      margin: auto;
-      padding: 1rem 1.25rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--primary);
-      letter-spacing: -0.5px;
-    }
-
-    .menu {
-      display: flex;
-      gap: 1.75rem;
-    }
-
-    .menu a {
-      text-decoration: none;
-      color: var(--text-light);
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: color 0.2s;
-      cursor: pointer;
-      padding: 0.25rem 0;
-    }
-
-    .menu a:hover {
-      color: var(--primary);
-    }
-
-    .menu a.active {
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .menu-toggle {
-      display: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text);
-      padding: 0.25rem;
-      background: none;
-      border: none;
-    }
-
-    /* ===== MENU MÓVIL ===== */
-    .mobile-menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modal-bg);
-      display: none;
-      z-index: 999;
-    }
-
-    .mobile-menu-overlay.show {
-      display: block;
-    }
-
-    .mobile-menu {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 280px;
-      height: 100%;
-      background: white;
-      display: flex;
-      flex-direction: column;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease;
-      z-index: 1000;
-      box-shadow: var(--shadow-lg);
-    }
-
-    .mobile-menu.show {
-      transform: translateX(0);
-    }
-
-    .mobile-menu-header {
-      padding: 1.5rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .mobile-menu-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--primary);
-    }
-
-    .mobile-close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text);
-      padding: 0.25rem;
-      line-height: 1;
-    }
-
-    .mobile-menu-items {
-      padding: 1rem 0;
-      flex: 1;
-    }
-
-    .mobile-menu-item {
-      display: block;
-      padding: 1rem 1.5rem;
-      text-decoration: none;
-      color: var(--text);
-      font-weight: 500;
-      font-size: 1rem;
-      border-left: 3px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .mobile-menu-item:hover {
-      background: var(--primary-light-2);
-      color: var(--primary);
-    }
-
-    .mobile-menu-item.active {
-      background: var(--primary-light-2);
-      color: var(--primary);
-      border-left-color: var(--primary);
-      font-weight: 600;
-    }
-
-    /* ===== SECCIONES ===== */
-    section {
-      max-width: 1100px;
-      margin: auto;
-      padding: 1.5rem 1.25rem;
-      min-height: calc(100vh - 68px);
-      display: none;
-      flex-direction: column;
-      animation: fadeIn 0.3s ease;
-    }
-
-    section.active {
-      display: flex;
-    }
-
-    h1 {
-      font-size: clamp(1.4rem, 4vw, 2rem);
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      color: var(--text);
-      letter-spacing: -0.5px;
-    }
-
-    /* ===== ESTADÍSTICAS ===== */
-    .stats-container {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .stat-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .stat-card.income {
-      border-top: 4px solid var(--income);
-    }
-
-    .stat-card.expense {
-      border-top: 4px solid var(--expense);
-    }
-
-    .stat-card.balance {
-      border-top: 4px solid var(--primary);
-    }
-
-    .stat-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .stat-label {
-      font-size: 0.9rem;
-      color: var(--text-light);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .stat-icon {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-
-    .stat-icon.income {
-      color: var(--income);
-    }
-
-    .stat-icon.expense {
-      color: var(--expense);
-    }
-
-    .stat-icon.balance {
-      color: var(--primary);
-    }
-
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .stat-value.income {
-      color: var(--income);
-    }
-
-    .stat-value.expense {
-      color: var(--expense);
-    }
-
-    .stat-value.balance {
-      color: var(--primary);
-    }
-
-    .stat-details {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 0.75rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .stat-period {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .stat-change {
-      font-size: 0.85rem;
-      font-weight: 500;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-    }
-
-    .stat-change.positive {
-      background: var(--income-light);
-      color: var(--income);
-    }
-
-    .stat-change.negative {
-      background: var(--expense-light);
-      color: var(--expense);
-    }
-
-    /* ===== LOADING ===== */
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modal-bg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1003;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-
-    .loading-overlay.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 3px solid var(--primary-light);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    /* ===== CONTROLES DE TABLA ===== */
-    .table-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      align-items: center;
-      justify-content: space-between;
-      animation: fadeIn 0.4s ease;
-    }
-
-    .table-header {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-      width: 100%;
-      margin-bottom: 1.5rem;
-    }
-
-    .search-container {
-      flex: 1;
-      min-width: 200px;
-      position: relative;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.875rem;
-      background: white;
-      transition: all 0.3s;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-light);
-    }
-
-    .filter-container {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .filter-select {
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.875rem;
-      background: white;
-      color: var(--text);
-      transition: all 0.3s;
-      min-width: 150px;
-    }
-
-    .filter-select:focus {
-      border-color: var(--primary);
-      outline: none;
-    }
-
-    .clear-filters-btn {
-      padding: 0.75rem 1.25rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text-light);
-      cursor: pointer;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .clear-filters-btn:hover {
-      background: var(--hover-bg);
-      border-color: var(--text-light);
-      color: var(--text);
-    }
-
-    /* ===== BOTÓN PRINCIPAL ===== */
-    .primary-btn {
-      padding: 0.75rem 1.5rem;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 500;
-      font-size: 0.875rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .primary-btn:hover {
-      background: var(--primary-dark);
-    }
-
-    /* ===== TABLA RESPONSIVA ===== */
-    .table-wrapper {
-      width: 100%;
-      overflow-x: auto;
-      background: white;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      margin-bottom: 1.5rem;
-      animation: fadeIn 0.5s ease;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 700px;
-    }
-
-    .desktop-table {
-      display: table;
-    }
-
-    .mobile-table {
-      display: none;
-    }
-
-    th {
-      padding: 1rem;
-      text-align: left;
-      font-weight: 600;
-      color: var(--text-light);
-      background: white;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    td {
-      padding: 1rem;
-      text-align: left;
-      color: var(--text);
-      border-bottom: 1px solid var(--border);
-      font-size: 0.875rem;
-      transition: background-color 0.3s;
-    }
-
-    tr:hover td {
-      background: var(--hover-bg);
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* ===== ESTILOS PARA MÓVIL ===== */
-    .mobile-table {
-      display: none;
-      width: 100%;
-    }
-
-    .mobile-row {
-      background: white;
-      border-bottom: 1px solid var(--border);
-      padding: 1rem;
-    }
-
-    .mobile-row-content {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .mobile-row-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 0.5rem;
-    }
-
-    .mobile-row-title {
-      font-weight: 600;
-      color: var(--text);
-      font-size: 0.9rem;
-      flex: 1;
-    }
-
-    .mobile-row-details {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .mobile-detail-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
-    }
-
-    .mobile-detail-item:not(:last-child) {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .mobile-detail-label {
-      color: var(--text-light);
-      font-weight: 500;
-      font-size: 0.8rem;
-      min-width: 80px;
-    }
-
-    .mobile-detail-value {
-      color: var(--text);
-      font-size: 0.85rem;
-      text-align: right;
-      flex: 1;
-    }
-
-    /* ===== COLUMNA ACCIONES ===== */
-    .actions-desktop {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .action-btn {
-      padding: 0.5rem 1rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text);
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: all 0.3s;
-      font-weight: 500;
-    }
-
-    .action-btn:hover {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    .action-btn.danger {
-      border-color: var(--expense);
-      color: var(--expense);
-    }
-
-    .action-btn.danger:hover {
-      background: var(--expense);
-      color: white;
-    }
-
-    .mobile-actions-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: var(--text-light);
-      padding: 0.5rem;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-      margin-left: 0.5rem;
-      flex-shrink: 0;
-    }
-
-    .mobile-actions-btn:hover {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    /* ===== DETALLE MODAL ===== */
-    .detail-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modal-bg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-      z-index: 1004;
-      padding: 1rem;
-    }
-
-    .detail-modal.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .detail-modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      width: 100%;
-      max-width: 500px;
-      max-height: 85vh;
-      overflow-y: auto;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .detail-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .detail-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text);
-      margin: 0;
-      line-height: 1.3;
-    }
-
-    .detail-id {
-      color: var(--text-light);
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-top: 0.25rem;
-    }
-
-    .close-detail-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text-light);
-      padding: 0.25rem;
-      transition: color 0.3s;
-      line-height: 1;
-    }
-
-    .close-detail-btn:hover {
-      color: var(--primary);
-    }
-
-    .detail-info {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-
-    .detail-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .detail-label {
-      color: var(--text-light);
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .detail-value {
-      color: var(--text);
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-
-    .detail-amount {
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
-    .detail-amount.income {
-      color: var(--income);
-    }
-
-    .detail-amount.expense {
-      color: var(--expense);
-    }
-
-    .detail-type {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-top: 0.25rem;
-    }
-
-    /* ===== MODAL DE FORMULARIO CORREGIDO ===== */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modal-bg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-      z-index: 1001;
-      padding: 1rem;
-    }
-
-    .modal.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      width: 100%;
-      max-width: 450px;
-      max-height: 90vh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      /* CORREGIDO: Previene scroll horizontal */
-      animation: fadeIn 0.3s ease;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .modal-content h2 {
-      margin-bottom: 1.5rem;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .form-input,
-    .form-textarea,
-    .form-select {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.875rem;
-      transition: all 0.3s;
-      box-sizing: border-box;
-      /* CORREGIDO: Asegura tamaño consistente */
-    }
-
-    .form-input:focus,
-    .form-textarea:focus,
-    .form-select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-light);
-    }
-
-    .form-textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    /* BOTONES DE TIPO - CORREGIDOS */
-    .type-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .type-button {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      padding: 1rem;
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-      background: white;
-      min-width: 0;
-      /* CORREGIDO: Previene desbordamiento */
-    }
-
-    .type-button:hover {
-      border-color: var(--primary);
-    }
-
-    .type-button.selected {
-      border-color: var(--primary);
-      background: var(--primary-light-2);
-    }
-
-    .type-button.income.selected {
-      border-color: var(--income);
-    }
-
-    .type-button.expense.selected {
-      border-color: var(--expense);
-    }
-
-    .type-button input {
-      display: none;
-    }
-
-    .type-icon {
-      font-size: 1.5rem;
-      font-weight: 600;
-      flex-shrink: 0;
-      /* CORREGIDO: Previene compresión */
-    }
-
-    .type-icon.income {
-      color: var(--income);
-    }
-
-    .type-icon.expense {
-      color: var(--expense);
-    }
-
-    .type-label {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text);
-      white-space: nowrap;
-      /* CORREGIDO: Previene salto de línea */
-    }
-
-    /* FILA DE FORMULARIO - CORREGIDA */
-    .form-row {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .form-row .form-group {
-      flex: 1;
-      min-width: 0;
-      /* CORREGIDO: Permite que los campos se ajusten */
-    }
-
-    /* CORREGIDO: Campos de fecha y monto del mismo tamaño */
-    .form-row .form-input {
-      width: 100%;
-    }
-
-    /* CORREGIDO: Campo de fecha específico */
-    input[type="date"].form-input {
-      appearance: none;
-      -webkit-appearance: none;
-      min-height: 44px;
-      /* Tamaño táctil mínimo */
-    }
-
-    /* CORREGIDO: Campo de número específico */
-    input[type="number"].form-input {
-      min-height: 44px;
-      /* Tamaño táctil mínimo */
-    }
-
-    /* CORREGIDO: Select específico */
-    .form-select {
-      min-height: 44px;
-      /* Tamaño táctil mínimo */
-      appearance: none;
-      -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 1rem center;
-      background-size: 12px;
-      padding-right: 2.5rem;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
-    }
-
-    /* ===== PAGINACIÓN ===== */
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .page-btn {
-      padding: 0.5rem 0.75rem;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text);
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.3s;
-      min-width: 36px;
-      text-align: center;
-    }
-
-    .page-btn:hover {
-      background: var(--primary-light);
-      border-color: var(--primary);
-    }
-
-    .page-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    .page-btn.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .page-btn.disabled:hover {
-      background: white;
-      border-color: var(--border);
-    }
-
-    .page-info {
-      color: var(--text-light);
-      font-size: 0.85rem;
-      margin: 0 0.5rem;
-    }
-
-    /* ===== MENÚ DE ACCIONES PARA MÓVIL ===== */
-    .mobile-actions-menu {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modal-bg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-      z-index: 1002;
-      padding: 1rem;
-    }
-
-    .mobile-actions-menu.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .mobile-actions-content {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      width: 100%;
-      max-width: 280px;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .mobile-action-item {
-      padding: 1rem 0;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      font-size: 0.875rem;
-      color: var(--text);
-      transition: all 0.3s;
-    }
-
-    .mobile-action-item:not(:last-child) {
-      border-bottom: 1px solid var(--border);
-    }
-
-    .mobile-action-item:hover {
-      color: var(--primary);
-    }
-
-    .mobile-action-item.danger:hover {
-      color: var(--expense);
-    }
-
-    .action-label {
-      font-weight: 500;
-      flex: 1;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (min-width: 769px) {
-      .desktop-table {
-        display: table;
-      }
-
-      .mobile-table {
-        display: none !important;
-      }
-
-      .actions-mobile {
-        display: none;
-      }
-    }
-
-    @media (max-width: 768px) {
-      body {
-        font-size: 13px;
-      }
-
-      .menu {
-        display: none;
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      section {
-        padding: 1.25rem 1rem;
-      }
-
-      h1 {
-        font-size: 1.3rem;
-        margin-bottom: 1rem;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .table-controls {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.75rem;
-      }
-
-      .table-header {
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-
-      .search-container {
-        width: 100%;
-      }
-
-      .filter-container {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .filter-select {
-        flex: 1;
-        min-width: 0;
-        font-size: 0.8rem;
-      }
-
-      .clear-filters-btn {
-        padding: 0.75rem 1rem;
-        font-size: 0.8rem;
-      }
-
-      .primary-btn {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .desktop-table {
-        display: none !important;
-      }
-
-      .mobile-table {
-        display: block;
-      }
-
-      .mobile-row {
-        margin-bottom: 0.5rem;
-        border-radius: 6px;
-        padding: 1rem;
-      }
-
-      .mobile-row:last-child {
-        margin-bottom: 0;
-      }
-
-      .mobile-detail-label {
-        min-width: 70px;
-        font-size: 0.75rem;
-      }
-
-      .mobile-detail-value {
-        font-size: 0.75rem;
-      }
-
-      .mobile-row-title {
-        font-size: 0.8rem;
-      }
-
-      .detail-modal-content {
-        padding: 1.5rem;
-        max-height: 80vh;
-      }
-
-      .detail-title {
-        font-size: 1.2rem;
-      }
-
-      .detail-value {
-        font-size: 0.9rem;
-      }
-
-      /* CORREGIDO: Formulario móvil */
-      .form-row {
-        flex-direction: column;
-        gap: 0;
-      }
-
-      .modal-content {
-        padding: 1.5rem;
-        max-height: 85vh;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .type-buttons {
-        flex-direction: row;
-      }
-
-      .type-button {
-        padding: 0.75rem 0.5rem;
-        min-height: 44px;
-      }
-
-      .type-icon {
-        font-size: 1.25rem;
-      }
-
-      .type-label {
-        font-size: 0.8rem;
-      }
-
-      /* CORREGIDO: Todos los campos del mismo tamaño en móvil */
-      .form-input,
-      .form-select,
-      input[type="date"],
-      input[type="number"] {
-        min-height: 44px;
-        font-size: 16px;
-        /* Previene zoom en iOS */
-        width: 100%;
-      }
-
-      .pagination {
-        gap: 0.25rem;
-      }
-
-      .page-btn {
-        padding: 0.4rem 0.6rem;
-        min-width: 32px;
-        font-size: 0.8rem;
-      }
-
-      .page-info {
-        font-size: 0.8rem;
-      }
-
-      .notification-container {
-        top: 70px;
-        right: 10px;
-        max-width: 300px;
-      }
-
-      .notification {
-        padding: 12px;
-        font-size: 0.85rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      body {
-        font-size: 12px;
-      }
-
-      .nav {
-        padding: 0.75rem 1rem;
-      }
-
-      .logo {
-        font-size: 1.1rem;
-      }
-
-      h1 {
-        font-size: 1.2rem;
-      }
-
-      .mobile-menu {
-        width: 100%;
-      }
-
-      .mobile-row {
-        padding: 0.875rem;
-      }
-
-      .mobile-detail-label {
-        min-width: 60px;
-        font-size: 0.7rem;
-      }
-
-      .mobile-detail-value {
-        font-size: 0.7rem;
-      }
-
-      .mobile-row-title {
-        font-size: 0.75rem;
-      }
-
-      .type-buttons {
-        flex-direction: row;
-      }
-
-      .type-button {
-        padding: 0.75rem 0.25rem;
-      }
-
-      .type-icon {
-        font-size: 1.1rem;
-      }
-
-      .type-label {
-        font-size: 0.75rem;
-      }
-
-      .mobile-actions-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 1rem;
-        padding: 0.25rem;
-      }
-
-      .page-btn {
-        padding: 0.35rem 0.5rem;
-        min-width: 28px;
-        font-size: 0.75rem;
-      }
-
-      .detail-modal-content {
-        padding: 1.25rem;
-        max-height: 75vh;
-      }
-
-      .modal-content {
-        padding: 1.25rem;
-        max-height: 80vh;
-      }
-
-      /* CORREGIDO: Campos aún más pequeños en móvil */
-      .form-input,
-      .form-select {
-        padding: 0.5rem 0.75rem;
-        min-height: 40px;
-      }
-
-      .notification-container {
-        max-width: 280px;
-      }
-
-      .notification {
-        padding: 10px;
-      }
-
-      .notification-title {
-        font-size: 0.9rem;
-      }
-
-      .notification-message {
-        font-size: 0.8rem;
-      }
-    }
-
-    @media (max-width: 360px) {
-      body {
-        font-size: 11px;
-      }
-
-      .mobile-detail-label {
-        min-width: 50px;
-      }
-
-      .type-buttons {
-        flex-direction: column;
-      }
-
-      .type-button {
-        width: 100%;
-      }
-
-      .notification-container {
-        max-width: 250px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Produccion EYP</title>
+    <style>
+        :root {
+            --charcoal: #2c3e50;
+            --blanco: #ffffff;
+            --verde-claro: #e8f5e9;
+            --verde-texto: #2e7d32;
+            --celeste-claro: #e3f2fd;
+            --celeste-texto: #1565c0;
+            --gris-fondo: #f8f9fa;
+            --gris-borde: #dddddd;
+            --rojo-claro: #ffebee;
+            --rojo-texto: #c62828;
+            --amarillo-claro: #fff9c4;
+            --amarillo-texto: #fbc02d;
+            --gris-oscuro: #34495e;
+            --azul-claro: #e1f5fe;
+            --azul-texto: #0277bd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--blanco);
+            color: var(--charcoal);
+        }
+
+        /* Notificaciones */
+        .notificacion {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
+            max-width: 350px;
+            border: none;
+        }
+
+        .notificacion.exito {
+            background: var(--verde-texto);
+        }
+
+        .notificacion.error {
+            background: var(--rojo-texto);
+        }
+
+        .notificacion.advertencia {
+            background: var(--amarillo-texto);
+            color: var(--charcoal);
+        }
+
+        .notificacion.info {
+            background: var(--azul-texto);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Login */
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            border: 1px solid var(--gris-borde);
+            background: var(--gris-fondo);
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            border-left: none;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid var(--gris-borde);
+            box-sizing: border-box;
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background: var(--charcoal);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .login-container button:hover {
+            opacity: 0.9;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .login-footer a {
+            color: var(--celeste-texto);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Header con usuario */
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--gris-borde);
+        }
+
+        .user-info {
+            font-size: 14px;
+        }
+
+        .user-info strong {
+            color: var(--celeste-texto);
+        }
+
+        .sync-status {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: var(--gris-fondo);
+            border: 1px solid var(--gris-borde);
+            margin-left: 10px;
+        }
+
+        .sync-status.online {
+            background: var(--verde-claro);
+            color: var(--verde-texto);
+            border-color: var(--verde-texto);
+        }
+
+        .sync-status.offline {
+            background: var(--rojo-claro);
+            color: var(--rojo-texto);
+            border-color: var(--rojo-texto);
+        }
+
+        .logout-btn {
+            padding: 8px 15px;
+            background: var(--rojo-claro);
+            color: var(--rojo-texto);
+            border: 1px solid var(--rojo-texto);
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: var(--rojo-texto);
+            color: white;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--gris-borde);
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            cursor: pointer;
+            background: var(--gris-fondo);
+            border: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            color: var(--charcoal);
+        }
+
+        .tab-btn:hover {
+            background: var(--celeste-claro);
+        }
+
+        .tab-btn.active {
+            background: var(--charcoal);
+            color: var(--blanco);
+        }
+
+        .tab-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        h2 {
+            text-align: left;
+            color: var(--charcoal);
+            text-transform: uppercase;
+            font-weight: 300;
+            letter-spacing: 1px;
+            border-left: 5px solid var(--verde-texto);
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+
+        .top-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: 1px solid var(--gris-borde);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .btn-add {
+            background: var(--verde-claro);
+            color: var(--verde-texto);
+            border-color: var(--verde-texto);
+        }
+
+        .btn-group {
+            background: var(--charcoal);
+            color: var(--blanco);
+            border-color: var(--charcoal);
+        }
+
+        .btn-export {
+            background: var(--gris-fondo);
+            color: var(--charcoal);
+            border-color: var(--charcoal);
+        }
+
+        .btn-admin {
+            background: var(--celeste-claro);
+            color: var(--celeste-texto);
+            border-color: var(--celeste-texto);
+        }
+
+        .btn-bitacora {
+            background: var(--azul-claro);
+            color: var(--azul-texto);
+            border-color: var(--azul-texto);
+        }
+
+        /* Tablas */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            background: white;
+            margin-top: 10px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--charcoal);
+            color: white;
+            padding: 12px 10px;
+            font-size: 10px;
+            text-align: left;
+            border-bottom: 2px solid var(--gris-borde);
+            white-space: nowrap;
+            font-weight: normal;
+        }
+
+        td {
+            padding: 10px;
+            font-size: 12px;
+            border-bottom: 1px solid var(--gris-borde);
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background-color: var(--celeste-claro);
+        }
+
+        .btn-action {
+            width: 65px;
+            padding: 5px 0;
+            text-align: center;
+            margin: 2px;
+        }
+
+        .btn-view {
+            background: var(--gris-fondo);
+            color: var(--charcoal);
+            border: 1px solid var(--charcoal);
+        }
+
+        .btn-edit {
+            background: var(--celeste-claro);
+            color: var(--celeste-texto);
+            border: 1px solid var(--celeste-texto);
+        }
+
+        .btn-delete {
+            background: var(--rojo-claro);
+            color: var(--rojo-texto);
+            border: 1px solid var(--rojo-texto);
+        }
+
+        /* Formulario */
+        .form-container {
+            display: none;
+            background: var(--gris-fondo);
+            padding: 20px;
+            border: 1px solid var(--gris-borde);
+            margin-bottom: 20px;
+        }
+
+        .grid-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            font-size: 10px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 3px;
+            color: var(--charcoal);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--gris-borde);
+            box-sizing: border-box;
+            font-size: 12px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-group input.autocompletado {
+            border-left: 4px solid var(--verde-texto);
+            background-color: var(--verde-claro);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: 1px solid var(--celeste-texto);
+        }
+
+        /* Sugerencias */
+        .sugerencias {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--gris-borde);
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .sugerencias div {
+            padding: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            border-bottom: 1px solid var(--gris-borde);
+        }
+
+        .sugerencias div:hover {
+            background: var(--celeste-claro);
+        }
+
+        /* Card de Grupo Histórico */
+        .group-card {
+            border: 1px solid var(--gris-borde);
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gris-borde);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .group-code {
+            font-weight: bold;
+            color: var(--celeste-texto);
+            font-size: 16px;
+        }
+
+        .group-creador {
+            font-size: 11px;
+            color: var(--gris-oscuro);
+            margin-left: 10px;
+        }
+
+        .group-observaciones {
+            font-size: 12px;
+            color: var(--gris-oscuro);
+            background: var(--gris-fondo);
+            padding: 8px;
+            margin-top: 10px;
+            border-left: 3px solid var(--azul-texto);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--gris-borde);
+        }
+
+        .modal-lg {
+            max-width: 1400px;
+            width: 95%;
+        }
+
+        /* Estilos para edición de registros */
+        .edit-registros-container {
+            max-height: 600px;
+            overflow-y: auto;
+            margin: 15px 0;
+            border: 1px solid var(--gris-borde);
+            background: white;
+        }
+
+        .edit-registros-tabla {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+
+        .edit-registros-tabla th {
+            background: var(--charcoal);
+            color: white;
+            padding: 10px 5px;
+            text-align: left;
+            font-weight: normal;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .edit-registros-tabla td {
+            padding: 8px 5px;
+            border-bottom: 1px solid var(--gris-borde);
+            vertical-align: middle;
+        }
+
+        .edit-registros-tabla input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid var(--gris-borde);
+            box-sizing: border-box;
+            font-size: 11px;
+        }
+
+        .edit-registros-tabla input:focus {
+            outline: 1px solid var(--celeste-texto);
+        }
+
+        .btn-eliminar-registro {
+            background: var(--rojo-claro);
+            color: var(--rojo-texto);
+            border: 1px solid var(--rojo-texto);
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-eliminar-registro:hover {
+            background: var(--rojo-texto);
+            color: white;
+        }
+
+        .btn-agregar-registro {
+            background: var(--verde-claro);
+            color: var(--verde-texto);
+            border: 1px solid var(--verde-texto);
+            padding: 10px 15px;
+            margin-top: 10px;
+            width: 100%;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-agregar-registro:hover {
+            background: var(--verde-texto);
+            color: white;
+        }
+
+        /* Tabla de detalles */
+        .detalle-tabla-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid var(--gris-borde);
+        }
+
+        .detalle-tabla-container table {
+            font-size: 11px;
+        }
+
+        .detalle-tabla-container th {
+            position: sticky;
+            top: 0;
+            background: var(--charcoal);
+            color: white;
+            z-index: 10;
+            padding: 12px 8px;
+            font-weight: normal;
+        }
+
+        /* Tabla de usuarios */
+        .usuarios-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .usuarios-table th {
+            background: var(--charcoal);
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: normal;
+        }
+
+        .usuarios-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--gris-borde);
+        }
+
+        .permiso-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 10px;
+            margin: 2px;
+        }
+
+        .permiso-activo {
+            background: var(--verde-claro);
+            color: var(--verde-texto);
+            border: 1px solid var(--verde-texto);
+        }
+
+        .permiso-inactivo {
+            background: var(--gris-fondo);
+            color: var(--gris-oscuro);
+            border: 1px solid var(--gris-borde);
+        }
+
+        /* Tabla de bitácora */
+        .bitacora-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .bitacora-table th {
+            background: var(--charcoal);
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: normal;
+        }
+
+        .bitacora-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--gris-borde);
+        }
+
+        .bitacora-filtros {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .bitacora-filtros input,
+        .bitacora-filtros select {
+            padding: 8px;
+            border: 1px solid var(--gris-borde);
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .tipo-info {
+            color: var(--azul-texto);
+            font-weight: bold;
+        }
+
+        .tipo-seguridad {
+            color: var(--rojo-texto);
+            font-weight: bold;
+        }
+
+        .tipo-administrativo {
+            color: var(--celeste-texto);
+            font-weight: bold;
+        }
+
+        .tipo-grupo {
+            color: var(--verde-texto);
+            font-weight: bold;
+        }
+
+        .tipo-datos {
+            color: var(--amarillo-texto);
+            font-weight: bold;
+        }
+    </style>
 </head>
 
 <body>
 
-  <header>
-    <nav class="nav">
-      <div class="logo">Finance Pro</div>
-      <div class="menu">
-        <a onclick="showSection('inicio')" class="active">Inicio</a>
-        <a onclick="showSection('transacciones')">Transacciones</a>
-        <a onclick="showSection('estadisticas')">Estadísticas</a>
-      </div>
-      <button class="menu-toggle" onclick="toggleMobileMenu()">☰</button>
-    </nav>
-  </header>
+    <div id="notificacionContainer"></div>
+    <div id="app"></div>
 
-  <!-- NOTIFICACIONES -->
-  <div class="notification-container" id="notificationContainer"></div>
+    <!-- Incluir la base de datos -->
+    <script src="database.js" type="module"></script>
 
-  <!-- MENU MÓVIL -->
-  <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
-  <div class="mobile-menu" id="mobileMenu">
-    <div class="mobile-menu-header">
-      <div class="mobile-menu-title">Finance Pro</div>
-      <button class="mobile-close-btn" onclick="closeMobileMenu()">×</button>
-    </div>
-    <div class="mobile-menu-items">
-      <a class="mobile-menu-item active" onclick="showSectionAndClose('inicio')">Inicio</a>
-      <a class="mobile-menu-item" onclick="showSectionAndClose('transacciones')">Transacciones</a>
-      <a class="mobile-menu-item" onclick="showSectionAndClose('estadisticas')">Estadísticas</a>
-    </div>
-  </div>
+    <script type="module">
+        import { db as firebaseDb } from './firebase-config.js';
 
-  <!-- SECCIONES -->
-  <section id="inicio" class="active">
-    <h1>Bienvenido a Finance Pro</h1>
-    <p style="text-align: center; color: var(--text-light); max-width: 600px; font-size: 0.95rem; margin: 0 auto;">
-      Sistema profesional de gestión y control de finanzas personales
-    </p>
-  </section>
+        // Estado de la aplicación
+        let datosDiarios = JSON.parse(localStorage.getItem("eyp_diario")) || [];
 
-  <section id="transacciones">
-    <h1>Transacciones Financieras</h1>
+        // Variables para autocompletado
+        let timeoutId;
+        let currentEditMode = false;
 
-    <div class="table-header">
-      <div class="search-container">
-        <input type="text" class="search-input" placeholder="Buscar transacciones..." id="searchInput"
-          oninput="filterTable()">
-      </div>
+        // Función para mostrar notificaciones
+        window.mostrarNotificacion = function (mensaje, tipo = 'exito') {
+            const container = document.getElementById('notificacionContainer');
+            const notificacion = document.createElement('div');
+            notificacion.className = `notificacion ${tipo}`;
+            notificacion.textContent = mensaje;
 
-      <div class="filter-container">
-        <select class="filter-select" id="filterType" onchange="filterTable()">
-          <option value="">Todos los tipos</option>
-          <option value="ingreso">Ingresos</option>
-          <option value="salida">Salidas</option>
-        </select>
+            container.appendChild(notificacion);
 
-        <select class="filter-select" id="filterCategory" onchange="filterTable()">
-          <option value="">Todas las categorías</option>
-          <option value="alimentacion">Alimentación</option>
-          <option value="transporte">Transporte</option>
-          <option value="entretenimiento">Entretenimiento</option>
-          <option value="salario">Salario</option>
-          <option value="servicios">Servicios</option>
-        </select>
+            setTimeout(() => {
+                notificacion.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    container.removeChild(notificacion);
+                }, 300);
+            }, 3000);
+        };
 
-        <button class="clear-filters-btn" onclick="clearFilters()">
-          <span>×</span> Limpiar
-        </button>
-      </div>
-
-      <button class="primary-btn" onclick="openModal()">
-        <span>+</span> Ingresar Movimiento
-      </button>
-    </div>
-
-    <!-- Tabla para escritorio -->
-    <div class="table-wrapper">
-      <table class="desktop-table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Categoría</th>
-            <th>Observación</th>
-            <th>Monto</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <!-- Los datos se cargan dinámicamente -->
-        </tbody>
-      </table>
-
-      <!-- Tabla para móvil -->
-      <div class="mobile-table" id="mobileTable">
-        <!-- Los datos móviles se cargan dinámicamente -->
-      </div>
-    </div>
-
-    <!-- Paginación -->
-    <div class="pagination" id="pagination">
-      <!-- La paginación se genera dinámicamente -->
-    </div>
-  </section>
-
-  <section id="estadisticas">
-    <h1>Estadísticas Financieras</h1>
-
-    <!-- Estadísticas -->
-    <div class="stats-container" id="statsContainer">
-      <!-- Se generará dinámicamente -->
-    </div>
-  </section>
-
-  <!-- LOADING OVERLAY -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-spinner"></div>
-  </div>
-
-  <!-- MODAL FORMULARIO CORREGIDO -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <h2 id="modalTitle">Ingresar Movimiento</h2>
-
-      <div class="form-group">
-        <label class="form-label">Tipo *</label>
-        <div class="type-buttons" id="typeSelector">
-          <div class="type-button income" onclick="selectType('ingreso')">
-            <div class="type-icon income">+</div>
-            <div class="type-label">Ingreso</div>
-          </div>
-          <div class="type-button expense" onclick="selectType('salida')">
-            <div class="type-icon expense">−</div>
-            <div class="type-label">Salida</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Categoría *</label>
-        <select class="form-select" id="transactionCategory">
-          <option value="alimentacion">Alimentación</option>
-          <option value="transporte">Transporte</option>
-          <option value="entretenimiento">Entretenimiento</option>
-          <option value="salario">Salario</option>
-          <option value="inversiones">Inversiones</option>
-          <option value="servicios">Servicios</option>
-          <option value="salud">Salud</option>
-          <option value="educacion">Educación</option>
-          <option value="otros">Otros</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Observación</label>
-        <textarea class="form-textarea" id="transactionObservation"
-          placeholder="Descripción de la transacción..."></textarea>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Monto *</label>
-          <input type="number" class="form-input" id="transactionAmount" placeholder="0.00" step="0.01" min="0.01">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Fecha *</label>
-          <input type="date" class="form-input" id="transactionDate">
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="action-btn" onclick="closeModal()">Cancelar</button>
-        <button type="button" class="primary-btn" onclick="saveTransaction()" id="saveTransactionBtn">
-          <span id="saveBtnText">Guardar Movimiento</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE DETALLE -->
-  <div class="detail-modal" id="detailModal">
-    <div class="detail-modal-content">
-      <div class="detail-header">
-        <div>
-          <h3 class="detail-title" id="detailTitle">Detalle de Transacción</h3>
-          <div class="detail-id">Fecha: <span id="detailDate">-</span></div>
-        </div>
-        <button class="close-detail-btn" onclick="closeDetailModal()">×</button>
-      </div>
-
-      <div class="detail-info">
-        <div class="detail-item">
-          <div class="detail-label">TIPO</div>
-          <div class="detail-value">
-            <span id="detailType" class="detail-type">-</span>
-          </div>
-        </div>
-
-        <div class="detail-item">
-          <div class="detail-label">CATEGORÍA</div>
-          <div class="detail-value" id="detailCategory">-</div>
-        </div>
-
-        <div class="detail-item">
-          <div class="detail-label">OBSERVACIÓN</div>
-          <div class="detail-value" id="detailObservation">-</div>
-        </div>
-
-        <div class="detail-item">
-          <div class="detail-label">MONTO</div>
-          <div class="detail-value">
-            <span id="detailAmount" class="detail-amount">-</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MENÚ DE ACCIONES PARA MÓVIL -->
-  <div class="mobile-actions-menu" id="mobileActionsMenu">
-    <div class="mobile-actions-content">
-      <h3 style="margin-bottom: 1rem; font-size: 0.95rem; font-weight: 600; color: var(--text);">Acciones</h3>
-      <div class="mobile-action-item" onclick="viewDetailAction()">
-        <span class="action-label">Ver detalle</span>
-      </div>
-      <div class="mobile-action-item" onclick="editAction()">
-        <span class="action-label">Editar</span>
-      </div>
-      <div class="mobile-action-item danger" onclick="deleteAction()">
-        <span class="action-label">Eliminar</span>
-      </div>
-      <div class="mobile-action-item" onclick="closeMobileActions()" style="color: var(--text-light);">
-        <span class="action-label">Cancelar</span>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ===== Variables globales =====
-    let currentItemId = null;
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    let allData = [];
-    let filteredData = [];
-    let isEditing = false;
-    let currentTransactionType = 'ingreso';
-
-    // ===== Datos de ejemplo =====
-    const sampleData = [
-      {
-        id: 1,
-        date: "2024-01-15",
-        type: "ingreso",
-        category: "salario",
-        observation: "Salario mensual",
-        amount: 2500.00
-      },
-      {
-        id: 2,
-        date: "2024-01-16",
-        type: "salida",
-        category: "alimentacion",
-        observation: "Compra supermercado",
-        amount: 150.75
-      },
-      {
-        id: 3,
-        date: "2024-01-17",
-        type: "salida",
-        category: "transporte",
-        observation: "Gasolina del mes",
-        amount: 80.50
-      },
-      {
-        id: 4,
-        date: "2024-01-18",
-        type: "ingreso",
-        category: "inversiones",
-        observation: "Dividendos",
-        amount: 120.00
-      },
-      {
-        id: 5,
-        date: "2024-01-19",
-        type: "salida",
-        category: "servicios",
-        observation: "Pago de luz",
-        amount: 45.30
-      },
-      {
-        id: 6,
-        date: "2024-01-20",
-        type: "salida",
-        category: "entretenimiento",
-        observation: "Cena restaurante",
-        amount: 65.00
-      },
-      {
-        id: 7,
-        date: "2024-01-21",
-        type: "ingreso",
-        category: "otros",
-        observation: "Venta de artículos usados",
-        amount: 200.00
-      },
-      {
-        id: 8,
-        date: "2024-01-22",
-        type: "salida",
-        category: "salud",
-        observation: "Consulta médica",
-        amount: 75.00
-      }
-    ];
-
-    // ===== Notificaciones =====
-    function showNotification(type, title, message, duration = 4000) {
-      const container = document.getElementById('notificationContainer');
-      const notification = document.createElement('div');
-      notification.className = `notification ${type}`;
-
-      const icons = {
-        'success': '✓',
-        'error': '✕',
-        'warning': '⚠',
-        'info': 'ℹ'
-      };
-
-      notification.innerHTML = `
-      <div class="notification-icon">${icons[type] || 'ℹ'}</div>
-      <div class="notification-content">
-        <div class="notification-title">${title}</div>
-        <div class="notification-message">${message}</div>
-      </div>
-      <button class="notification-close" onclick="this.parentElement.remove()">×</button>
-    `;
-
-      container.appendChild(notification);
-
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.classList.add('hiding');
-          setTimeout(() => {
-            if (notification.parentNode) {
-              notification.remove();
+        // Función para confirmar acciones
+        function confirmarAccion(mensaje, callback) {
+            if (confirm(mensaje)) {
+                callback();
+                return true;
             }
-          }, 300);
+            return false;
         }
-      }, duration);
-    }
 
-    // ===== Inicialización =====
-    document.addEventListener('DOMContentLoaded', function () {
-      allData = [...sampleData];
-      filteredData = [...sampleData];
-      updateStats();
-      renderTable();
+        // Comandos de teclado
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'g') {
+                e.preventDefault();
+                if (currentEditMode) {
+                    guardarEdicionRegistros();
+                } else {
+                    guardar();
+                }
+            }
 
-      // Configurar fecha actual por defecto
-      document.getElementById('transactionDate').value = new Date().toISOString().split('T')[0];
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                if (currentEditMode) {
+                    agregarRegistroVacio();
+                } else {
+                    abrirFormulario();
+                }
+            }
 
-      // Inicializar selección de tipo
-      selectType('ingreso');
+            if (e.ctrlKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
+                e.preventDefault();
+                navegarEntreCampos(e.key === 'ArrowRight' ? 1 : -1);
+            }
+        });
 
-      // Mostrar mensaje de bienvenida
-      setTimeout(() => {
-        showNotification('success', 'Bienvenido', 'Finance Pro cargado correctamente');
-      }, 500);
-    });
+        function navegarEntreCampos(direccion) {
+            const inputs = document.querySelectorAll('#formulario input:not([readonly]), .edit-registros-tabla input:not([readonly])');
+            if (inputs.length === 0) return;
 
-    // ===== Loading =====
-    const loadingOverlay = document.getElementById('loadingOverlay');
+            let currentIndex = -1;
+            for (let i = 0; i < inputs.length; i++) {
+                if (document.activeElement === inputs[i]) {
+                    currentIndex = i;
+                    break;
+                }
+            }
 
-    function showLoading() {
-      loadingOverlay.classList.add('show');
-    }
-
-    function hideLoading() {
-      loadingOverlay.classList.remove('show');
-    }
-
-    function simulateLoad(callback) {
-      showLoading();
-      setTimeout(() => {
-        callback();
-        hideLoading();
-      }, 300);
-    }
-
-    // ===== Actualizar estadísticas =====
-    function updateStats() {
-      const statsContainer = document.getElementById('statsContainer');
-
-      const totalIncome = allData
-        .filter(item => item.type === 'ingreso')
-        .reduce((sum, item) => sum + item.amount, 0);
-
-      const totalExpense = allData
-        .filter(item => item.type === 'salida')
-        .reduce((sum, item) => sum + item.amount, 0);
-
-      const balance = totalIncome - totalExpense;
-
-      // Calcular cambio porcentual (ejemplo simplificado)
-      const incomeChange = "+12.5%";
-      const expenseChange = "-8.3%";
-      const balanceChange = balance >= 0 ? "+5.2%" : "-5.2%";
-
-      const currentMonth = new Date().toLocaleString('es-ES', { month: 'long' });
-      const formattedMonth = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
-
-      statsContainer.innerHTML = `
-      <div class="stats-grid">
-        <div class="stat-card income">
-          <div class="stat-header">
-            <div class="stat-label">TOTAL INGRESOS</div>
-            <div class="stat-icon income">+</div>
-          </div>
-          <div class="stat-value income">$${totalIncome.toFixed(2)}</div>
-          <div class="stat-details">
-            <div class="stat-period">${formattedMonth}</div>
-            <div class="stat-change positive">${incomeChange}</div>
-          </div>
-        </div>
-        
-        <div class="stat-card expense">
-          <div class="stat-header">
-            <div class="stat-label">TOTAL SALIDAS</div>
-            <div class="stat-icon expense">−</div>
-          </div>
-          <div class="stat-value expense">$${totalExpense.toFixed(2)}</div>
-          <div class="stat-details">
-            <div class="stat-period">${formattedMonth}</div>
-            <div class="stat-change negative">${expenseChange}</div>
-          </div>
-        </div>
-        
-        <div class="stat-card balance">
-          <div class="stat-header">
-            <div class="stat-label">BALANCE TOTAL</div>
-            <div class="stat-icon balance">⚖</div>
-          </div>
-          <div class="stat-value balance">$${balance.toFixed(2)}</div>
-          <div class="stat-details">
-            <div class="stat-period">${formattedMonth}</div>
-            <div class="stat-change ${balance >= 0 ? 'positive' : 'negative'}">${balanceChange}</div>
-          </div>
-        </div>
-      </div>
-    `;
-    }
-
-    // ===== Renderizar tabla =====
-    function renderTable() {
-      simulateLoad(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const currentData = filteredData.slice(startIndex, endIndex);
-
-        renderDesktopTable(currentData);
-        renderMobileTable(currentData);
-        renderPagination();
-      });
-    }
-
-    // ===== Renderizar tabla de escritorio =====
-    function renderDesktopTable(data) {
-      const tableBody = document.getElementById('tableBody');
-      tableBody.innerHTML = '';
-
-      data.forEach((item, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-        <td><strong>${formatDate(item.date)}</strong></td>
-        <td>
-          <span style="color: ${item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)'}; font-weight: 600;">
-            ${item.type === 'ingreso' ? 'Ingreso' : 'Salida'}
-          </span>
-        </td>
-        <td>
-          <span style="color: ${getCategoryColor(item.category)}; font-weight: 600;">
-            ${getCategoryText(item.category)}
-          </span>
-        </td>
-        <td>${item.observation}</td>
-        <td>
-          <strong style="color: ${item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)'};">
-            ${item.type === 'ingreso' ? '+' : '-'}$${item.amount.toFixed(2)}
-          </strong>
-        </td>
-        <td>
-          <div class="actions-desktop">
-            <button class="action-btn" onclick="openDetailModal(${item.id})">Ver</button>
-            <button class="action-btn" onclick="editItem(${item.id})">Editar</button>
-            <button class="action-btn danger" onclick="deleteItem(${item.id})">Eliminar</button>
-          </div>
-        </td>
-      `;
-        tableBody.appendChild(row);
-      });
-    }
-
-    // ===== Renderizar tabla móvil =====
-    function renderMobileTable(data) {
-      const mobileTable = document.getElementById('mobileTable');
-      mobileTable.innerHTML = '';
-
-      data.forEach((item, index) => {
-        const row = document.createElement('div');
-        row.className = 'mobile-row';
-        row.innerHTML = `
-        <div class="mobile-row-content">
-          <div class="mobile-row-header">
-            <div class="mobile-row-title">
-              <strong>${formatDate(item.date)}</strong>
-              <div style="margin-top: 0.25rem;">
-                <span style="color: ${item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)'}; font-weight: 600; font-size: 0.8rem;">
-                  ${item.type === 'ingreso' ? 'Ingreso' : 'Salida'}
-                </span>
-              </div>
-            </div>
-            <button class="mobile-actions-btn" onclick="event.stopPropagation(); openMobileActions(${item.id})">⋯</button>
-          </div>
-          <div class="mobile-row-details">
-            <div class="mobile-detail-item">
-              <span class="mobile-detail-label">Categoría:</span>
-              <span class="mobile-detail-value" style="color: ${getCategoryColor(item.category)}; font-weight: 600;">
-                ${getCategoryText(item.category)}
-              </span>
-            </div>
-            <div class="mobile-detail-item">
-              <span class="mobile-detail-label">Observación:</span>
-              <span class="mobile-detail-value">${item.observation}</span>
-            </div>
-            <div class="mobile-detail-item">
-              <span class="mobile-detail-label">Monto:</span>
-              <span class="mobile-detail-value" style="color: ${item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)'}; font-weight: 600;">
-                ${item.type === 'ingreso' ? '+' : '-'}$${item.amount.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
-      `;
-        mobileTable.appendChild(row);
-      });
-    }
-
-    // ===== Renderizar paginación =====
-    function renderPagination() {
-      const pagination = document.getElementById('pagination');
-      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-      if (totalPages <= 1) {
-        pagination.innerHTML = '';
-        return;
-      }
-
-      let paginationHTML = '';
-
-      paginationHTML += `
-      <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" 
-              onclick="changePage(${currentPage - 1})" 
-              ${currentPage === 1 ? 'disabled' : ''}>
-        ←
-      </button>
-    `;
-
-      const maxVisiblePages = window.innerWidth < 768 ? 3 : 5;
-      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-      if (endPage - startPage + 1 < maxVisiblePages) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        paginationHTML += `
-        <button class="page-btn ${i === currentPage ? 'active' : ''}" 
-                onclick="changePage(${i})">
-          ${i}
-        </button>
-      `;
-      }
-
-      paginationHTML += `
-      <button class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" 
-              onclick="changePage(${currentPage + 1})" 
-              ${currentPage === totalPages ? 'disabled' : ''}>
-        →
-      </button>
-    `;
-
-      paginationHTML += `
-      <div class="page-info">
-        ${((currentPage - 1) * itemsPerPage) + 1}-${Math.min(currentPage * itemsPerPage, filteredData.length)} de ${filteredData.length}
-      </div>
-    `;
-
-      pagination.innerHTML = paginationHTML;
-    }
-
-    // ===== Filtrar tabla =====
-    function filterTable() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const typeFilter = document.getElementById('filterType').value;
-      const categoryFilter = document.getElementById('filterCategory').value;
-
-      filteredData = allData.filter(item => {
-        const matchesSearch = item.observation.toLowerCase().includes(searchTerm) ||
-          getCategoryText(item.category).toLowerCase().includes(searchTerm);
-        const matchesType = !typeFilter || item.type === typeFilter;
-        const matchesCategory = !categoryFilter || item.category === categoryFilter;
-
-        return matchesSearch && matchesType && matchesCategory;
-      });
-
-      currentPage = 1;
-      renderTable();
-    }
-
-    // ===== Limpiar filtros =====
-    function clearFilters() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('filterType').value = '';
-      document.getElementById('filterCategory').value = '';
-
-      filteredData = [...allData];
-      currentPage = 1;
-      renderTable();
-      showNotification('info', 'Filtros limpiados', 'Se han restablecido todos los filtros');
-    }
-
-    // ===== Cambiar página =====
-    function changePage(page) {
-      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-      if (page >= 1 && page <= totalPages && page !== currentPage) {
-        currentPage = page;
-        renderTable();
-      }
-    }
-
-    // ===== Funciones auxiliares =====
-    function formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
-    }
-
-    function getCategoryText(category) {
-      const categoryMap = {
-        'alimentacion': 'Alimentación',
-        'transporte': 'Transporte',
-        'entretenimiento': 'Entretenimiento',
-        'salario': 'Salario',
-        'inversiones': 'Inversiones',
-        'servicios': 'Servicios',
-        'salud': 'Salud',
-        'educacion': 'Educación',
-        'otros': 'Otros'
-      };
-      return categoryMap[category] || category;
-    }
-
-    function getCategoryColor(category) {
-      const colors = {
-        'alimentacion': '#f59e0b',
-        'transporte': '#3b82f6',
-        'entretenimiento': '#8b5cf6',
-        'salario': '#10b981',
-        'inversiones': '#f59e0b',
-        'servicios': '#10b981',
-        'salud': '#ec4899',
-        'educacion': '#6366f1',
-        'otros': '#6b7280'
-      };
-      return colors[category] || '#6b7280';
-    }
-
-    // ===== Modal de Detalle =====
-    const detailModal = document.getElementById('detailModal');
-
-    function openDetailModal(id) {
-      const item = allData.find(i => i.id === id);
-      if (item) {
-        document.getElementById('detailDate').textContent = formatDate(item.date);
-        document.getElementById('detailTitle').textContent = item.observation;
-
-        const typeElement = document.getElementById('detailType');
-        typeElement.textContent = item.type === 'ingreso' ? 'Ingreso' : 'Salida';
-        typeElement.style.color = item.type === 'ingreso' ? 'var(--income)' : 'var(--expense)';
-
-        document.getElementById('detailCategory').textContent = getCategoryText(item.category);
-        document.getElementById('detailCategory').style.color = getCategoryColor(item.category);
-        document.getElementById('detailObservation').textContent = item.observation;
-
-        const amountElement = document.getElementById('detailAmount');
-        amountElement.textContent = `${item.type === 'ingreso' ? '+' : '-'}$${item.amount.toFixed(2)}`;
-        amountElement.className = `detail-amount ${item.type}`;
-
-        detailModal.classList.add('show');
-        document.body.style.overflow = 'hidden';
-      }
-    }
-
-    function closeDetailModal() {
-      detailModal.classList.remove('show');
-      document.body.style.overflow = '';
-    }
-
-    // ===== Modal de formulario =====
-    const modal = document.getElementById('modal');
-
-    function selectType(type) {
-      currentTransactionType = type;
-      const buttons = document.querySelectorAll('.type-button');
-      buttons.forEach(button => {
-        button.classList.remove('selected');
-      });
-
-      const selectedButton = document.querySelector(`.type-button.${type}`);
-      if (selectedButton) {
-        selectedButton.classList.add('selected');
-      }
-    }
-
-    function openModal(itemId = null) {
-      isEditing = itemId !== null;
-
-      const modalTitle = document.getElementById('modalTitle');
-      const saveBtnText = document.getElementById('saveBtnText');
-
-      if (isEditing && itemId) {
-        const item = allData.find(i => i.id === itemId);
-        if (item) {
-          currentItemId = itemId;
-          modalTitle.textContent = 'Editar Movimiento';
-          saveBtnText.textContent = 'Actualizar';
-          selectType(item.type);
-
-          document.getElementById('transactionCategory').value = item.category;
-          document.getElementById('transactionObservation').value = item.observation;
-          document.getElementById('transactionAmount').value = item.amount;
-          document.getElementById('transactionDate').value = item.date;
+            let newIndex = currentIndex + direccion;
+            if (newIndex >= 0 && newIndex < inputs.length) {
+                inputs[newIndex].focus();
+            }
         }
-      } else {
-        currentItemId = null;
-        modalTitle.textContent = 'Ingresar Movimiento';
-        saveBtnText.textContent = 'Guardar Movimiento';
 
-        document.getElementById('transactionCategory').value = 'alimentacion';
-        document.getElementById('transactionObservation').value = '';
-        document.getElementById('transactionAmount').value = '';
-        document.getElementById('transactionDate').value = new Date().toISOString().split('T')[0];
-      }
+        // Renderizar la aplicación según el estado de sesión
+        function renderizarApp() {
+            const app = document.getElementById('app');
 
-      modal.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
+            if (!db.haySesion()) {
+                mostrarLogin();
+            } else {
+                mostrarSistema();
+            }
+        }
 
-    function closeModal() {
-      modal.classList.remove('show');
-      document.body.style.overflow = '';
-      isEditing = false;
-    }
+        // Mostrar pantalla de login
+        function mostrarLogin() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="login-container">
+                    <h2>Sistema de Producción EYP</h2>
+                    <input type="text" id="login-username" placeholder="Usuario">
+                    <input type="password" id="login-password" placeholder="Contraseña">
+                    <button onclick="iniciarSesion()">Ingresar</button>
+                    <div class="login-footer">
+                        <a onclick="mostrarRecuperarPassword()">¿Olvidó su contraseña?</a>
+                    </div>
+                </div>
+            `;
+        }
 
-    function saveTransaction() {
-      const category = document.getElementById('transactionCategory').value;
-      const observation = document.getElementById('transactionObservation').value.trim();
-      const amount = parseFloat(document.getElementById('transactionAmount').value);
-      const date = document.getElementById('transactionDate').value;
+        // Iniciar sesión
+        window.iniciarSesion = async function () {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
 
-      if (!amount || amount <= 0) {
-        showNotification('error', 'Error', 'El monto debe ser mayor a 0');
-        return;
-      }
+            const resultado = await db.login(username, password);
 
-      if (!date) {
-        showNotification('error', 'Error', 'La fecha es obligatoria');
-        return;
-      }
+            if (resultado.success) {
+                mostrarNotificacion('Bienvenido ' + resultado.usuario.nombre, 'exito');
+                renderizarApp();
+            } else {
+                mostrarNotificacion(resultado.message, 'error');
+            }
+        };
 
-      simulateLoad(() => {
-        if (isEditing && currentItemId) {
-          const index = allData.findIndex(i => i.id === currentItemId);
-          if (index !== -1) {
-            allData[index] = {
-              ...allData[index],
-              type: currentTransactionType,
-              category: category,
-              observation: observation || 'Sin observación',
-              amount: amount,
-              date: date
+        // Mostrar formulario de recuperación de contraseña
+        window.mostrarRecuperarPassword = function () {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Recuperar Contraseña</h3>
+                    <div class="form-group">
+                        <label>Usuario</label>
+                        <input type="text" id="rec-username" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Respuesta de seguridad</label>
+                        <input type="text" id="rec-respuesta" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                    <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
+                        <button onclick="recuperarPassword()" style="padding:10px; background:var(--celeste-texto); color:white; border:none; cursor:pointer;">Recuperar</button>
+                        <button onclick="this.closest('.modal').remove()" style="padding:10px; background:var(--gris-fondo); border:1px solid var(--gris-borde); cursor:pointer;">Cancelar</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        };
+
+        // Recuperar contraseña
+        window.recuperarPassword = function () {
+            const username = document.getElementById('rec-username').value;
+            const respuesta = document.getElementById('rec-respuesta').value;
+
+            const resultado = db.recuperarPassword(username, respuesta);
+
+            if (resultado.success) {
+                alert('Respuesta correcta. Contacte al administrador para restablecer su contraseña.');
+                document.querySelector('.modal').remove();
+            } else {
+                mostrarNotificacion(resultado.message, 'error');
+            }
+        };
+
+        // Cerrar sesión
+        window.cerrarSesion = async function () {
+            confirmarAccion('¿Cerrar sesión?', async () => {
+                await db.cerrarSesion();
+                renderizarApp();
+            });
+        };
+
+        // Cambiar contraseña
+        window.mostrarCambiarPassword = function (esAdmin = false) {
+            const usuario = db.getUsuarioActual();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Cambiar Contraseña</h3>
+                    ${!esAdmin ? `
+                    <div class="form-group">
+                        <label>Contraseña actual</label>
+                        <input type="password" id="cambiar-password-actual" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                    ` : ''}
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Nueva contraseña</label>
+                        <input type="password" id="cambiar-password-nueva" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Confirmar nueva contraseña</label>
+                        <input type="password" id="cambiar-password-confirmar" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                    <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
+                        <button onclick="cambiarPassword(${esAdmin})" style="padding:10px; background:var(--verde-texto); color:white; border:none; cursor:pointer;">Cambiar</button>
+                        <button onclick="this.closest('.modal').remove()" style="padding:10px; background:var(--gris-fondo); border:1px solid var(--gris-borde); cursor:pointer;">Cancelar</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+        };
+
+        window.cambiarPassword = async function (esAdmin = false) {
+            const usuario = db.getUsuarioActual();
+            const actual = esAdmin ? '' : document.getElementById('cambiar-password-actual').value;
+            const nueva = document.getElementById('cambiar-password-nueva').value;
+            const confirmar = document.getElementById('cambiar-password-confirmar').value;
+
+            if (nueva !== confirmar) {
+                mostrarNotificacion('Las contraseñas nuevas no coinciden', 'error');
+                return;
+            }
+
+            const resultado = await db.cambiarPassword(usuario.username, actual, nueva, esAdmin);
+
+            if (resultado.success) {
+                mostrarNotificacion(resultado.message, 'exito');
+                document.querySelector('.modal').remove();
+            } else {
+                mostrarNotificacion(resultado.message, 'error');
+            }
+        };
+
+        // Mostrar sistema principal
+        function mostrarSistema() {
+            const usuario = db.getUsuarioActual();
+            const esAdmin = db.esAdministrador();
+            const puedeCambiarPassword = db.tienePermiso('cambiarPassword') || esAdmin;
+            const puedeVerBitacora = db.tienePermiso('verBitacora') || esAdmin;
+
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="user-header">
+                    <div class="user-info">
+                        Usuario: <strong>${usuario.nombre}</strong> (${usuario.rol})
+                        <span class="sync-status ${db.conectado ? 'online' : 'offline'}">
+                            ${db.conectado ? 'Online' : 'Offline'}
+                        </span>
+                    </div>
+                    <div>
+                        ${puedeCambiarPassword ? '<button class="btn-edit" onclick="mostrarCambiarPassword(false)" style="margin-right:10px;">Cambiar Contraseña</button>' : ''}
+                        <button class="logout-btn" onclick="cerrarSesion()">Cerrar Sesión</button>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('control')">Control de Producción</button>
+                    ${db.tienePermiso('verHistorialGrupos') ? '<button class="tab-btn" onclick="switchTab(\'planilla\')">Grupos Planilla</button>' : ''}
+                    ${puedeVerBitacora ? '<button class="tab-btn" onclick="switchTab(\'bitacora\')">Bitácora</button>' : ''}
+                </div>
+
+                <section id="control" class="content-section active">
+                    <h2>Control de Producción Diario</h2>
+
+                    <div class="top-buttons">
+                        ${db.tienePermiso('agregarRegistros') ? '<button class="btn-add" onclick="abrirFormulario()">+ Nuevo Registro</button>' : ''}
+                        <button class="btn-group" onclick="abrirModalGrupo()">Guardar como Grupo</button>
+                        ${db.tienePermiso('exportarExcel') ? '<button class="btn-export" onclick="exportarExcel()">Exportar Excel</button>' : ''}
+                        ${db.tienePermiso('verAdminDB') ? '<button class="btn-admin" onclick="mostrarPanelAdminDB()">Admin DB</button>' : ''}
+                        ${db.tienePermiso('gestionarUsuarios') ? '<button class="btn-admin" onclick="mostrarPanelUsuarios()">Admin Usuarios</button>' : ''}
+                    </div>
+
+                    <div class="form-container" id="formulario">
+                        <h3 style="margin-top:0; color:var(--charcoal);">Nuevo Registro</h3>
+                        <input type="hidden" id="editIndex">
+                        <div class="grid-form">
+                            <div class="form-group" id="grupo-codigo">
+                                <label>CODIGO TRAB. *</label>
+                                <input type="text" id="codigo" placeholder="Ingrese código" autocomplete="off">
+                                <div class="sugerencias" id="sugerencias-trabajador"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>NOMBRE *</label>
+                                <input type="text" id="nombre" placeholder="Se autocompletará" readonly>
+                            </div>
+                            <div class="form-group" id="grupo-cod-act">
+                                <label>COD. ACT *</label>
+                                <input type="text" id="codActividad" placeholder="Ingrese código" autocomplete="off">
+                                <div class="sugerencias" id="sugerencias-actividad"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>ACTIVIDAD *</label>
+                                <input type="text" id="actividad" placeholder="Se autocompletará" readonly>
+                            </div>
+                            <div class="form-group"><label>PROD.</label><input type="number" id="produccion" placeholder="0"></div>
+                            <div class="form-group"><label>LOTE</label><input type="text" id="lote" placeholder="N° lote"></div>
+                            <div class="form-group"><label>HA</label><input type="number" id="hectareas" step="0.01" placeholder="0.00"></div>
+                            <div class="form-group"><label>AÑO</label><input type="number" id="anio" placeholder="2024"></div>
+                            <div class="form-group"><label>DIA</label><input type="text" id="dia" placeholder="Ej: Lunes"></div>
+                            <div class="form-group"><label>AVANCE</label><input type="text" id="avance" placeholder="% o descripción"></div>
+                            <div class="form-group"><label>H. ENT</label><input type="time" id="hEntrada"></div>
+                            <div class="form-group"><label>H. SAL</label><input type="time" id="hSalida"></div>
+                            <div class="form-group"><label>H. ORD</label><input type="number" id="hOrdinarias" step="0.5" placeholder="0.0"></div>
+                            <div class="form-group"><label>H. EXT</label><input type="number" id="hExtras" step="0.5" placeholder="0.0"></div>
+                        </div>
+                        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                            <button class="btn-add" onclick="guardar()">Guardar Registro</button>
+                            <button onclick="limpiar()" style="background:var(--gris-fondo);">Cancelar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table id="tabla">
+                            <thead>
+                                <tr>
+                                    <th>COD</th>
+                                    <th>NOMBRE</th>
+                                    <th>COD.ACT</th>
+                                    <th>ACTIVIDAD</th>
+                                    <th>PROD</th>
+                                    <th>LOTE</th>
+                                    <th>HA</th>
+                                    <th>AÑO</th>
+                                    <th>DIA</th>
+                                    <th>AVANCE</th>
+                                    <th>H.ENT</th>
+                                    <th>H.SAL</th>
+                                    <th>H.ORD</th>
+                                    <th>H.EXT</th>
+                                    <th>ACCIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaCuerpo"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                ${db.tienePermiso('verHistorialGrupos') ? `
+                <section id="planilla" class="content-section">
+                    <h2>Historial de Grupos Planilla</h2>
+                    <div id="listaGrupos"></div>
+                </section>
+                ` : ''}
+
+                ${puedeVerBitacora ? `
+                <section id="bitacora" class="content-section">
+                    <h2>Bitácora de Actividades</h2>
+                    
+                    <div class="bitacora-filtros">
+                        <input type="text" id="filtro-usuario" placeholder="Filtrar por usuario" oninput="filtrarBitacora()">
+                        <input type="text" id="filtro-accion" placeholder="Filtrar por acción" oninput="filtrarBitacora()">
+                        <select id="filtro-tipo" onchange="filtrarBitacora()">
+                            <option value="">Todos los tipos</option>
+                            <option value="info">Información</option>
+                            <option value="seguridad">Seguridad</option>
+                            <option value="administrativo">Administrativo</option>
+                            <option value="grupo">Grupos</option>
+                            <option value="datos">Datos</option>
+                        </select>
+                        <input type="date" id="filtro-desde" onchange="filtrarBitacora()">
+                        <input type="date" id="filtro-hasta" onchange="filtrarBitacora()">
+                        <button onclick="limpiarFiltrosBitacora()" style="padding:8px; background:var(--gris-fondo);">Limpiar</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="bitacora-table">
+                            <thead>
+                                <tr>
+                                    <th>FECHA/HORA</th>
+                                    <th>USUARIO</th>
+                                    <th>TIPO</th>
+                                    <th>ACCIÓN</th>
+                                    <th>DETALLES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaBitacora"></tbody>
+                        </table>
+                    </div>
+                </section>
+                ` : ''}
+
+                <!-- Modal para datos del encargado con observaciones -->
+                <div id="modalGrupo" class="modal">
+                    <div class="modal-content">
+                        <h3 id="tituloModalGrupo">Datos del Encargado</h3>
+                        <input type="hidden" id="editGrupoIndex">
+                        <input type="hidden" id="grupoCreador" value="${usuario.username}">
+                        <div class="form-group"><label>CODIGO ENCARGADO *</label><input type="text" id="encCodigo" placeholder="Ingrese código"></div>
+                        <div class="form-group" style="margin-top:10px"><label>NOMBRE ENCARGADO *</label><input type="text" id="encNombre" placeholder="Nombre completo"></div>
+                        <div class="form-group" style="margin-top:10px">
+                            <label>OBSERVACIONES</label>
+                            <textarea id="observacionesGrupo" placeholder="Ingrese observaciones para este grupo..."></textarea>
+                        </div>
+                        <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
+                            <button class="btn-group" id="btnConfirmarGrupo" onclick="finalizarGuardarGrupo()">Confirmar</button>
+                            <button onclick="cerrarModalGrupo()">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para ver detalles del grupo -->
+                <div id="modalDetalleGrupo" class="modal">
+                    <div class="modal-content modal-lg">
+                        <h3 id="detGrupoTitulo">Detalles del Grupo</h3>
+                        <div id="detGrupoEncargado" style="margin-bottom:15px; font-size:13px; padding:10px; background:var(--gris-fondo);"></div>
+                        <div id="detGrupoObservaciones" style="margin-bottom:15px; font-size:13px; padding:10px; background:var(--gris-fondo); border-left:3px solid var(--azul-texto);"></div>
+                        <div class="detalle-tabla-container">
+                            <table id="tablaDetalleGrupo">
+                                <thead>
+                                    <tr>
+                                        <th>COD</th>
+                                        <th>NOMBRE</th>
+                                        <th>COD.ACT</th>
+                                        <th>ACTIVIDAD</th>
+                                        <th>PROD</th>
+                                        <th>LOTE</th>
+                                        <th>HA</th>
+                                        <th>AÑO</th>
+                                        <th>DIA</th>
+                                        <th>AVANCE</th>
+                                        <th>H.ENT</th>
+                                        <th>H.SAL</th>
+                                        <th>H.ORD</th>
+                                        <th>H.EXT</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cuerpoDetalleGrupo"></tbody>
+                            </table>
+                        </div>
+                        <button onclick="cerrarModalDetalle()" style="width:100%; margin-top:20px; padding:12px; background: var(--charcoal); color:white; border:none; cursor:pointer;">Cerrar</button>
+                    </div>
+                </div>
+
+                <!-- Modal para editar registros del grupo -->
+                <div id="modalEditarRegistrosGrupo" class="modal">
+                    <div class="modal-content modal-lg">
+                        <h3 id="editRegistrosTitulo" style="color:var(--charcoal); margin-bottom:15px;">Editando Registros del Grupo</h3>
+                        <input type="hidden" id="editRegistrosGrupoIndex">
+                        
+                        <div class="edit-registros-container">
+                            <table class="edit-registros-tabla" id="editRegistrosTabla">
+                                <thead>
+                                    <tr>
+                                        <th>CODIGO</th>
+                                        <th>NOMBRE</th>
+                                        <th>COD.ACT</th>
+                                        <th>ACTIVIDAD</th>
+                                        <th>PROD</th>
+                                        <th>LOTE</th>
+                                        <th>HA</th>
+                                        <th>AÑO</th>
+                                        <th>DIA</th>
+                                        <th>AVANCE</th>
+                                        <th>H.ENT</th>
+                                        <th>H.SAL</th>
+                                        <th>H.ORD</th>
+                                        <th>H.EXT</th>
+                                        <th>ACCIÓN</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="editRegistrosBody">
+                                    <!-- Aquí se generarán dinámicamente los registros editables -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <button class="btn-agregar-registro" onclick="agregarRegistroVacio()">
+                            + Agregar Nuevo Registro
+                        </button>
+                        
+                        <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                            <button class="btn-add" onclick="guardarEdicionRegistros()">Guardar Cambios</button>
+                            <button onclick="cerrarModalEditarRegistros()" style="background:var(--gris-fondo);">Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Configurar eventos de autocompletado
+            configurarAutocompletado();
+
+            // Renderizar datos
+            renderizarDiario();
+            if (db.tienePermiso('verHistorialGrupos')) {
+                renderizarHistorial();
+            }
+            if (puedeVerBitacora) {
+                renderizarBitacora();
+            }
+        }
+
+        // Configurar eventos de autocompletado
+        function configurarAutocompletado() {
+            const inputCodigo = document.getElementById('codigo');
+            const inputCodActividad = document.getElementById('codActividad');
+
+            if (inputCodigo) {
+                inputCodigo.addEventListener('input', function () {
+                    clearTimeout(timeoutId);
+                    const valor = this.value;
+                    timeoutId = setTimeout(() => {
+                        const trabajador = db.buscarTrabajador(valor);
+                        if (trabajador) {
+                            document.getElementById('nombre').value = trabajador.nombre;
+                            document.getElementById('nombre').classList.add('autocompletado');
+                            ocultarSugerencias('trabajador');
+                        } else {
+                            document.getElementById('nombre').value = '';
+                            document.getElementById('nombre').classList.remove('autocompletado');
+                            mostrarSugerenciasTrabajador(valor);
+                        }
+                    }, 300);
+                });
+            }
+
+            if (inputCodActividad) {
+                inputCodActividad.addEventListener('input', function () {
+                    clearTimeout(timeoutId);
+                    const valor = this.value;
+                    timeoutId = setTimeout(() => {
+                        const actividad = db.buscarActividad(valor);
+                        if (actividad) {
+                            document.getElementById('actividad').value = actividad.nombre;
+                            document.getElementById('actividad').classList.add('autocompletado');
+                            ocultarSugerencias('actividad');
+                        } else {
+                            document.getElementById('actividad').value = '';
+                            document.getElementById('actividad').classList.remove('autocompletado');
+                            mostrarSugerenciasActividad(valor);
+                        }
+                    }, 300);
+                });
+            }
+        }
+
+        function mostrarSugerenciasTrabajador(termino) {
+            const sugerencias = document.getElementById('sugerencias-trabajador');
+            if (!sugerencias) return;
+
+            const filtrados = db.buscarTrabajadoresPorNombreOMatch(termino);
+
+            if (filtrados.length === 0) {
+                sugerencias.style.display = 'none';
+                return;
+            }
+
+            sugerencias.innerHTML = '';
+            filtrados.forEach(t => {
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${t.codigo}</strong> - ${t.nombre}`;
+                div.onclick = () => {
+                    document.getElementById('codigo').value = t.codigo;
+                    document.getElementById('nombre').value = t.nombre;
+                    document.getElementById('nombre').classList.add('autocompletado');
+                    sugerencias.style.display = 'none';
+                };
+                sugerencias.appendChild(div);
+            });
+
+            sugerencias.style.display = 'block';
+        }
+
+        function mostrarSugerenciasActividad(termino) {
+            const sugerencias = document.getElementById('sugerencias-actividad');
+            if (!sugerencias) return;
+
+            const filtrados = db.buscarActividadesPorNombreOMatch(termino);
+
+            if (filtrados.length === 0) {
+                sugerencias.style.display = 'none';
+                return;
+            }
+
+            sugerencias.innerHTML = '';
+            filtrados.forEach(a => {
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${a.codigo}</strong> - ${a.nombre}`;
+                div.onclick = () => {
+                    document.getElementById('codActividad').value = a.codigo;
+                    document.getElementById('actividad').value = a.nombre;
+                    document.getElementById('actividad').classList.add('autocompletado');
+                    sugerencias.style.display = 'none';
+                };
+                sugerencias.appendChild(div);
+            });
+
+            sugerencias.style.display = 'block';
+        }
+
+        function ocultarSugerencias(tipo) {
+            const sugerencias = document.getElementById(`sugerencias-${tipo}`);
+            if (sugerencias) {
+                sugerencias.style.display = 'none';
+            }
+        }
+
+        // Funciones del sistema principal
+        function switchTab(tabId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            if (tabId === 'planilla') {
+                renderizarHistorial();
+            } else if (tabId === 'bitacora') {
+                renderizarBitacora();
+            }
+            currentEditMode = false;
+        }
+
+        function abrirFormulario() {
+            document.getElementById("formulario").style.display = "block";
+            currentEditMode = false;
+            window.scrollTo({
+                top: document.getElementById("formulario").offsetTop,
+                behavior: 'smooth'
+            });
+        }
+
+        function guardar() {
+            const ids = ['codigo', 'nombre', 'codActividad', 'actividad', 'produccion', 'lote', 'hectareas', 'anio', 'dia', 'avance', 'hEntrada', 'hSalida', 'hOrdinarias', 'hExtras'];
+            let reg = {};
+            ids.forEach(id => reg[id] = document.getElementById(id).value);
+
+            if (!reg.nombre) {
+                mostrarNotificacion("El campo NOMBRE es obligatorio", 'error');
+                return;
+            }
+
+            if (!reg.actividad) {
+                mostrarNotificacion("El campo ACTIVIDAD es obligatorio", 'error');
+                return;
+            }
+
+            let idx = document.getElementById("editIndex").value;
+            if (idx === "") {
+                datosDiarios.push(reg);
+                mostrarNotificacion("Registro agregado exitosamente", 'exito');
+            } else {
+                if (!db.tienePermiso('editarRegistros')) {
+                    mostrarNotificacion('No tiene permiso para editar registros', 'error');
+                    return;
+                }
+                datosDiarios[idx] = reg;
+                mostrarNotificacion("Registro actualizado exitosamente", 'exito');
+            }
+
+            localStorage.setItem("eyp_diario", JSON.stringify(datosDiarios));
+            limpiar();
+            renderizarDiario();
+        }
+
+        function renderizarDiario() {
+            let tbody = document.getElementById("tablaCuerpo");
+            if (!tbody) return;
+
+            tbody.innerHTML = "";
+            datosDiarios.forEach((d, i) => {
+                let acciones = '';
+                if (db.tienePermiso('editarRegistros')) {
+                    acciones += `<button class="btn-action btn-edit" onclick="editar(${i})">Editar</button> `;
+                }
+                if (db.tienePermiso('eliminarRegistros')) {
+                    acciones += `<button class="btn-action btn-delete" onclick="eliminar(${i})">Eliminar</button>`;
+                }
+
+                tbody.innerHTML += `
+                <tr>
+                    <td>${d.codigo || ''}</td>
+                    <td><strong>${d.nombre || ''}</strong></td>
+                    <td>${d.codActividad || ''}</td>
+                    <td>${d.actividad || ''}</td>
+                    <td>${d.produccion || ''}</td>
+                    <td>${d.lote || ''}</td>
+                    <td>${d.hectareas || ''}</td>
+                    <td>${d.anio || ''}</td>
+                    <td>${d.dia || ''}</td>
+                    <td>${d.avance || ''}</td>
+                    <td>${d.hEntrada || ''}</td>
+                    <td>${d.hSalida || ''}</td>
+                    <td>${d.hOrdinarias || ''}</td>
+                    <td>${d.hExtras || ''}</td>
+                    <td>${acciones}</td>
+                </tr>`;
+            });
+        }
+
+        function limpiar() {
+            document.querySelectorAll("#formulario input").forEach(i => {
+                i.value = "";
+                i.classList.remove('autocompletado');
+            });
+            document.getElementById("editIndex").value = "";
+            document.getElementById("formulario").style.display = "none";
+        }
+
+        function editar(i) {
+            if (!db.tienePermiso('editarRegistros')) {
+                mostrarNotificacion('No tiene permiso para editar registros', 'error');
+                return;
+            }
+
+            let d = datosDiarios[i];
+            const ids = ['codigo', 'nombre', 'codActividad', 'actividad', 'produccion', 'lote', 'hectareas', 'anio', 'dia', 'avance', 'hEntrada', 'hSalida', 'hOrdinarias', 'hExtras'];
+            ids.forEach(id => {
+                document.getElementById(id).value = d[id] || '';
+                if (d[id]) {
+                    document.getElementById(id).classList.add('autocompletado');
+                }
+            });
+            document.getElementById("editIndex").value = i;
+            abrirFormulario();
+        }
+
+        function eliminar(i) {
+            if (!db.tienePermiso('eliminarRegistros')) {
+                mostrarNotificacion('No tiene permiso para eliminar registros', 'error');
+                return;
+            }
+
+            confirmarAccion("¿Está seguro de eliminar este registro?", () => {
+                datosDiarios.splice(i, 1);
+                localStorage.setItem("eyp_diario", JSON.stringify(datosDiarios));
+                renderizarDiario();
+                mostrarNotificacion("Registro eliminado correctamente", 'exito');
+            });
+        }
+
+        // GRUPOS con observaciones
+        function abrirModalGrupo() {
+            if (datosDiarios.length === 0) {
+                mostrarNotificacion("No hay registros para guardar en el grupo", 'error');
+                return;
+            }
+            document.getElementById("editGrupoIndex").value = "";
+            document.getElementById("encCodigo").value = "";
+            document.getElementById("encNombre").value = "";
+            document.getElementById("observacionesGrupo").value = "";
+            document.getElementById("tituloModalGrupo").innerText = "Datos del Encargado";
+            document.getElementById("btnConfirmarGrupo").onclick = finalizarGuardarGrupo;
+            document.getElementById("modalGrupo").style.display = "flex";
+        }
+
+        function cerrarModalGrupo() {
+            document.getElementById("modalGrupo").style.display = "none";
+        }
+
+        async function finalizarGuardarGrupo() {
+            let encCod = document.getElementById("encCodigo").value;
+            let encNom = document.getElementById("encNombre").value;
+            let observaciones = document.getElementById("observacionesGrupo").value;
+
+            if (!encCod || !encNom) {
+                mostrarNotificacion("Complete los datos del encargado", 'error');
+                return;
+            }
+
+            const resultado = await db.guardarGrupo({
+                encargado: { codigo: encCod, nombre: encNom },
+                observaciones: observaciones,
+                registros: datosDiarios
+            });
+
+            if (resultado.success) {
+                datosDiarios = [];
+                localStorage.setItem("eyp_diario", JSON.stringify(datosDiarios));
+
+                document.getElementById("encCodigo").value = "";
+                document.getElementById("encNombre").value = "";
+                document.getElementById("observacionesGrupo").value = "";
+
+                cerrarModalGrupo();
+                renderizarDiario();
+                mostrarNotificacion(resultado.message, 'exito');
+                if (db.tienePermiso('verHistorialGrupos')) {
+                    switchTab('planilla');
+                }
+            }
+        }
+
+        function renderizarHistorial() {
+            let contenedor = document.getElementById("listaGrupos");
+            if (!contenedor) return;
+
+            const usuario = db.getUsuarioActual();
+            const puedeVerTodos = db.tienePermiso('verTodosLosGrupos') || db.esAdministrador();
+
+            let gruposAMostrar = puedeVerTodos ? db.historialGrupos : db.historialGrupos.filter(g => g.creador === usuario.username);
+
+            contenedor.innerHTML = gruposAMostrar.length === 0 ? "<p style='text-align:center; padding:20px; background:var(--gris-fondo);'>No hay grupos guardados.</p>" : "";
+
+            gruposAMostrar.forEach((g, i) => {
+                const indexOriginal = db.historialGrupos.findIndex(h => h.idGrupo === g.idGrupo);
+
+                let acciones = '';
+                acciones += `<button class="btn-action btn-view" onclick="verDetalleGrupo(${indexOriginal})">VER</button> `;
+
+                if (db.tienePermiso('editarRegistros') && (g.creador === usuario.username || db.esAdministrador())) {
+                    acciones += `<button class="btn-action btn-edit" onclick="editarEncargadoGrupo(${indexOriginal})">ENC</button> `;
+                    acciones += `<button class="btn-action btn-edit" onclick="editarRegistrosGrupo(${indexOriginal})" style="background:var(--verde-claro); color:var(--verde-texto); border-color:var(--verde-texto);">REG</button> `;
+                }
+
+                if (db.tienePermiso('eliminarRegistros') && (g.creador === usuario.username || db.esAdministrador())) {
+                    acciones += `<button class="btn-action btn-delete" onclick="eliminarGrupo(${indexOriginal})">ELIM</button> `;
+                }
+
+                if (db.tienePermiso('exportarExcel')) {
+                    acciones += `<button class="btn-action btn-export" onclick="descargarGrupoCSV(${indexOriginal})" style="width:auto; padding:5px 10px">EXCEL</button>`;
+                }
+
+                let observacionesHtml = g.observaciones ?
+                    `<div class="group-observaciones"><strong>Observaciones:</strong> ${g.observaciones}</div>` : '';
+
+                contenedor.innerHTML += `
+                <div class="group-card">
+                    <div class="group-header">
+                        <div>
+                            <span class="group-code">${g.idGrupo}</span>
+                            <span class="group-creador">(Creado por: ${g.creadorNombre || g.creador})</span><br>
+                            <small style="color:var(--gris-oscuro);">${g.fechaCreacion} | ${g.registros.length} registros</small>
+                        </div>
+                        <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                            ${acciones}
+                        </div>
+                    </div>
+                    <div style="font-size:12px; color:var(--charcoal); background:var(--gris-fondo); padding:8px;">
+                        <strong>Encargado:</strong> ${g.encargado.nombre} (${g.encargado.codigo})
+                    </div>
+                    ${observacionesHtml}
+                </div>`;
+            });
+        }
+
+        function verDetalleGrupo(index) {
+            let g = db.historialGrupos[index];
+            document.getElementById("detGrupoTitulo").innerText = "Detalle: " + g.idGrupo;
+            document.getElementById("detGrupoEncargado").innerHTML = `
+                <strong>Encargado:</strong> ${g.encargado.nombre} (${g.encargado.codigo}) | 
+                <strong>Fecha:</strong> ${g.fechaCreacion} | 
+                <strong>Creado por:</strong> ${g.creadorNombre || g.creador} |
+                <strong>Total:</strong> ${g.registros.length} registros
+            `;
+
+            document.getElementById("detGrupoObservaciones").innerHTML = g.observaciones ?
+                `<strong>Observaciones:</strong> ${g.observaciones}` : 'Sin observaciones';
+
+            let tbody = document.getElementById("cuerpoDetalleGrupo");
+            tbody.innerHTML = "";
+
+            g.registros.forEach(r => {
+                tbody.innerHTML += `<tr>
+                    <td>${r.codigo || ''}</td>
+                    <td><strong>${r.nombre || ''}</strong></td>
+                    <td>${r.codActividad || ''}</td>
+                    <td>${r.actividad || ''}</td>
+                    <td>${r.produccion || ''}</td>
+                    <td>${r.lote || ''}</td>
+                    <td>${r.hectareas || ''}</td>
+                    <td>${r.anio || ''}</td>
+                    <td>${r.dia || ''}</td>
+                    <td>${r.avance || ''}</td>
+                    <td>${r.hEntrada || ''}</td>
+                    <td>${r.hSalida || ''}</td>
+                    <td>${r.hOrdinarias || ''}</td>
+                    <td>${r.hExtras || ''}</td>
+                </tr>`;
+            });
+
+            document.getElementById("modalDetalleGrupo").style.display = "flex";
+        }
+
+        function cerrarModalDetalle() {
+            document.getElementById("modalDetalleGrupo").style.display = "none";
+        }
+
+        function editarEncargadoGrupo(index) {
+            if (!db.tienePermiso('editarRegistros')) {
+                mostrarNotificacion('No tiene permiso para editar', 'error');
+                return;
+            }
+
+            let g = db.historialGrupos[index];
+            document.getElementById("editGrupoIndex").value = index;
+            document.getElementById("encCodigo").value = g.encargado.codigo;
+            document.getElementById("encNombre").value = g.encargado.nombre;
+            document.getElementById("observacionesGrupo").value = g.observaciones || '';
+            document.getElementById("tituloModalGrupo").innerText = "Editar Encargado de " + g.idGrupo;
+            document.getElementById("btnConfirmarGrupo").onclick = guardarEdicionEncargado;
+            document.getElementById("modalGrupo").style.display = "flex";
+        }
+
+        async function guardarEdicionEncargado() {
+            let index = document.getElementById("editGrupoIndex").value;
+            let observaciones = document.getElementById("observacionesGrupo").value;
+
+            db.historialGrupos[index].encargado.codigo = document.getElementById("encCodigo").value;
+            db.historialGrupos[index].encargado.nombre = document.getElementById("encNombre").value;
+            db.historialGrupos[index].observaciones = observaciones;
+            db.historialGrupos[index].ultimaModificacion = new Date().toISOString();
+            db.historialGrupos[index].modificadoPor = db.getUsuarioActual().username;
+
+            localStorage.setItem("eyp_historial", JSON.stringify(db.historialGrupos));
+            await db.registrarEnBitacora(
+                'Grupo editado',
+                `Se editó encargado del grupo ${db.historialGrupos[index].idGrupo}`,
+                'grupo'
+            );
+
+            cerrarModalGrupo();
+            renderizarHistorial();
+            mostrarNotificacion("Encargado actualizado correctamente", 'exito');
+        }
+
+        function editarRegistrosGrupo(index) {
+            if (!db.tienePermiso('editarRegistros')) {
+                mostrarNotificacion('No tiene permiso para editar registros', 'error');
+                return;
+            }
+
+            currentEditMode = true;
+            let g = db.historialGrupos[index];
+            document.getElementById("editRegistrosGrupoIndex").value = index;
+            document.getElementById("editRegistrosTitulo").innerHTML = `Editando Registros - <span style="color:var(--celeste-texto);">${g.idGrupo}</span>`;
+
+            let tbody = document.getElementById("editRegistrosBody");
+            tbody.innerHTML = "";
+
+            g.registros.forEach((registro, regIndex) => {
+                agregarFilaRegistro(tbody, index, regIndex, registro);
+            });
+
+            document.getElementById("modalEditarRegistrosGrupo").style.display = "flex";
+        }
+
+        function agregarFilaRegistro(tbody, grupoIndex, regIndex, registro = null) {
+            let row = document.createElement("tr");
+
+            let deleteButton = db.tienePermiso('eliminarRegistros')
+                ? `<button class="btn-eliminar-registro" onclick="eliminarRegistroDeGrupo(this, ${grupoIndex}, ${regIndex})">Eliminar</button>`
+                : '';
+
+            row.innerHTML = `
+                <td><input type="text" class="reg-codigo" value="${registro?.codigo || ''}" placeholder="Código"></td>
+                <td><input type="text" class="reg-nombre" value="${registro?.nombre || ''}" placeholder="Nombre *"></td>
+                <td><input type="text" class="reg-codActividad" value="${registro?.codActividad || ''}" placeholder="Cod.Act"></td>
+                <td><input type="text" class="reg-actividad" value="${registro?.actividad || ''}" placeholder="Actividad"></td>
+                <td><input type="text" class="reg-produccion" value="${registro?.produccion || ''}" placeholder="Prod"></td>
+                <td><input type="text" class="reg-lote" value="${registro?.lote || ''}" placeholder="Lote"></td>
+                <td><input type="text" class="reg-hectareas" value="${registro?.hectareas || ''}" placeholder="HA"></td>
+                <td><input type="text" class="reg-anio" value="${registro?.anio || ''}" placeholder="Año"></td>
+                <td><input type="text" class="reg-dia" value="${registro?.dia || ''}" placeholder="Día"></td>
+                <td><input type="text" class="reg-avance" value="${registro?.avance || ''}" placeholder="Avance"></td>
+                <td><input type="text" class="reg-hEntrada" value="${registro?.hEntrada || ''}" placeholder="H.Ent"></td>
+                <td><input type="text" class="reg-hSalida" value="${registro?.hSalida || ''}" placeholder="H.Sal"></td>
+                <td><input type="text" class="reg-hOrdinarias" value="${registro?.hOrdinarias || ''}" placeholder="H.Ord"></td>
+                <td><input type="text" class="reg-hExtras" value="${registro?.hExtras || ''}" placeholder="H.Ext"></td>
+                <td>${deleteButton}</td>
+            `;
+
+            tbody.appendChild(row);
+        }
+
+        function agregarRegistroVacio() {
+            if (!db.tienePermiso('editarRegistros')) {
+                mostrarNotificacion('No tiene permiso para agregar registros', 'error');
+                return;
+            }
+
+            let tbody = document.getElementById("editRegistrosBody");
+            let grupoIndex = document.getElementById("editRegistrosGrupoIndex").value;
+            let nuevoIndex = tbody.children.length;
+            agregarFilaRegistro(tbody, grupoIndex, nuevoIndex, null);
+
+            setTimeout(() => {
+                let container = document.querySelector(".edit-registros-container");
+                container.scrollTop = container.scrollHeight;
+            }, 100);
+        }
+
+        function eliminarRegistroDeGrupo(button, grupoIndex, regIndex) {
+            if (!db.tienePermiso('eliminarRegistros')) {
+                mostrarNotificacion('No tiene permiso para eliminar registros', 'error');
+                return;
+            }
+
+            confirmarAccion("¿Eliminar este registro del grupo?", () => {
+                let row = button.closest('tr');
+                row.remove();
+
+                let tbody = document.getElementById("editRegistrosBody");
+                let rows = tbody.querySelectorAll('tr');
+                rows.forEach((row, idx) => {
+                    let deleteBtn = row.querySelector('.btn-eliminar-registro');
+                    if (deleteBtn) {
+                        let oldOnclick = deleteBtn.getAttribute('onclick');
+                        let newOnclick = oldOnclick.replace(/,\s*\d+\s*\)/, `, ${idx})`);
+                        deleteBtn.setAttribute('onclick', newOnclick);
+                    }
+                });
+
+                mostrarNotificacion("Registro eliminado", 'exito');
+            });
+        }
+
+        async function guardarEdicionRegistros() {
+            if (!db.tienePermiso('editarRegistros')) {
+                mostrarNotificacion('No tiene permiso para editar registros', 'error');
+                return;
+            }
+
+            let grupoIndex = document.getElementById("editRegistrosGrupoIndex").value;
+            let tbody = document.getElementById("editRegistrosBody");
+            let rows = tbody.querySelectorAll('tr');
+
+            let nuevosRegistros = [];
+            let registrosGuardados = 0;
+            let registrosConError = 0;
+
+            rows.forEach(row => {
+                let registro = {
+                    codigo: row.querySelector(".reg-codigo").value,
+                    nombre: row.querySelector(".reg-nombre").value,
+                    codActividad: row.querySelector(".reg-codActividad").value,
+                    actividad: row.querySelector(".reg-actividad").value,
+                    produccion: row.querySelector(".reg-produccion").value,
+                    lote: row.querySelector(".reg-lote").value,
+                    hectareas: row.querySelector(".reg-hectareas").value,
+                    anio: row.querySelector(".reg-anio").value,
+                    dia: row.querySelector(".reg-dia").value,
+                    avance: row.querySelector(".reg-avance").value,
+                    hEntrada: row.querySelector(".reg-hEntrada").value,
+                    hSalida: row.querySelector(".reg-hSalida").value,
+                    hOrdinarias: row.querySelector(".reg-hOrdinarias").value,
+                    hExtras: row.querySelector(".reg-hExtras").value
+                };
+
+                if (registro.nombre) {
+                    nuevosRegistros.push(registro);
+                    registrosGuardados++;
+                } else {
+                    registrosConError++;
+                    row.querySelector(".reg-nombre").style.borderColor = 'var(--rojo-texto)';
+                }
+            });
+
+            if (registrosConError > 0) {
+                mostrarNotificacion(`${registrosConError} registro(s) no tienen nombre y no se guardaron`, 'error');
+                return;
+            }
+
+            db.historialGrupos[grupoIndex].registros = nuevosRegistros;
+            db.historialGrupos[grupoIndex].ultimaModificacion = new Date().toISOString();
+            db.historialGrupos[grupoIndex].modificadoPor = db.getUsuarioActual().username;
+
+            localStorage.setItem("eyp_historial", JSON.stringify(db.historialGrupos));
+
+            await db.registrarEnBitacora(
+                'Registros de grupo editados',
+                `Se editaron ${registrosGuardados} registros del grupo ${db.historialGrupos[grupoIndex].idGrupo}`,
+                'grupo'
+            );
+
+            cerrarModalEditarRegistros();
+            renderizarHistorial();
+            mostrarNotificacion(`${registrosGuardados} registros actualizados correctamente`, 'exito');
+            currentEditMode = false;
+        }
+
+        function cerrarModalEditarRegistros() {
+            document.getElementById("modalEditarRegistrosGrupo").style.display = "none";
+            currentEditMode = false;
+        }
+
+        async function eliminarGrupo(i) {
+            if (!db.tienePermiso('eliminarRegistros')) {
+                mostrarNotificacion('No tiene permiso para eliminar grupos', 'error');
+                return;
+            }
+
+            confirmarAccion("¿Está seguro de eliminar todo este grupo permanentemente?", async () => {
+                let grupoEliminado = db.historialGrupos[i].idGrupo;
+                db.historialGrupos.splice(i, 1);
+                localStorage.setItem("eyp_historial", JSON.stringify(db.historialGrupos));
+
+                await db.registrarEnBitacora(
+                    'Grupo eliminado',
+                    `Se eliminó grupo ${grupoEliminado}`,
+                    'grupo'
+                );
+
+                renderizarHistorial();
+                mostrarNotificacion(`Grupo ${grupoEliminado} eliminado correctamente`, 'exito');
+            });
+        }
+
+        function descargarGrupoCSV(index) {
+            if (!db.tienePermiso('exportarExcel')) {
+                mostrarNotificacion('No tiene permiso para exportar', 'error');
+                return;
+            }
+
+            let g = db.historialGrupos[index];
+            let csv = `GRUPO:;${g.idGrupo};FECHA:;${g.fechaCreacion};ENCARGADO:;${g.encargado.nombre};CREADO POR:;${g.creadorNombre || g.creador}\n`;
+            if (g.observaciones) {
+                csv += `OBSERVACIONES:;${g.observaciones}\n`;
+            }
+            csv += "CODIGO;NOMBRE;COD_ACT;ACTIVIDAD;PRODUCCION;LOTE;HA;ANIO;DIA;AVANCE;H_ENT;H_SAL;H_ORD;H_EXT\n";
+            g.registros.forEach(r => {
+                csv += `${r.codigo || ''};${r.nombre || ''};${r.codActividad || ''};${r.actividad || ''};${r.produccion || ''};${r.lote || ''};${r.hectareas || ''};${r.anio || ''};${r.dia || ''};${r.avance || ''};${r.hEntrada || ''};${r.hSalida || ''};${r.hOrdinarias || ''};${r.hExtras || ''}\n`;
+            });
+            let blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = `${g.idGrupo}.csv`;
+            a.click();
+            mostrarNotificacion(`Archivo ${g.idGrupo}.csv descargado`, 'exito');
+        }
+
+        function exportarExcel() {
+            if (!db.tienePermiso('exportarExcel')) {
+                mostrarNotificacion('No tiene permiso para exportar', 'error');
+                return;
+            }
+
+            if (datosDiarios.length === 0) {
+                mostrarNotificacion("No hay datos para exportar", 'error');
+                return;
+            }
+
+            let csv = "CODIGO;NOMBRE;COD_ACT;ACTIVIDAD;PRODUCCION;LOTE;HA;ANIO;DIA;AVANCE;H_ENT;H_SAL;H_ORD;H_EXT\n";
+            datosDiarios.forEach(d => {
+                csv += `${d.codigo || ''};${d.nombre || ''};${d.codActividad || ''};${d.actividad || ''};${d.produccion || ''};${d.lote || ''};${d.hectareas || ''};${d.anio || ''};${d.dia || ''};${d.avance || ''};${d.hEntrada || ''};${d.hSalida || ''};${d.hOrdinarias || ''};${d.hExtras || ''}\n`;
+            });
+            let blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "produccion_diaria.csv";
+            a.click();
+            mostrarNotificacion("Archivo produccion_diaria.csv descargado", 'exito');
+        }
+
+        // Funciones de bitácora
+        function renderizarBitacora(filtros = {}) {
+            let tbody = document.getElementById("tablaBitacora");
+            if (!tbody) return;
+
+            const usuario = db.getUsuarioActual();
+            const puedeVerTodos = db.esAdministrador() || db.tienePermiso('verTodosLosGrupos');
+
+            let registros = db.getBitacora(filtros);
+
+            // Si no puede ver todo, filtrar solo sus acciones
+            if (!puedeVerTodos) {
+                registros = registros.filter(r => r.usuario === usuario.username);
+            }
+
+            tbody.innerHTML = "";
+
+            if (registros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">No hay registros en la bitácora</td></tr>';
+                return;
+            }
+
+            registros.slice(0, 100).forEach(r => {
+                let fecha = new Date(r.timestamp);
+                let fechaFormateada = fecha.toLocaleDateString() + ' ' + fecha.toLocaleTimeString();
+
+                let tipoClass = '';
+                switch (r.tipo) {
+                    case 'info': tipoClass = 'tipo-info'; break;
+                    case 'seguridad': tipoClass = 'tipo-seguridad'; break;
+                    case 'administrativo': tipoClass = 'tipo-administrativo'; break;
+                    case 'grupo': tipoClass = 'tipo-grupo'; break;
+                    case 'datos': tipoClass = 'tipo-datos'; break;
+                }
+
+                tbody.innerHTML += `
+                <tr>
+                    <td>${fechaFormateada}</td>
+                    <td><strong>${r.usuarioNombre || r.usuario}</strong></td>
+                    <td><span class="${tipoClass}">${r.tipo}</span></td>
+                    <td>${r.accion}</td>
+                    <td>${r.detalles}</td>
+                </tr>`;
+            });
+        }
+
+        window.filtrarBitacora = function () {
+            const usuario = document.getElementById('filtro-usuario')?.value;
+            const accion = document.getElementById('filtro-accion')?.value;
+            const tipo = document.getElementById('filtro-tipo')?.value;
+            const desde = document.getElementById('filtro-desde')?.value;
+            const hasta = document.getElementById('filtro-hasta')?.value;
+
+            const filtros = {};
+            if (usuario) filtros.usuario = usuario;
+            if (accion) filtros.accion = accion;
+            if (tipo) filtros.tipo = tipo;
+            if (desde) filtros.desde = desde;
+            if (hasta) filtros.hasta = hasta;
+
+            renderizarBitacora(filtros);
+        };
+
+        window.limpiarFiltrosBitacora = function () {
+            document.getElementById('filtro-usuario').value = '';
+            document.getElementById('filtro-accion').value = '';
+            document.getElementById('filtro-tipo').value = '';
+            document.getElementById('filtro-desde').value = '';
+            document.getElementById('filtro-hasta').value = '';
+            renderizarBitacora();
+        };
+
+        // Panel de Administración de Usuarios
+        window.mostrarPanelUsuarios = function () {
+            if (!db.tienePermiso('gestionarUsuarios')) {
+                mostrarNotificacion('No tiene permiso para gestionar usuarios', 'error');
+                return;
+            }
+
+            const usuarios = db.getUsuarios();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+
+            const contenido = document.createElement('div');
+            contenido.className = 'modal-content';
+            contenido.style.maxWidth = '1000px';
+
+            contenido.innerHTML = `
+                <h2 style="margin-bottom:20px;">Administración de Usuarios</h2>
+                
+                <div style="margin-bottom:20px;">
+                    <button onclick="mostrarFormularioNuevoUsuario()" style="padding:10px; background:var(--verde-texto); color:white; border:none; cursor:pointer;">+ Nuevo Usuario</button>
+                </div>
+                
+                <table class="usuarios-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Permisos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${usuarios.map(u => `
+                            <tr>
+                                <td><strong>${u.username}</strong></td>
+                                <td>${u.nombre}</td>
+                                <td>${u.rol}</td>
+                                <td>
+                                    <span style="color:${u.activo ? 'var(--verde-texto)' : 'var(--rojo-texto)'}">
+                                        ${u.activo ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="permiso-badge ${u.permisos.verAdminDB ? 'permiso-activo' : 'permiso-inactivo'}">DB</span>
+                                    <span class="permiso-badge ${u.permisos.exportarExcel ? 'permiso-activo' : 'permiso-inactivo'}">XLS</span>
+                                    <span class="permiso-badge ${u.permisos.eliminarRegistros ? 'permiso-activo' : 'permiso-inactivo'}">DEL</span>
+                                    <span class="permiso-badge ${u.permisos.editarRegistros ? 'permiso-activo' : 'permiso-inactivo'}">EDT</span>
+                                    <span class="permiso-badge ${u.permisos.agregarRegistros ? 'permiso-activo' : 'permiso-inactivo'}">ADD</span>
+                                    <span class="permiso-badge ${u.permisos.verHistorialGrupos ? 'permiso-activo' : 'permiso-inactivo'}">HIS</span>
+                                    <span class="permiso-badge ${u.permisos.verTodosLosGrupos ? 'permiso-activo' : 'permiso-inactivo'}">ALL</span>
+                                    <span class="permiso-badge ${u.permisos.cambiarPassword ? 'permiso-activo' : 'permiso-inactivo'}">PWD</span>
+                                    <span class="permiso-badge ${u.permisos.verBitacora ? 'permiso-activo' : 'permiso-inactivo'}">LOG</span>
+                                </td>
+                                <td>
+                                    <button onclick="editarUsuarioForm(${u.id})" style="padding:3px 8px; background:var(--celeste-claro); border:1px solid var(--celeste-texto); cursor:pointer; margin-right:5px;">Editar</button>
+                                    <button onclick="toggleUsuarioActivo(${u.id})" style="padding:3px 8px; background:var(--amarillo-claro); border:1px solid var(--amarillo-texto); cursor:pointer; margin-right:5px;">${u.activo ? 'Inhabilitar' : 'Habilitar'}</button>
+                                    ${u.id !== 1 ? `<button onclick="eliminarUsuarioConfirm(${u.id})" style="padding:3px 8px; background:var(--rojo-claro); border:1px solid var(--rojo-texto); cursor:pointer;">Eliminar</button>` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <button onclick="this.closest('.modal').remove()" style="width:100%; margin-top:20px; padding:10px; background:var(--charcoal); color:white; border:none; cursor:pointer;">Cerrar</button>
+            `;
+
+            modal.appendChild(contenido);
+            document.body.appendChild(modal);
+        };
+
+        // Mostrar formulario de nuevo usuario
+        window.mostrarFormularioNuevoUsuario = function () {
+            document.querySelector('.modal').remove();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+
+            const contenido = document.createElement('div');
+            contenido.className = 'modal-content';
+
+            contenido.innerHTML = `
+                <h3 style="margin-bottom:15px;">Nuevo Usuario</h3>
+                
+                <div class="form-group">
+                    <label>Nombre de usuario *</label>
+                    <input type="text" id="nuevo-username" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                </div>
+                
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Contraseña *</label>
+                    <input type="password" id="nuevo-password" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                </div>
+                
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Nombre completo *</label>
+                    <input type="text" id="nuevo-nombre" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                </div>
+                
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Rol</label>
+                    <select id="nuevo-rol" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                        <option value="usuario">Usuario</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
+                
+                <div style="margin-top:15px;">
+                    <h4>Permisos</h4>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <label><input type="checkbox" id="perm-verAdminDB"> Ver Admin DB</label>
+                        <label><input type="checkbox" id="perm-exportarExcel"> Exportar Excel</label>
+                        <label><input type="checkbox" id="perm-eliminarRegistros"> Eliminar Registros</label>
+                        <label><input type="checkbox" id="perm-editarRegistros" checked> Editar Registros</label>
+                        <label><input type="checkbox" id="perm-agregarRegistros" checked> Agregar Registros</label>
+                        <label><input type="checkbox" id="perm-verHistorialGrupos" checked> Ver Historial</label>
+                        <label><input type="checkbox" id="perm-verTodosLosGrupos"> Ver Todos los Grupos</label>
+                        <label><input type="checkbox" id="perm-cambiarPassword"> Cambiar Contraseña</label>
+                        <label><input type="checkbox" id="perm-verBitacora"> Ver Bitácora</label>
+                    </div>
+                </div>
+                
+                <div style="margin-top:15px;">
+                    <h4>Pregunta de seguridad</h4>
+                    <div class="form-group">
+                        <label>Pregunta *</label>
+                        <input type="text" id="nuevo-pregunta" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Respuesta *</label>
+                        <input type="text" id="nuevo-respuesta" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                </div>
+                
+                <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
+                    <button onclick="guardarNuevoUsuario()" style="padding:10px; background:var(--verde-texto); color:white; border:none; cursor:pointer;">Guardar</button>
+                    <button onclick="volverPanelUsuarios()" style="padding:10px; background:var(--gris-fondo); border:1px solid var(--gris-borde); cursor:pointer;">Cancelar</button>
+                </div>
+            `;
+
+            modal.appendChild(contenido);
+            document.body.appendChild(modal);
+        };
+
+        // Guardar nuevo usuario
+        window.guardarNuevoUsuario = async function () {
+            const permisos = {
+                verAdminDB: document.getElementById('perm-verAdminDB').checked,
+                exportarExcel: document.getElementById('perm-exportarExcel').checked,
+                eliminarRegistros: document.getElementById('perm-eliminarRegistros').checked,
+                editarRegistros: document.getElementById('perm-editarRegistros').checked,
+                agregarRegistros: document.getElementById('perm-agregarRegistros').checked,
+                verHistorialGrupos: document.getElementById('perm-verHistorialGrupos').checked,
+                verTodosLosGrupos: document.getElementById('perm-verTodosLosGrupos').checked,
+                cambiarPassword: document.getElementById('perm-cambiarPassword').checked,
+                verBitacora: document.getElementById('perm-verBitacora').checked,
+                gestionarUsuarios: false
             };
 
-            showNotification('success', 'Movimiento actualizado', `El movimiento ha sido actualizado correctamente`);
-          }
-        } else {
-          const newId = allData.length > 0 ? Math.max(...allData.map(item => item.id)) + 1 : 1;
-          const newTransaction = {
-            id: newId,
-            type: currentTransactionType,
-            category: category,
-            observation: observation || 'Sin observación',
-            amount: amount,
-            date: date
-          };
+            const resultado = await db.agregarUsuario({
+                username: document.getElementById('nuevo-username').value,
+                password: document.getElementById('nuevo-password').value,
+                nombre: document.getElementById('nuevo-nombre').value,
+                rol: document.getElementById('nuevo-rol').value,
+                permisos: permisos,
+                preguntaSeguridad: document.getElementById('nuevo-pregunta').value,
+                respuestaSeguridad: document.getElementById('nuevo-respuesta').value
+            });
 
-          allData.unshift(newTransaction);
-          showNotification('success', 'Movimiento agregado',
-            `${currentTransactionType === 'ingreso' ? 'Ingreso' : 'Salida'} de $${amount.toFixed(2)} agregado correctamente`);
-        }
+            if (resultado.success) {
+                mostrarNotificacion(resultado.message, 'exito');
+                document.querySelector('.modal').remove();
+                mostrarPanelUsuarios();
+            } else {
+                mostrarNotificacion(resultado.message, 'error');
+            }
+        };
 
-        updateStats();
-        filterTable();
-        closeModal();
-      });
-    }
+        // Volver al panel de usuarios
+        window.volverPanelUsuarios = function () {
+            document.querySelector('.modal').remove();
+            mostrarPanelUsuarios();
+        };
 
-    // ===== Funciones de edición y eliminación =====
-    function editItem(id) {
-      openModal(id);
-    }
+        // Editar usuario
+        window.editarUsuarioForm = function (id) {
+            const usuario = db.getUsuarios().find(u => u.id === id);
+            if (!usuario) return;
 
-    function deleteItem(id) {
-      const item = allData.find(i => i.id === id);
-      if (item) {
-        const notification = document.createElement('div');
-        notification.className = 'notification warning';
-        notification.innerHTML = `
-        <div class="notification-icon">?</div>
-        <div class="notification-content">
-          <div class="notification-title">Confirmar eliminación</div>
-          <div class="notification-message">¿Estás seguro de eliminar el movimiento del ${formatDate(item.date)}?</div>
-          <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button onclick="confirmDelete(${id}, this.parentElement.parentElement.parentElement)" style="
-              padding: 6px 12px;
-              background: var(--expense);
-              color: white;
-              border: none;
-              border-radius: 4px;
-              cursor: pointer;
-              font-size: 0.8rem;
-            ">Eliminar</button>
-            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="
-              padding: 6px 12px;
-              background: var(--border);
-              color: var(--text);
-              border: none;
-              border-radius: 4px;
-              cursor: pointer;
-              font-size: 0.8rem;
-            ">Cancelar</button>
-          </div>
-        </div>
-      `;
+            document.querySelector('.modal').remove();
 
-        document.getElementById('notificationContainer').appendChild(notification);
-      }
-    }
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
 
-    function confirmDelete(id, notificationElement) {
-      simulateLoad(() => {
-        const index = allData.findIndex(i => i.id === id);
-        if (index !== -1) {
-          const item = allData[index];
-          allData.splice(index, 1);
-          updateStats();
-          filterTable();
-          closeMobileActions();
+            const contenido = document.createElement('div');
+            contenido.className = 'modal-content';
 
-          if (notificationElement) {
-            notificationElement.remove();
-          }
+            contenido.innerHTML = `
+                <h3>Editar Usuario</h3>
+                <input type="hidden" id="edit-usuario-id" value="${id}">
+                
+                <div class="form-group">
+                    <label>Nombre de usuario</label>
+                    <input type="text" id="edit-username" value="${usuario.username}" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                </div>
+                
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Nueva contraseña (dejar en blanco para no cambiar)</label>
+                    <input type="password" id="edit-password" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                </div>
+                
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Nombre completo</label>
+                    <input type="text" id="edit-nombre" value="${usuario.nombre}" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                </div>
+                
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Rol</label>
+                    <select id="edit-rol" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                        <option value="usuario" ${usuario.rol === 'usuario' ? 'selected' : ''}>Usuario</option>
+                        <option value="supervisor" ${usuario.rol === 'supervisor' ? 'selected' : ''}>Supervisor</option>
+                        <option value="administrador" ${usuario.rol === 'administrador' ? 'selected' : ''}>Administrador</option>
+                    </select>
+                </div>
+                
+                <div style="margin-top:15px;">
+                    <h4>Permisos</h4>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <label><input type="checkbox" id="edit-perm-verAdminDB" ${usuario.permisos.verAdminDB ? 'checked' : ''}> Ver Admin DB</label>
+                        <label><input type="checkbox" id="edit-perm-exportarExcel" ${usuario.permisos.exportarExcel ? 'checked' : ''}> Exportar Excel</label>
+                        <label><input type="checkbox" id="edit-perm-eliminarRegistros" ${usuario.permisos.eliminarRegistros ? 'checked' : ''}> Eliminar Registros</label>
+                        <label><input type="checkbox" id="edit-perm-editarRegistros" ${usuario.permisos.editarRegistros ? 'checked' : ''}> Editar Registros</label>
+                        <label><input type="checkbox" id="edit-perm-agregarRegistros" ${usuario.permisos.agregarRegistros ? 'checked' : ''}> Agregar Registros</label>
+                        <label><input type="checkbox" id="edit-perm-verHistorialGrupos" ${usuario.permisos.verHistorialGrupos ? 'checked' : ''}> Ver Historial</label>
+                        <label><input type="checkbox" id="edit-perm-verTodosLosGrupos" ${usuario.permisos.verTodosLosGrupos ? 'checked' : ''}> Ver Todos los Grupos</label>
+                        <label><input type="checkbox" id="edit-perm-cambiarPassword" ${usuario.permisos.cambiarPassword ? 'checked' : ''}> Cambiar Contraseña</label>
+                        <label><input type="checkbox" id="edit-perm-verBitacora" ${usuario.permisos.verBitacora ? 'checked' : ''}> Ver Bitácora</label>
+                    </div>
+                </div>
+                
+                <div style="margin-top:15px;">
+                    <h4>Pregunta de seguridad</h4>
+                    <div class="form-group">
+                        <label>Pregunta</label>
+                        <input type="text" id="edit-pregunta" value="${usuario.preguntaSeguridad || ''}" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Nueva respuesta (dejar en blanco para no cambiar)</label>
+                        <input type="text" id="edit-respuesta" style="width:100%; padding:8px; border:1px solid var(--gris-borde);">
+                    </div>
+                </div>
+                
+                <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
+                    <button onclick="guardarEdicionUsuario()" style="padding:10px; background:var(--verde-texto); color:white; border:none; cursor:pointer;">Guardar</button>
+                    <button onclick="volverPanelUsuarios()" style="padding:10px; background:var(--gris-fondo); border:1px solid var(--gris-borde); cursor:pointer;">Cancelar</button>
+                </div>
+            `;
 
-          showNotification('success', 'Movimiento eliminado', 'El movimiento ha sido eliminado correctamente');
-        }
-      });
-    }
+            modal.appendChild(contenido);
+            document.body.appendChild(modal);
+        };
 
-    // ===== Menú móvil =====
-    function toggleMobileMenu() {
-      const mobileMenu = document.getElementById('mobileMenu');
-      const overlay = document.getElementById('mobileMenuOverlay');
+        // Guardar edición de usuario
+        window.guardarEdicionUsuario = async function () {
+            const id = parseInt(document.getElementById('edit-usuario-id').value);
 
-      mobileMenu.classList.toggle('show');
-      overlay.classList.toggle('show');
-      document.body.style.overflow = mobileMenu.classList.contains('show') ? 'hidden' : '';
-    }
+            const usuarioData = {
+                username: document.getElementById('edit-username').value,
+                nombre: document.getElementById('edit-nombre').value,
+                rol: document.getElementById('edit-rol').value,
+                permisos: {
+                    verAdminDB: document.getElementById('edit-perm-verAdminDB').checked,
+                    exportarExcel: document.getElementById('edit-perm-exportarExcel').checked,
+                    eliminarRegistros: document.getElementById('edit-perm-eliminarRegistros').checked,
+                    editarRegistros: document.getElementById('edit-perm-editarRegistros').checked,
+                    agregarRegistros: document.getElementById('edit-perm-agregarRegistros').checked,
+                    verHistorialGrupos: document.getElementById('edit-perm-verHistorialGrupos').checked,
+                    verTodosLosGrupos: document.getElementById('edit-perm-verTodosLosGrupos').checked,
+                    cambiarPassword: document.getElementById('edit-perm-cambiarPassword').checked,
+                    verBitacora: document.getElementById('edit-perm-verBitacora').checked,
+                    gestionarUsuarios: false
+                },
+                preguntaSeguridad: document.getElementById('edit-pregunta').value
+            };
 
-    function closeMobileMenu() {
-      const mobileMenu = document.getElementById('mobileMenu');
-      const overlay = document.getElementById('mobileMenuOverlay');
+            const password = document.getElementById('edit-password').value;
+            if (password) {
+                usuarioData.password = password;
+            }
 
-      mobileMenu.classList.remove('show');
-      overlay.classList.remove('show');
-      document.body.style.overflow = '';
-    }
+            const respuesta = document.getElementById('edit-respuesta').value;
+            if (respuesta) {
+                usuarioData.respuestaSeguridad = respuesta;
+            }
 
-    function showSectionAndClose(id) {
-      showSection(id);
-      closeMobileMenu();
-    }
+            const resultado = await db.editarUsuario(id, usuarioData);
 
-    // ===== Secciones =====
-    function showSection(id) {
-      const sections = document.querySelectorAll('section');
-      const menuItems = document.querySelectorAll('.menu a');
-      const mobileMenuItems = document.querySelectorAll('.mobile-menu-item');
+            if (resultado.success) {
+                mostrarNotificacion(resultado.message, 'exito');
+                document.querySelector('.modal').remove();
+                mostrarPanelUsuarios();
+            } else {
+                mostrarNotificacion(resultado.message, 'error');
+            }
+        };
 
-      sections.forEach(sec => sec.classList.remove('active'));
-      menuItems.forEach(item => item.classList.remove('active'));
-      mobileMenuItems.forEach(item => item.classList.remove('active'));
+        // Toggle usuario activo
+        window.toggleUsuarioActivo = async function (id) {
+            const resultado = await db.toggleUsuarioActivo(id);
+            if (resultado.success) {
+                mostrarNotificacion(resultado.message, 'exito');
+                document.querySelector('.modal').remove();
+                mostrarPanelUsuarios();
+            } else {
+                mostrarNotificacion(resultado.message, 'error');
+            }
+        };
 
-      document.getElementById(id).classList.add('active');
+        // Eliminar usuario
+        window.eliminarUsuarioConfirm = async function (id) {
+            if (confirm('¿Está seguro de eliminar este usuario?')) {
+                const resultado = await db.eliminarUsuario(id);
+                if (resultado.success) {
+                    mostrarNotificacion(resultado.message, 'exito');
+                    document.querySelector('.modal').remove();
+                    mostrarPanelUsuarios();
+                } else {
+                    mostrarNotificacion(resultado.message, 'error');
+                }
+            }
+        };
 
-      menuItems.forEach(item => {
-        if (item.getAttribute('onclick')?.includes(`'${id}'`)) {
-          item.classList.add('active');
-        }
-      });
+        // Mostrar panel de Admin DB
+        window.mostrarPanelAdminDB = function () {
+            if (!db.tienePermiso('verAdminDB')) {
+                mostrarNotificacion('No tiene permiso para ver esta sección', 'error');
+                return;
+            }
 
-      mobileMenuItems.forEach(item => {
-        if (item.getAttribute('onclick')?.includes(`'${id}'`)) {
-          item.classList.add('active');
-        }
-      });
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
 
-      if (id === 'transacciones') {
-        setTimeout(() => {
-          renderPagination();
-        }, 100);
-      } else if (id === 'estadisticas') {
-        updateStats();
-      }
-    }
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width:800px;">
+                    <h2 style="margin-bottom:20px;">Administración de Base de Datos</h2>
+                    
+                    <div style="margin-bottom:20px;">
+                        <h3>Trabajadores</h3>
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr style="background:var(--charcoal); color:white;">
+                                    <th style="padding:8px;">Código</th>
+                                    <th style="padding:8px;">Nombre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${db.getTrabajadores().map(t => `
+                                    <tr style="border-bottom:1px solid var(--gris-borde);">
+                                        <td style="padding:8px;">${t.codigo}</td>
+                                        <td style="padding:8px;">${t.nombre}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top:20px;">
+                        <h3>Actividades</h3>
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr style="background:var(--charcoal); color:white;">
+                                    <th style="padding:8px;">Código</th>
+                                    <th style="padding:8px;">Actividad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${db.getActividades().map(a => `
+                                    <tr style="border-bottom:1px solid var(--gris-borde);">
+                                        <td style="padding:8px;">${a.codigo}</td>
+                                        <td style="padding:8px;">${a.nombre}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button onclick="this.closest('.modal').remove()" style="width:100%; margin-top:20px; padding:10px; background:var(--charcoal); color:white; border:none; cursor:pointer;">Cerrar</button>
+                </div>
+            `;
 
-    // ===== Menú de acciones para móvil =====
-    const mobileActionsMenu = document.getElementById('mobileActionsMenu');
+            document.body.appendChild(modal);
+        };
 
-    function openMobileActions(itemId) {
-      currentItemId = itemId;
-      mobileActionsMenu.classList.add('show');
-      document.body.style.overflow = 'hidden';
-    }
+        // Hacer funciones globales
+        window.switchTab = switchTab;
+        window.abrirFormulario = abrirFormulario;
+        window.guardar = guardar;
+        window.limpiar = limpiar;
+        window.editar = editar;
+        window.eliminar = eliminar;
+        window.abrirModalGrupo = abrirModalGrupo;
+        window.cerrarModalGrupo = cerrarModalGrupo;
+        window.finalizarGuardarGrupo = finalizarGuardarGrupo;
+        window.verDetalleGrupo = verDetalleGrupo;
+        window.cerrarModalDetalle = cerrarModalDetalle;
+        window.editarEncargadoGrupo = editarEncargadoGrupo;
+        window.guardarEdicionEncargado = guardarEdicionEncargado;
+        window.editarRegistrosGrupo = editarRegistrosGrupo;
+        window.agregarRegistroVacio = agregarRegistroVacio;
+        window.eliminarRegistroDeGrupo = eliminarRegistroDeGrupo;
+        window.guardarEdicionRegistros = guardarEdicionRegistros;
+        window.cerrarModalEditarRegistros = cerrarModalEditarRegistros;
+        window.eliminarGrupo = eliminarGrupo;
+        window.descargarGrupoCSV = descargarGrupoCSV;
+        window.exportarExcel = exportarExcel;
 
-    function closeMobileActions() {
-      mobileActionsMenu.classList.remove('show');
-      document.body.style.overflow = '';
-    }
-
-    function viewDetailAction() {
-      if (currentItemId) {
-        openDetailModal(currentItemId);
-        closeMobileActions();
-      }
-    }
-
-    function editAction() {
-      if (currentItemId) {
-        editItem(currentItemId);
-        closeMobileActions();
-      }
-    }
-
-    function deleteAction() {
-      if (currentItemId) {
-        deleteItem(currentItemId);
-        closeMobileActions();
-      }
-    }
-
-    // ===== Event Listeners =====
-    document.addEventListener('click', (e) => {
-      if (mobileActionsMenu.classList.contains('show') &&
-        !e.target.closest('.mobile-actions-content') &&
-        !e.target.closest('.mobile-actions-btn')) {
-        closeMobileActions();
-      }
-
-      if (modal.classList.contains('show') &&
-        !e.target.closest('.modal-content') &&
-        e.target.classList.contains('modal')) {
-        closeModal();
-      }
-
-      if (detailModal.classList.contains('show') &&
-        !e.target.closest('.detail-modal-content') &&
-        e.target.classList.contains('detail-modal')) {
-        closeDetailModal();
-      }
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeMobileActions();
-        closeModal();
-        closeDetailModal();
-      }
-    });
-
-    // Prevenir scroll horizontal en formularios
-    const modalContent = document.querySelector('.modal-content');
-    modalContent.addEventListener('scroll', function (e) {
-      if (this.scrollLeft !== 0) {
-        this.scrollLeft = 0;
-      }
-    });
-
-    window.addEventListener('resize', () => {
-      renderPagination();
-    });
-
-    // Inicializar
-    showSection('inicio');
-  </script>
+        // Inicializar la aplicación
+        renderizarApp();
+    </script>
 </body>
 
 </html>
